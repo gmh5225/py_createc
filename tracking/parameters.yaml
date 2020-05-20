@@ -1,0 +1,37 @@
+#const height scan, height range
+StartHeight: -2.0
+EndHeight:  -0.0
+Total_steps: 21
+#bias range
+Bias_Range_mV: [0] #List every bias, needs at leat one element
+
+g_filename_len: 18 # The last 18 char is sth. like A191214.245959.dat
+
+
+#Use one image as a template. Before each scan, use the parameters of the template to scan the current location, then use phase-correlation to find where to move,
+#so that after the movement, the new location is the same as the template.
+
+g_reposition_delay: 5 #seconds before reposition for alignment to template
+
+#template file, const current scan
+template_file: '\Cu(111)\2020-05-15\A200519.100455.dat'
+template_folder: 'H:\Createc\STMDATA'
+
+use_last_as_template: True
+
+shift_reg_channel: 1 # channel number for shift registration, i.e. alignment
+subpixel_reg: 1 # precision for alignment, use 1, 10 or 100
+
+Chmode:
+    mode: 1 # 1 for const height, 0 for const current
+    rotation: 0.0
+    ddeltaX: 128 #scan speed
+    deltaX_dac: 6 #pixel size in x
+    channels_code: 30
+
+Ccmode:
+    mode: 0
+    rotation: 0.0
+    ddeltaX: 20
+    deltaX_dac: 6
+    channels_code: 3
