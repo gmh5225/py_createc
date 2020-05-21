@@ -12,8 +12,11 @@ import re
 import pandas as pd
 from itertools import compress
 import io
+import os
 
-with open('./py_createc/Createc_global_const.yaml', 'rt') as f:
+dir = os.path.dirname(__file__)
+cgc_file = os.path.join(dir, 'Createc_global_const.yaml')
+with open(cgc_file, 'rt') as f:
     cgc = yaml.safe_load(f.read())
 
 class GENERIC_FILE:
