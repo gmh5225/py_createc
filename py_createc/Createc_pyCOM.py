@@ -32,18 +32,16 @@ class CreatecWin32():
         sign = np.int(np.sign(end-init))
         for i in range(np.int(init)+sign, np.int(end)+ sign, sign):
             time.sleep(0.01)
-    #        print (10**((i)/100.))
             self.client.setparam('Biasvolt.[mV]', bias_pole*10**((i)/100.))
         self.client.setparam('Biasvolt.[mV]', _end_bias_mV)
         
-    def ramp_bias_mV(self, end_bias_mV, init_bias_mV = None):
+    def ramp_bias_mV(self, end_bias_mV):
         """
         Ramp bias from one value to another value
-        input: end_bias in mV, and optionally init_bias in mV
+        input: end_bias in mV
         output: None
         """
-        if init_bias_mV is None:
-            init_bias_mV = float(self.client.getparam('Biasvolt.[mV]'))
+        init_bias_mV = float(self.client.getparam('Biasvolt.[mV]'))
         if init_bias_mV * end_bias_mV == 0: pass
         elif init_bias_mV == end_bias_mV: pass
         elif init_bias_mV * end_bias_mV > 0:
@@ -58,19 +56,24 @@ class CreatecWin32():
             else:
                 self.client.setparam('Biasvolt.[mV]', end_bias_mV)
                 
-    def ramp_current_log(self, end_FBLogIset, init_FBLogIset = None):
+    def ramp_current_log(self, end_FBLogIset):
         """
         Ramp current from one value to another value
-        input: end_current in Log10 form and optionally initial current in Log10 form
+        input: end_current in pA
         output: None
         """
-        if np.float(self.show_current_log_value()) == end_FBLogIset: return
-        if init_FBLogIset is None:
-            init_FBLogIset = np.float(self.client.getparam('FBLogIset').split()[-1])
-        sign = np.sign(end_FBLogIset - init_FBLogIset)
-        for i in range(np.int(init_FBLogIset + sign), np.int(end_FBLogIset + sign), np.int(sign)):
-            time.sleep(0.001)
-            self.client.setparam('FBLogIset', i*1.)
+        init_FBLogIset = np.float(self.client.getparam('FBLogIset').split()[-1])
+        init_FBLogIset = np.int(init_FBLogIset)
+        end_FBLogIset = np.int(end_FBLogIset)
+        if init_FBLogIset == end_FBLogIset: return
+        init = np.int(100 * np.log10(np.abs(init_FBLogIset)))
+        end = np.int(100 * np.log10(np.abs(end_FBLogIset)))
+        one_step = np.int(np.sign(end - init))
+        now = init
+        while now!=end:
+            time.sleep(0.01)
+            now += one_step
+            self.client.setparam('FBLogIset', 10**(now/100.))
         self.client.setparam('FBLogIset', end_FBLogIset)
     
     def show_current_log_value(self):
