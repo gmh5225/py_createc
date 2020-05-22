@@ -15,6 +15,9 @@ Log_Interval = 60  # Logging every X seconds
 
 
 def createc_fbz():
+    """   
+    function returning Createc channel feedback z value
+    """
     import py_createc.Createc_pyCOM as cp
     createc = cp.CreatecWin32()
     return createc.client.getdacvalfb()
@@ -32,60 +35,33 @@ def createc_adc(channel, kelvin=False, arg0=1):
         data = py_createc.DT670.Volt2Kelvin(data)
     return data
 
-	
-def f_createc_ADC2_T():
-    """   
-    function returning Createc channel ADC2 and converting to Temperature
-    
-    Returns
-    -------
-    (datetime, float)
-        A tuple of datetime object and the current streaming data
-    """
-    import Createc_pyCOM as cp
-    import DT670
-    createc = cp.CreatecWin32()
-    ADC2 = createc.client.getadcvalf(1, 2)
-    return (datetime.datetime.now(), DT670.Volt2Kelvin(ADC2))
-
-
-def f_createc_ADC3_T():
-    """   
-    function returning Createc channel ADC3 and converting to Temperature
-    
-    Returns
-    -------
-    (datetime, float)
-        A tuple of datetime object and the current streaming data
-    """
-    import Createc_pyCOM as cp
-    import DT670
-    createc = cp.CreatecWin32()
-    ADC3 = createc.client.getadcvalf(1, 3)
-    return (datetime.datetime.now(), DT670.Volt2Kelvin(ADC3))
 
 def f_cpu():
+    """   
+    function returning cpu in percetage
+    """
     import psutil
-    data = psutil.cpu_percent(percpu=False)
-    data = (datetime.datetime.now(), data)
-    return data
+    return psutil.cpu_percent(percpu=False)
 
 
 def f_random():
-    data = np.random.rand()
-    data = (datetime.datetime.now(), data)
-    # print (data)
-    return data
+    """   
+    function returning a random value
+    """
+    return np.random.rand()
 
 
 def f_random2():
+    """   
+    Another function returning a random value
+    """
     try:
-        prev = f_random2.prev
+        data = f_random2.data
     except AttributeError:
-        prev = 0
-    prev += np.random.uniform(-1, 1) * 0.1
-    f_random2.prev = prev
-    return (datetime.datetime.now(), prev)
+        data = 0
+    data += np.random.uniform(-1, 1) * 0.1
+    f_random2.data = data
+    return data
 
 
 def f_sinewave():
@@ -94,12 +70,11 @@ def f_sinewave():
 
     Returns
     ------
-    (datetime, float)
-        A tuple of datetime object and the current streaming data
+    float
+        the current streaming data
     """
-    data = np.sin(time.time()/1.)
-    data = (datetime.datetime.now(), data)
-    return data
+    return np.sin(time.time()/1.)
+
 
 
 def f_emitter(p=0.1):
@@ -112,11 +87,16 @@ def f_emitter(p=0.1):
 
     Returns
     ------
-    (datetime, float)
-        A tuple of datetime object and a random float between (0,1)
+    float
+        the current streaming data
     """
     v = np.random.rand()        
-    return (datetime.datetime.now(), 0. if v>p else v)
+    return 0. if v>p else v
+
+
+"""
+The codes below are for archive
+"""
 
 
 def g_emitter(p=0.1):
