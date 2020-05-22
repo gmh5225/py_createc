@@ -56,18 +56,21 @@ class CreatecWin32():
             else:
                 self.client.setparam('Biasvolt.[mV]', end_bias_mV)
                 
-    def ramp_current_log(self, end_FBLogIset):
+    def ramp_current_pA(self, end_FBLogIset):
         """
         Ramp current from one value to another value
         input: end_current in pA
         output: None
         """
         init_FBLogIset = np.float(self.client.getparam('FBLogIset').split()[-1])
-        init_FBLogIset = np.int(init_FBLogIset)
-        end_FBLogIset = np.int(end_FBLogIset)
         if init_FBLogIset == end_FBLogIset: return
-        init = np.int(100 * np.log10(np.abs(init_FBLogIset)))
-        end = np.int(100 * np.log10(np.abs(end_FBLogIset)))
+        # init_FBLogIset = np.int(init_FBLogIset)
+        # end_FBLogIset = np.int(end_FBLogIset)
+        # if init_FBLogIset == 0:
+        _init_FBLogIset = init_FBLogIset if init_FBLogIset else 0.1
+        _end_FBLogIset = end_FBLogIset if end_FBLogIset else 0.1
+        init = np.int(100 * np.log10(np.abs(_init_FBLogIset)))
+        end = np.int(100 * np.log10(np.abs(_end_FBLogIset)))
         one_step = np.int(np.sign(end - init))
         now = init
         while now!=end:
