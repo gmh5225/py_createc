@@ -114,7 +114,7 @@ def make_document(doc, buffer_q, labels):
                            y_axis_label=labels[i],
                            toolbar_location=None, active_drag=None, active_scroll=None, tools=[hover]))
         figs[i].line(x='time', y='data', source=sources[i], line_color='red')
-        annotations.append(Label(x=10, y=10, text='text', text_font_size='10vm', text_color='white',
+        annotations.append(Label(x=10, y=10, text='text', text_font_size='10vh', text_color='white',
                                  x_units='screen', y_units='screen', background_fill_color=None))
         figs[i].add_layout(annotations[i])
 
