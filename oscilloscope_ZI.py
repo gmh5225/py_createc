@@ -114,10 +114,11 @@ def make_document(doc, buffer_q, labels):
                            y_axis_label=labels[i],
                            toolbar_location=None, active_drag=None, active_scroll=None, tools=[hover]))
         figs[i].line(x='time', y='data', source=sources[i], line_color='red')
-        annotations.append(Label(x=10, y=10, text='text', text_font_size='100px', text_color='white',
+        annotations.append(Label(x=10, y=10, text='text', text_font_size='10vw', text_color='white',
                                  x_units='screen', y_units='screen', background_fill_color=None))
         figs[i].add_layout(annotations[i])
-
+        # annotations[i].text_font_size = str(figs[i].plot_height * 0.01)+'rem'
+        
     doc.theme = 'dark_minimal'
     doc.title = "Oscilloscope"
     doc.add_root(column([fig for fig in figs], sizing_mode='stretch_both'))
@@ -129,6 +130,7 @@ if __name__ == '__main__':
     producer_funcs = [dp.createc_fbz,
                       partial(dp.createc_adc, channel=0, kelvin=False)]
                       
+    # producer_funcs = [dp.f_emitter, dp.f_sinewave]
     y_labels = ['Feedback Z', 'Current']
 
     # Two queues, one for graphing one for logging
