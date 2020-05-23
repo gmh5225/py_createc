@@ -66,8 +66,12 @@ for ch_zoff in Height_Range_Angstrom:
         
         logger.info('Align to template')
         img_src = DAT_IMG(cc_file_4align)
+        # shift = [rt(level_correction(gaussian(ri(src))), level_correction(gaussian(ri(des))))[0] 
+        #          for src, des in zip(img_src.img_array_list, img_des.img_array_list)]
+        # shift = np.mean(shift, axis=0)
         shift = [rt(level_correction(gaussian(ri(src))), level_correction(gaussian(ri(des))))[0] 
-                 for src, des in zip(img_src.img_array_list, img_des.img_array_list)]
+                  for src, des in zip([img_src.img_array_list[i] for i in [0,2]], 
+                                      [img_des.img_array_list[i] for i in [0,2]])]
         shift = np.mean(shift, axis=0)
         logger.info('[dy, dx] = {}'.format(shift))
         createc.setxyoffpixel(dx=shift[1], dy=shift[0])
