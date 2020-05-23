@@ -20,6 +20,7 @@ import numpy as np
 import datetime as dt
 from threading import Thread, main_thread
 import queue
+import argparse
 
 
 Scope_Points = 1200  # total points to show in each channel in the scope
@@ -44,7 +45,7 @@ def data_producer(funcs, graph_q, logger_q):
         time.sleep(Stream_Interval)
 
 
-def logger(buffer_q, labels):
+def logger(buffer_q, labels, logger_cfg_file):
     """
     A logger function logging result to stdout and/or file
     :param buffer_q: a queue of data from data producer
@@ -54,7 +55,7 @@ def logger(buffer_q, labels):
     import yaml
     import logging.config
 
-    with open('./osc/logging_stream_ZI.yaml', 'rt') as f:
+    with open(logger_cfg_file, 'rt') as f:
         config = yaml.safe_load(f.read())
     logging.config.dictConfig(config)
     logger = logging.getLogger(__name__)
@@ -126,13 +127,32 @@ def make_document(doc, buffer_q, labels):
 
 
 if __name__ == '__main__':
-    # All the channels, and the labels, formatted as lists
-    producer_funcs = [dp.createc_fbz,
-                      partial(dp.createc_adc, channel=0, kelvin=False)]
-                      
-    # producer_funcs = [dp.f_emitter, dp.f_sinewave]
-    y_labels = ['Feedback Z', 'Current']
+    parser = argparse.ArgumentParser(description='An oscilloscope')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-z", "-i", "--zi", help="show feedback Z and current", action="store_true")
+    group.add_argument("-t", "--temperature", help="show temperatures", action="store_true")
+    group.add_argument("-r", "--random", help="show random values", action="store_true")
+    args = parser.parse_args()
 
+    if args.zi:
+        producer_funcs = [dp.createc_fbz,
+                          partial(dp.createc_adc, channel=0, kelvin=False)]
+        y_labels = ['Feedback Z', 'Current']
+        logger_cfg = './osc/logging_stream_ZI.yaml'  
+    elif args.temperature:
+        producer_funcs = [partial(dp.createc_adc, channel=2, kelvin=True), 
+                          partial(dp.createc_adc, channel=3, kelvin=True)]
+        y_labels = ['STM(K)', 'LHe(K)']
+        logger_cfg = './osc/logging_stream_T.yaml'
+    elif args.random:
+        producer_funcs = [dp.f_random, dp.f_random2]
+        y_labels = ['Random1', 'Random2']
+        logger_cfg = './osc/logging_stream_R.yaml'
+    else:
+        producer_funcs = [dp.f_cpu, dp.f_ram]                     
+        y_labels = ['CPU', 'RAM']
+        logger_cfg = './osc/logging_stream_C.yaml'
+    
     # Two queues, one for graphing one for logging
     channels = len(producer_funcs)
     graph_q = queue.Queue()
@@ -141,7 +161,7 @@ if __name__ == '__main__':
     # Start the data producer thread and the logger thread
     producer = Thread(target=data_producer, args=(producer_funcs, graph_q, logger_q))
     producer.start()
-    logging = Thread(target=logger, args=(logger_q, y_labels))
+    logging = Thread(target=logger, args=(logger_q, y_labels, logger_cfg))
     logging.start()
     print('Start')
 

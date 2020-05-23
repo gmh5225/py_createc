@@ -44,6 +44,14 @@ def f_cpu():
     return psutil.cpu_percent(percpu=False)
 
 
+def f_ram():
+    """   
+    function returning RAM in percetage
+    """
+    import psutil
+    return psutil.swap_memory().percent
+
+
 def f_random():
     """   
     function returning a random value
