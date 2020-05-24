@@ -130,7 +130,7 @@ if __name__ == '__main__':
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-z", "-i", "--zi", help="show feedback Z and current", action="store_true")
     group.add_argument("-t", "--temperature", help="show temperatures", action="store_true")
-    group.add_argument("-r", "--random", help="show random values", action="store_true")
+    group.add_argument("-c", "--cpu", help="show cpu usage", action="store_true")
     args = parser.parse_args()
 
     if args.zi:
@@ -143,15 +143,14 @@ if __name__ == '__main__':
                           partial(dp.createc_adc, channel=3, kelvin=True)]
         y_labels = ['STM(K)', 'LHe(K)']
         logger_cfg = './osc/logging_stream_T.yaml'
-    elif args.random:
+    elif args.cpu:
+        producer_funcs = [dp.f_cpu]                     
+        y_labels = ['CPU']
+        logger_cfg = './osc/logging_stream_C.yaml'
+    else:
         producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
         y_labels = ['Random1', 'Random2', 'Emitter']
-        logger_cfg = './osc/logging_stream_R.yaml'
-    else:
-        producer_funcs = [dp.f_cpu, dp.f_ram]                     
-        y_labels = ['CPU', 'RAM']
-        logger_cfg = './osc/logging_stream_C.yaml'
-    
+        logger_cfg = './osc/logging_stream_R.yaml'   
     # Two queues, one for graphing one for logging
     channels = len(producer_funcs)
     graph_q = queue.Queue()
