@@ -145,8 +145,8 @@ if __name__ == '__main__':
         y_labels = ['STM(K)', 'LHe(K)']
         logger_cfg = './osc/logging_stream_T.yaml'
     elif args.random:
-        producer_funcs = [dp.f_random, dp.f_random2]
-        y_labels = ['Random1', 'Random2']
+        producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
+        y_labels = ['Random1', 'Random2', 'Emitter']
         logger_cfg = './osc/logging_stream_R.yaml'
     else:
         producer_funcs = [dp.f_cpu, dp.f_ram]                     
