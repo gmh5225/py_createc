@@ -1,7 +1,7 @@
 #const height scan, height range
-StartHeight: -0.5
+StartHeight: -2.0
 EndHeight:  -0.0
-Total_steps: 6
+Total_steps: 21
 #bias range
 Bias_Range_mV: [0] #List every bias, needs at leat one element
 
@@ -22,16 +22,13 @@ use_last_as_template: True
 shift_reg_channel: 1 # channel number for shift registration, i.e. alignment
 subpixel_reg: 1 # precision for alignment, use 1, 10 or 100
 
+deltaX_dac: 8 #pixel size in x
 Chmode:
     mode: 1 # 1 for const height, 0 for const current
-    rotation: 0.0
     ddeltaX: 128 #scan speed
-    deltaX_dac: 10 #pixel size in x
     channels_code: 30
 
 Ccmode:
     mode: 0
-    rotation: 0.0
     ddeltaX: 20
-    deltaX_dac: 10
     channels_code: 3

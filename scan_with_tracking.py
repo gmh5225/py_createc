@@ -95,7 +95,7 @@ for ch_zoff in Height_Range_Angstrom:
         createc.pre_scan_config_01(params['Ccmode']['mode'],
                                    img_des.rotation,
                                    img_des.ddeltaX,
-                                   params['Ccmode']['deltaX_dac'],
+                                   params['deltaX_dac'],
                                    params['Ccmode']['channels_code'])
         createc.do_scan_01()
         time.sleep(2)
@@ -106,7 +106,7 @@ for ch_zoff in Height_Range_Angstrom:
         createc.pre_scan_config_01(params['Chmode']['mode'],
                                    img_des.rotation,
                                    params['Chmode']['ddeltaX'],
-                                   params['Chmode']['deltaX_dac'],
+                                   params['deltaX_dac'],
                                    params['Chmode']['channels_code'],
                                    ch_zoff, ch_bias)
         createc.do_scan_01()
