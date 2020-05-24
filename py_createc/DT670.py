@@ -11,7 +11,7 @@ para2={'ZL':1.112300, 'ZU':1.383730, 'A': [17.244846, -7.964373, 0.625343, -0.10
 para3={'ZL':0.909416, 'ZU':1.122751, 'A': [82.017868, -59.064244, -1.356615, 1.055396, 0.837341, 0.431875, 0.440840, -0.061588, 0.209414, -0.120882, 0.055734, -0.035974]}
 para4={'ZL':0.070000, 'ZU':0.997990, 'A': [306.592351, -205.393808, -4.695680, -2.031603, -0.071792, -0.437682, 0.176352, -0.182516, 0.064687, -0.027019, 0.010019]}
 
-def Chebychev(Z, p):
+def _Chebychev(Z, p):
     X = ((Z-p['ZL'])-(p['ZU']-Z))/(p['ZU']-p['ZL'])
     T=0
     for I, A in enumerate(p['A']):
@@ -20,10 +20,10 @@ def Chebychev(Z, p):
 
 def Volt2Kelvin(volt):
     if volt >=1.334990:
-        return Chebychev(volt, para1)
+        return _Chebychev(volt, para1)
     elif volt >=1.1226855:
-        return Chebychev(volt, para2)
+        return _Chebychev(volt, para2)
     elif volt >=0.986974:
-        return Chebychev(volt, para3)
+        return _Chebychev(volt, para3)
     else:
-        return Chebychev(volt, para4)
+        return _Chebychev(volt, para4)

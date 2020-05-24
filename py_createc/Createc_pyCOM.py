@@ -79,9 +79,9 @@ class CreatecWin32():
             self.client.setparam('FBLogIset', 10**(now/100.))
         self.client.setparam('FBLogIset', end_FBLogIset)
     
-    def show_current_log_value(self):
+    def current_pA(self):
         """
-        Return current as log value
+        Return current in pA
         """
         return self.client.getparam('FBLogIset')
     
