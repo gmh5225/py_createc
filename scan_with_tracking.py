@@ -9,7 +9,8 @@ Autofilesave should be OFF
 
 """
 from py_createc.Createc_pyFile import DAT_IMG
-from skimage.feature import register_translation as rt
+#from skimage.feature import register_translation as rt
+from skimage.registration import phase_cross_correlation as pcc
 from skimage.exposure import rescale_intensity as ri
 from skimage.filters import gaussian
 import numpy as np
@@ -69,7 +70,7 @@ for ch_zoff in Height_Range_Angstrom:
         # shift = [rt(level_correction(gaussian(ri(src))), level_correction(gaussian(ri(des))))[0] 
         #          for src, des in zip(img_src.img_array_list, img_des.img_array_list)]
         # shift = np.mean(shift, axis=0)
-        shift = [rt(level_correction(gaussian(ri(src))), level_correction(gaussian(ri(des))))[0] 
+        shift = [pcc(level_correction(gaussian(ri(src))), level_correction(gaussian(ri(des))))[0] 
                   for src, des in zip([img_src.img_array_list[i] for i in [0,2]], 
                                       [img_des.img_array_list[i] for i in [0,2]])]
         shift = np.mean(shift, axis=0)
@@ -77,6 +78,8 @@ for ch_zoff in Height_Range_Angstrom:
         createc.setxyoffpixel(dx=shift[1], dy=shift[0])
         time.sleep(params['g_reposition_delay'])
             
+
+        # for testing shift registration
         """
         import random
         createc.do_scan_01()
@@ -91,6 +94,8 @@ for ch_zoff in Height_Range_Angstrom:
         createc.setxyoffpixel(dx=shift[1], dy=shift[0])
         time.sleep(params['g_reposition_delay'])        
         """
+
+
         logger.info('pre-scan for post-alignment')
         createc.pre_scan_config_01(params['Ccmode']['mode'],
                                    img_des.rotation,
