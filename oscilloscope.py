@@ -118,7 +118,6 @@ def make_document(doc, buffer_q, labels):
         annotations.append(Label(x=10, y=10, text='text', text_font_size='10vh', text_color='white',
                                  x_units='screen', y_units='screen', background_fill_color=None))
         figs[i].add_layout(annotations[i])
-        # annotations[i].text_font_size = str(figs[i].plot_height * 0.01)+'rem'
         
     doc.theme = 'dark_minimal'
     doc.title = "Oscilloscope"
@@ -167,7 +166,7 @@ if __name__ == '__main__':
 
     # Main thread for graphing
     print('Opening Bokeh application on http://localhost:5006/')
-    server = Server({'/ZI': partial(make_document, buffer_q=graph_q, labels=y_labels)})
+    server = Server({'/': partial(make_document, buffer_q=graph_q, labels=y_labels)})
     server.start()
     server.io_loop.add_callback(server.show, "/")
     try:
