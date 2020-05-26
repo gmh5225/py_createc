@@ -23,7 +23,7 @@ import queue
 import argparse
 
 
-Scope_Points = 1200  # total points to show in each channel in the scope
+Scope_Points = 240  # total points to show in each channel in the scope
 Log_Avg_Len = 5  # Average through recent X points for logging
 Log_Interval = 60  # Logging every X seconds
 Stream_Interval = 0.2  # I/O data fetching interval in seconds (Stream_Interval <= Consumer_Timeout)
@@ -103,6 +103,7 @@ def make_document(doc, buffer_q, labels):
     sources = [ColumnDataSource(dict(time=[], data=[])) for _ in range(len(labels))]
     figs = []
     annotations = []
+    font_size = str(20/len(labels))+'vh'
     hover = HoverTool(
         tooltips=[
             ("value", "$y"),
@@ -115,7 +116,7 @@ def make_document(doc, buffer_q, labels):
                            y_axis_label=labels[i],
                            toolbar_location=None, active_drag=None, active_scroll=None, tools=[hover]))
         figs[i].line(x='time', y='data', source=sources[i], line_color='red')
-        annotations.append(Label(x=10, y=10, text='text', text_font_size='10vh', text_color='white',
+        annotations.append(Label(x=10, y=10, text='text', text_font_size=font_size, text_color='white',
                                  x_units='screen', y_units='screen', background_fill_color=None))
         figs[i].add_layout(annotations[i])
         
@@ -131,7 +132,7 @@ if __name__ == '__main__':
     group.add_argument("-z", "-i", "--zi", help="show feedback Z and current", action="store_true")
     group.add_argument("-t", "--temperature", help="show temperatures", action="store_true")
     group.add_argument("-c", "--cpu", help="show cpu usage", action="store_true")
-    group.add_argument("-f", "--frequency", help="show frequency", action="store_true")
+    group.add_argument("-a", "--adc", help="show ADC signals board 1..2 channel 0..5", action="store_true")
     args = parser.parse_args()
 
     if args.zi:
@@ -148,10 +149,21 @@ if __name__ == '__main__':
         producer_funcs = [dp.f_cpu]                     
         y_labels = ['CPU']
         logger_cfg = './osc/logging_stream_C.yaml'
-    elif args.frequency:
-        producer_funcs = [partial(dp.createc_adc, channel=2, kelvin=True, board=1)]                     
-        y_labels = ['Frequency']
-        logger_cfg = './osc/logging_stream_R.yaml'
+    elif args.adc:
+        producer_funcs = [partial(dp.createc_adc, channel=0, board=1),
+                          partial(dp.createc_adc, channel=1, board=1),
+                          partial(dp.createc_adc, channel=2, board=1),
+                          partial(dp.createc_adc, channel=3, board=1),
+                          partial(dp.createc_adc, channel=4, board=1),
+                          partial(dp.createc_adc, channel=5, board=1),
+                          partial(dp.createc_adc, channel=0, board=2),
+                          partial(dp.createc_adc, channel=1, board=2),
+                          partial(dp.createc_adc, channel=2, board=2),
+                          partial(dp.createc_adc, channel=3, board=2),
+                          partial(dp.createc_adc, channel=4, board=2),
+                          partial(dp.createc_adc, channel=5, board=2)]             
+        y_labels = [str(i) for i in range(12)]
+        logger_cfg = './osc/logging_stream_A.yaml'
     else:
         producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
         y_labels = ['Random1', 'Random2', 'Emitter']
