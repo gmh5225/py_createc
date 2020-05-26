@@ -23,13 +23,13 @@ def createc_fbz():
     return createc.client.getdacvalfb()
 
 
-def createc_adc(channel, kelvin=False, arg0=1):
+def createc_adc(channel, kelvin=False, board=1):
     """   
     function returning Createc channel ADC value
     """
     import py_createc.Createc_pyCOM as cp
     createc = cp.CreatecWin32()
-    data = createc.client.getadcvalf(arg0, channel)
+    data = createc.client.getadcvalf(board, channel)
     if kelvin:
         import py_createc.DT670
         data = py_createc.DT670.Volt2Kelvin(data)

@@ -131,22 +131,27 @@ if __name__ == '__main__':
     group.add_argument("-z", "-i", "--zi", help="show feedback Z and current", action="store_true")
     group.add_argument("-t", "--temperature", help="show temperatures", action="store_true")
     group.add_argument("-c", "--cpu", help="show cpu usage", action="store_true")
+    group.add_argument("-f", "--frequency", help="show frequency", action="store_true")
     args = parser.parse_args()
 
     if args.zi:
         producer_funcs = [dp.createc_fbz,
-                          partial(dp.createc_adc, channel=0, kelvin=False)]
+                          partial(dp.createc_adc, channel=0, kelvin=False, board=1)]
         y_labels = ['Feedback Z', 'Current']
         logger_cfg = './osc/logging_stream_ZI.yaml'  
     elif args.temperature:
-        producer_funcs = [partial(dp.createc_adc, channel=2, kelvin=True), 
-                          partial(dp.createc_adc, channel=3, kelvin=True)]
+        producer_funcs = [partial(dp.createc_adc, channel=2, kelvin=True, board=1), 
+                          partial(dp.createc_adc, channel=3, kelvin=True, board=1)]
         y_labels = ['STM(K)', 'LHe(K)']
         logger_cfg = './osc/logging_stream_T.yaml'
     elif args.cpu:
         producer_funcs = [dp.f_cpu]                     
         y_labels = ['CPU']
         logger_cfg = './osc/logging_stream_C.yaml'
+    elif args.frequency:
+        producer_funcs = [partial(dp.createc_adc, channel=2, kelvin=True, board=1)]                     
+        y_labels = ['Frequency']
+        logger_cfg = './osc/logging_stream_R.yaml'
     else:
         producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
         y_labels = ['Random1', 'Random2', 'Emitter']
