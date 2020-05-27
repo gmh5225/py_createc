@@ -41,7 +41,7 @@ logger = logging.getLogger('main')
 with open('./tracking/parameters.yaml', 'rt') as f:
     params = yaml.safe_load(f.read())
     
-logger.info('Start.')    
+logger.info('Start.'+'*'*30)    
 createc = CreatecWin32()
 template = createc.savedatfilename if params['use_last_as_template'] else params['template_folder']+params['template_file']
 img_des = DAT_IMG(template)
@@ -63,7 +63,7 @@ for ch_zoff in Height_Range_Angstrom:
         time.sleep(2)
         createc.client.quicksave()
         cc_file_4align = createc.client.savedatfilename
-        logger.info('cc_file_4align '+ cc_file_4align[-params['g_filename_len']:])
+        logger.info('cc_file_4align: ' + cc_file_4align[-params['g_filename_len']:])
         
         logger.info('Align to template')
         img_src = DAT_IMG(cc_file_4align)
@@ -86,7 +86,7 @@ for ch_zoff in Height_Range_Angstrom:
         time.sleep(2)
         createc.client.quicksave()
         cc_file_after_align = createc.client.savedatfilename
-        logger.info('cc_file_after_align '+ cc_file_after_align[-params['g_filename_len']:])
+        logger.info('cc_file_after_align: '+ cc_file_after_align[-params['g_filename_len']:])
         
         logger.info('Mock drifting')
         shift = random.choice([50, -50]), random.choice([50, -50])
@@ -96,7 +96,7 @@ for ch_zoff in Height_Range_Angstrom:
         """
 
 
-        logger.info('pre-scan for post-alignment')
+        logger.info('const current mode scan')
         createc.pre_scan_config_01(params['Ccmode']['mode'],
                                    img_des.rotation,
                                    img_des.ddeltaX,
@@ -105,7 +105,7 @@ for ch_zoff in Height_Range_Angstrom:
         createc.do_scan_01()
         time.sleep(2)
         createc.client.quicksave()
-        logger.info(createc.client.savedatfilename[-params['g_filename_len']:])
+        logger.info('cc: ' + createc.client.savedatfilename[-params['g_filename_len']:])
     
         logger.info('const height mode scan')
         createc.pre_scan_config_01(params['Chmode']['mode'],
@@ -117,7 +117,7 @@ for ch_zoff in Height_Range_Angstrom:
         createc.do_scan_01()
         time.sleep(2)
         createc.client.quicksave()
-        logger.info(createc.client.savedatfilename[-params['g_filename_len']:])
+        logger.info('ch: ' + createc.client.savedatfilename[-params['g_filename_len']:])
 
 logger.info('Final template scan')        
 createc.pre_scan_config_01(img_des.chmode,
