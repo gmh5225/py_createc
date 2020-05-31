@@ -19,7 +19,9 @@ def _Chebychev(Z, p):
     return T
 
 def Volt2Kelvin(volt):
-    if volt >=1.334990:
+    if volt < 0.090681 or volt > 1.65:
+	    return 0 # malfunctioning
+    elif volt >=1.334990:
         return _Chebychev(volt, para1)
     elif volt >=1.1226855:
         return _Chebychev(volt, para2)
