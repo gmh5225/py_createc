@@ -52,13 +52,11 @@ def logger(buffer_q, labels, logger_name):
     :param labels: the labels for all channels
     :return: None
     """
-    import yaml
     import logging.config
+    import logging
 
-    with open('./osc/logging_stream.yaml', 'rt') as f:
-        config = yaml.safe_load(f.read())
-    logging.config.dictConfig(config)
-    logger = logging.getLogger(logger_name)
+    logging.config.fileConfig('./osc/logger.config', defaults={'logfilename': './osc/'+logger_name+'.log'})
+    logger = logging.getLogger('this_logger')
 
     try:
         data_pak = buffer_q.get(timeout=Consumer_Timeout)
@@ -127,7 +125,7 @@ def make_document(doc, buffer_q, labels):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='An oscilloscope')
+    parser = argparse.ArgumentParser(description='An oscilloscope, showing random signals if no args given')
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-z", "-i", "--zi", help="show feedback Z and current", action="store_true")
     group.add_argument("-t", "--temperature", help="show temperatures", action="store_true")
