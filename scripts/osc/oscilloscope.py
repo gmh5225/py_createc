@@ -55,7 +55,7 @@ def logger(buffer_q, labels, logger_name):
     import logging.config
     import logging
 
-    logging.config.fileConfig('./osc/logger.config', defaults={'logfilename': './osc/'+logger_name+'.log'})
+    logging.config.fileConfig('./scripts/osc/logger.config', defaults={'logfilename': './logs/osc_'+logger_name+'.log'})
     logger = logging.getLogger('this_logger')
 
     try:
@@ -137,16 +137,16 @@ if __name__ == '__main__':
         producer_funcs = [dp.createc_fbz,
                           partial(dp.createc_adc, channel=0, kelvin=False, board=1)]
         y_labels = ['Feedback Z', 'Current']
-        logger_name = 'logger_zi'  
+        logger_name = 'zi'  
     elif args.temperature:
         producer_funcs = [partial(dp.createc_adc, channel=2, kelvin=True, board=1), 
                           partial(dp.createc_adc, channel=3, kelvin=True, board=1)]
         y_labels = ['STM(K)', 'LHe(K)']
-        logger_name = 'logger_temperature' 
+        logger_name = 'temperature' 
     elif args.cpu:
         producer_funcs = [dp.f_cpu]                     
         y_labels = ['CPU']
-        logger_name = 'logger_cpu'
+        logger_name = 'CPU'
     elif args.adc:
         producer_funcs = [partial(dp.createc_adc, channel=0, board=1),
                           partial(dp.createc_adc, channel=1, board=1),
@@ -161,11 +161,11 @@ if __name__ == '__main__':
                           partial(dp.createc_adc, channel=4, board=2),
                           partial(dp.createc_adc, channel=5, board=2)]             
         y_labels = [str(i) for i in range(12)]
-        logger_name = 'logger_adc'
+        logger_name = 'ADC'
     else:
         producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
         y_labels = ['Random1', 'Random2', 'Emitter']
-        logger_name = 'logger_random'   
+        logger_name = 'random'   
     # Two queues, one for graphing one for logging
     channels = len(producer_funcs)
     graph_q = queue.Queue()
