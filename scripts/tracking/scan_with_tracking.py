@@ -33,12 +33,12 @@ def level_correction(Y):
     return Y-plane
 
 
-with open('./tracking/logging_tracking.yaml', 'rt') as f:
+with open('./scripts/tracking/logging_tracking.yaml', 'rt') as f:
     config = yaml.safe_load(f.read())
 logging.config.dictConfig(config)    
 logger = logging.getLogger('main')
  
-with open('./tracking/parameters.yaml', 'rt') as f:
+with open('./scripts/tracking/parameters.yaml', 'rt') as f:
     params = yaml.safe_load(f.read())
     
 logger.info('Start.'+'*'*30)    
