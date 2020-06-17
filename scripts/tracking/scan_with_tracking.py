@@ -113,7 +113,7 @@ for ch_zoff in Height_Range_Angstrom:
         time.sleep(2)
         createc.client.quicksave()
         logger.info('cc: ' + createc.client.savedatfilename[-params['g_filename_len']:])
-    	img_previous = DAT_IMG(createc.client.savedatfilename)
+        img_previous = DAT_IMG(createc.client.savedatfilename)
 
         logger.info('const height mode scan')
         createc.pre_scan_config_01(params['Chmode']['mode'],

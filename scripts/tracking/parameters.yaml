@@ -1,6 +1,6 @@
 #const height scan, height range
-StartHeight: -2.0
-EndHeight:  -0.0
+StartHeight: -0.5
+EndHeight:  1.5
 Total_steps: 21
 #bias range
 Bias_Range_mV: [0] #List every bias, needs at leat one element
@@ -19,13 +19,13 @@ template_folder: 'H:\Createc\STMDATA'
 
 use_last_as_template: True
 
-shift_reg_channel: [0, 1, 2, 3] # channel number for shift registration, i.e. alignment
-subpixel_reg: 1 # precision for alignment, use 1, 10 or 100
+shift_reg_channel: [0, 1, 2, 3] # List of channel number for shift registration, i.e. alignment
+subpixel_reg: 1 # precision for alignment, use 1, 10 or 100, not in use
 
-deltaX_dac: 8 #pixel size in x
+deltaX_dac: 7 #pixel size in x
 Chmode:
     mode: 1 # 1 for const height, 0 for const current
-    ddeltaX: 128 #scan speed
+    ddeltaX: 80 #scan speed
     channels_code: 30
 
 Ccmode:
