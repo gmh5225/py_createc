@@ -24,7 +24,7 @@ g_file_data_bin_offset: 16384 # which is 128 * 128
 g_file_meta_binary_len: 7600 # 7673 useful readable meta info bytes
 g_file_meta_total_lines: 572 # total meta lines, same for .vert and .lat files
 g_file_dat_img_pixel_data_npdtype: '<f4' #little endian 32-bit float for .dat file
-
+g_file_year_pre: 2000 # filename, data taken are in year range 2000~2099
 
 #.vert & .lat file
 g_file_spec_meta_line: 575  # spectrum meta position line

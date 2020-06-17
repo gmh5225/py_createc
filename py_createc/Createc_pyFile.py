@@ -160,6 +160,7 @@ class DAT_IMG:
         self.img_array_list = []
         
         self.fp = file_path
+        _, self.fn = os.path.split(self.fp)
         self._meta_binary, self._data_binary = self._read_binary()
 
         self._bin2meta_dict()
@@ -264,4 +265,20 @@ class DAT_IMG:
             img_array = np.reshape(img_array[1: self.xPixel*self.yPixel*self.channels+1], (self.channels*self.yPixel, self.xPixel))
             for i in range(self.channels):
                 self.img_array_list.append(img_array[self.yPixel*i:self.yPixel*(i+1)])
-                
+
+    def get_datetime(self):
+        """
+        return datetime objext of the file using the file name
+        """
+        import textwrap, datetime
+        temp = textwrap.wrap(''.join(filter(str.isdigit, self.fn)), 2)
+        temp = [int(s) for s in temp]
+        temp[0] += cgc['g_file_year_pre']
+        return datetime.datetime(*temp)
+
+    def get_timestamp(self):
+        """
+        same as get_datetime, but it converts to seconds since 1970, 1, 1.
+        """
+        import datetime
+        return self.get_datetime().timestamp()
