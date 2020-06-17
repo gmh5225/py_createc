@@ -32,6 +32,16 @@ def level_correction(Y):
     plane = np.reshape(np.dot(X, theta), (m, n))
     return Y-plane
 
+def find_shift(img_src, img_des, img_previous, extra_sec):
+    shift = [pcc(level_correction(gaussian(ri(src))), level_correction(gaussian(ri(des))))[0] 
+              for src, des in zip([img_src.img_array_list[i] for i in params['shift_reg_channel']], 
+                                  [img_des.img_array_list[i] for i in params['shift_reg_channel']])]
+    shift = np.mean(shift, axis=0)
+    dt1 = img_src.get_timestamp() - img_previous.get_timestamp()
+    dt2 = time.time() + extra_sec - img_previous.get_timestamp()
+    shift = shift * dt2 / dt1
+    return shift
+
 
 with open('./scripts/tracking/logging_tracking.yaml', 'rt') as f:
     config = yaml.safe_load(f.read())
@@ -45,6 +55,7 @@ logger.info('Start.'+'*'*30)
 createc = CreatecWin32()
 template = createc.savedatfilename if params['use_last_as_template'] else params['template_folder']+params['template_file']
 img_des = DAT_IMG(template)
+img_previous = img_des
 logger.info('template: '+ template[-params['g_filename_len']:])
 
 idx = 0
@@ -67,13 +78,9 @@ for ch_zoff in Height_Range_Angstrom:
         
         logger.info('Align to template')
         img_src = DAT_IMG(cc_file_4align)
-        # shift = [rt(level_correction(gaussian(ri(src))), level_correction(gaussian(ri(des))))[0] 
-        #          for src, des in zip(img_src.img_array_list, img_des.img_array_list)]
-        # shift = np.mean(shift, axis=0)
-        shift = [pcc(level_correction(gaussian(ri(src))), level_correction(gaussian(ri(des))))[0] 
-                  for src, des in zip([img_src.img_array_list[i] for i in [0,2]], 
-                                      [img_des.img_array_list[i] for i in [0,2]])]
-        shift = np.mean(shift, axis=0)
+
+        shift = find_shift(img_src, img_des, img_previous, params['g_reposition_delay'])
+
         logger.info('[dy, dx] = {}'.format(shift))
         createc.setxyoffpixel(dx=shift[1], dy=shift[0])
         time.sleep(params['g_reposition_delay'])
@@ -106,7 +113,8 @@ for ch_zoff in Height_Range_Angstrom:
         time.sleep(2)
         createc.client.quicksave()
         logger.info('cc: ' + createc.client.savedatfilename[-params['g_filename_len']:])
-    
+    	img_previous = DAT_IMG(createc.client.savedatfilename)
+
         logger.info('const height mode scan')
         createc.pre_scan_config_01(params['Chmode']['mode'],
                                    img_des.rotation,

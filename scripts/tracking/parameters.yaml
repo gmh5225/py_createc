@@ -19,7 +19,7 @@ template_folder: 'H:\Createc\STMDATA'
 
 use_last_as_template: True
 
-shift_reg_channel: 1 # channel number for shift registration, i.e. alignment
+shift_reg_channel: [0, 1, 2, 3] # channel number for shift registration, i.e. alignment
 subpixel_reg: 1 # precision for alignment, use 1, 10 or 100
 
 deltaX_dac: 8 #pixel size in x
