@@ -64,6 +64,7 @@ class CreatecWin32():
         """
         init_FBLogIset = np.float(self.client.getparam('FBLogIset').split()[-1])
         if init_FBLogIset == end_FBLogIset: return
+        if end_FBLogIset < 0: return
         # init_FBLogIset = np.int(init_FBLogIset)
         # end_FBLogIset = np.int(end_FBLogIset)
         # if init_FBLogIset == 0:
