@@ -24,6 +24,7 @@ class CreatecWin32():
         To be used by ramp_bias_mV(). 
         The end result is that the machine will ramp the bias gradually.
         input: _end_bias in mV and _init_bias in mV, which are of the same polarity.
+               _speed can be any integer larger than 0. 1 means the fastest, default to 100
         output: None
         """
         bias_pole = np.sign(_init_bias_mV)
@@ -39,8 +40,12 @@ class CreatecWin32():
         """
         Ramp bias from one value to another value
         input: end_bias in mV
+               speed can be any integer larger than 0. 1 means the fastest, default to 100
         output: None
         """
+        speed = int(speed)
+        assert speed > 0, 'speed should be larger than 0' 
+
         init_bias_mV = float(self.client.getparam('Biasvolt.[mV]'))
         if init_bias_mV * end_bias_mV == 0: pass
         elif init_bias_mV == end_bias_mV: pass
@@ -60,8 +65,12 @@ class CreatecWin32():
         """
         Ramp current from one value to another value
         input: end_current in pA
+               speed can be any integer larger than 0. 1 means the fastest, default to 100
         output: None
         """
+        speed = int(speed)
+        assert speed > 0, 'speed should be larger than 0'
+        
         init_FBLogIset = np.float(self.client.getparam('FBLogIset').split()[-1])
         if init_FBLogIset == end_FBLogIset: return
         if end_FBLogIset < 0: return
