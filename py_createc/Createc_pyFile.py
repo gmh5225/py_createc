@@ -70,7 +70,7 @@ class GENERIC_FILE:
         self.rotation = float(self.meta['Rotation / Rotation'])
         self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
         self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
-        self.channels_code = int(self.meta['Channelselectval / Channelselectval'])        
+        self.channels_code = self.meta['Channelselectval / Channelselectval']      
                         
     def _file2meta_dict(self):
         """
@@ -167,6 +167,11 @@ class DAT_IMG:
         self._extracted_meta()
 
         self._read_img()
+
+        # imgs are numpy arrays, with rows with only zeros cropped off
+        self.imgs = [self._crop_img(arr) for arr in self.img_array_list]
+        assert(len(set(img.shape for img in self.imgs)) <= 1)
+        self.img_pixels = self.imgs[0].shape # size in (y, x)
         
     def _extracted_meta(self):
         """
@@ -184,7 +189,7 @@ class DAT_IMG:
         self.rotation = float(self.meta['Rotation / Rotation'])
         self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
         self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
-        self.channels_code = int(self.meta['Channelselectval / Channelselectval'])        
+        self.channels_code = self.meta['Channelselectval / Channelselectval']   
         
     def _read_binary(self):
         """
@@ -282,3 +287,10 @@ class DAT_IMG:
         """
         import datetime
         return self.get_datetime().timestamp()
+
+    def _crop_img(self, arr):
+        """
+        crop an image, by remove all rows which contain only zeros.
+        """
+        return arr[~np.all(arr == 0, axis=1)]
+
