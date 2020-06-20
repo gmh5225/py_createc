@@ -19,7 +19,7 @@ class CreatecWin32():
         self.client = win32.gencache.EnsureDispatch("pstmafm.stmafmrem")
         self.savedatfilename = self.client.savedatfilename
         
-    def _ramp_bias_same_pole(self, _end_bias_mV, _init_bias_mV):
+    def _ramp_bias_same_pole(self, _end_bias_mV, _init_bias_mV, _speed):
         """
         To be used by ramp_bias_mV(). 
         The end result is that the machine will ramp the bias gradually.
@@ -27,15 +27,15 @@ class CreatecWin32():
         output: None
         """
         bias_pole = np.sign(_init_bias_mV)
-        init = 100 * np.log10(np.abs(_init_bias_mV))
-        end = 100 * np.log10(np.abs(_end_bias_mV))
+        init = _speed * np.log10(np.abs(_init_bias_mV))
+        end = _speed * np.log10(np.abs(_end_bias_mV))
         sign = np.int(np.sign(end-init))
         for i in range(np.int(init)+sign, np.int(end)+ sign, sign):
             time.sleep(0.01)
-            self.client.setparam('Biasvolt.[mV]', bias_pole*10**((i)/100.))
+            self.client.setparam('Biasvolt.[mV]', bias_pole*10**((i)/_speed))
         self.client.setparam('Biasvolt.[mV]', _end_bias_mV)
         
-    def ramp_bias_mV(self, end_bias_mV):
+    def ramp_bias_mV(self, end_bias_mV, speed=100):
         """
         Ramp bias from one value to another value
         input: end_bias in mV
@@ -45,18 +45,18 @@ class CreatecWin32():
         if init_bias_mV * end_bias_mV == 0: pass
         elif init_bias_mV == end_bias_mV: pass
         elif init_bias_mV * end_bias_mV > 0:
-            self._ramp_bias_same_pole(end_bias_mV, init_bias_mV)
+            self._ramp_bias_same_pole(end_bias_mV, init_bias_mV, speed)
         else:
             if np.abs(init_bias_mV) > np.abs(end_bias_mV):
                 self.client.setparam('Biasvolt.[mV]', -init_bias_mV)
-                self._ramp_bias_same_pole(end_bias_mV, -init_bias_mV)
+                self._ramp_bias_same_pole(end_bias_mV, -init_bias_mV, speed)
             elif np.abs(init_bias_mV) < np.abs(end_bias_mV):
-                self._ramp_bias_same_pole(-end_bias_mV, init_bias_mV)
+                self._ramp_bias_same_pole(-end_bias_mV, init_bias_mV, speed)
                 self.client.setparam('Biasvolt.[mV]', end_bias_mV)
             else:
                 self.client.setparam('Biasvolt.[mV]', end_bias_mV)
                 
-    def ramp_current_pA(self, end_FBLogIset):
+    def ramp_current_pA(self, end_FBLogIset, speed=100):
         """
         Ramp current from one value to another value
         input: end_current in pA
@@ -69,14 +69,14 @@ class CreatecWin32():
         # if init_FBLogIset == 0:
         _init_FBLogIset = init_FBLogIset if init_FBLogIset else 0.1
         _end_FBLogIset = end_FBLogIset if end_FBLogIset else 0.1
-        init = np.int(100 * np.log10(np.abs(_init_FBLogIset)))
-        end = np.int(100 * np.log10(np.abs(_end_FBLogIset)))
+        init = np.int(speed * np.log10(np.abs(_init_FBLogIset)))
+        end = np.int(speed * np.log10(np.abs(_end_FBLogIset)))
         one_step = np.int(np.sign(end - init))
         now = init
         while now!=end:
             time.sleep(0.01)
             now += one_step
-            self.client.setparam('FBLogIset', 10**(now/100.))
+            self.client.setparam('FBLogIset', 10**(now/speed))
         self.client.setparam('FBLogIset', end_FBLogIset)
     
     def current_pA(self):
