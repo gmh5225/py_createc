@@ -70,7 +70,7 @@ class GENERIC_FILE:
         self.rotation = float(self.meta['Rotation / Rotation'])
         self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
         self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
-        self.channels_code = int(self.meta['Channelselectval / Channelselectval'])        
+        self.channels_code = self.meta['Channelselectval / Channelselectval']      
                         
     def _file2meta_dict(self):
         """
@@ -184,7 +184,7 @@ class DAT_IMG:
         self.rotation = float(self.meta['Rotation / Rotation'])
         self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
         self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
-        self.channels_code = int(self.meta['Channelselectval / Channelselectval'])        
+        self.channels_code = self.meta['Channelselectval / Channelselectval']   
         
     def _read_binary(self):
         """
