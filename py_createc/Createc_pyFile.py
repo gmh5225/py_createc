@@ -171,7 +171,7 @@ class DAT_IMG:
         # imgs are numpy arrays, with rows with only zeros cropped off
         self.imgs = [self._crop_img(arr) for arr in self.img_array_list]
         assert(len(set(img.shape for img in self.imgs)) <= 1)
-        self.img_pixels = self.imgs[0].shape # size in [y, x]
+        self.img_pixels = self.imgs[0].shape # size in (y, x)
         
     def _extracted_meta(self):
         """
