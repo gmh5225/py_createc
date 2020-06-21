@@ -238,8 +238,7 @@ class DAT_IMG:
         input: self
         output: None
         """
-        for k, v in self.meta.items():
-            print(k)
+        return [k for k in self.meta]
     
     def _file2meta_dict(self):
         """
