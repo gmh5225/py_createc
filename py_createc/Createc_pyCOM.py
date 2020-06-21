@@ -94,7 +94,13 @@ class CreatecWin32():
         Return current in pA
         """
         return self.client.getparam('FBLogIset')
-    
+
+    def bias_mV(self):
+        """
+        Return the bias in mV
+        """
+        return self.client.getparam('Biasvolt.[mV]')
+
     def scan_varying_size(self, chmod=0):
         """
         Not in use.
