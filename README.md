@@ -10,4 +10,4 @@ To do:
 - make function to show current bias
 - refactor pyFile for inheritance
 - create a map script
-
+- isolate confidential parameters
