@@ -109,7 +109,7 @@ class CreatecWin32():
         """
         self.client.setxyoffpixel(dx, dy)
     
-    def pre_scan_config_01(self, chmode, rotation, ddeltaX, deltaX_dac, channels_code, ch_zoff=None, ch_bias=None):
+    def pre_scan_01(self, chmode, rotation, ddeltaX, deltaX_dac, channels_code, ch_zoff=None, ch_bias=None):
         """
         Parameters configuration before scanning an image.
         input: 
