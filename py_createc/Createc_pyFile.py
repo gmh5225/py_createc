@@ -299,7 +299,7 @@ class DAT_IMG:
     def get_offset(self):
         """
         return offset relatvie to the whole range in angstrom in the format of 
-        (y_offset, x_offset)
+        Offset(y, x)
         """
         x_offset = np.float(self.meta['Scanrotoffx / OffsetX'])
         y_offset = np.float(self.meta['Scanrotoffy / OffsetY'])
@@ -312,3 +312,12 @@ class DAT_IMG:
 
         Offset = namedtuple('Offset', ['y', 'x'])
         return Offset(y_offset, x_offset)
+
+    def get_size(self):
+        """
+        return the true size of image in angstrom in Size(y, x)
+        """
+        x = float(self.meta['Length x[A]']) * self.img_pixels.x / self.xPixel
+        y = float(self.meta['Length y[A]']) * self.img_pixels.y / self.yPixel
+        Size = namedtuple('Size', ['y', 'x'])
+        return Size(y, x)
