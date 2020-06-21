@@ -36,3 +36,7 @@ g_file_spec_headers: ['I', 'dI/dV', 'd2I/dV2',
                       'ADC0', 'ADC1', 'ADC2', 'ADC3',
                       'NA01', 'NA02', 'NA03',
                       'di_q', 'di2_q','DAC0']
+
+# scanner movement in XY range
+g_XY_bits: 20 # 20 bits
+g_XY_volt: 200 # 200 volts

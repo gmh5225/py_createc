@@ -289,7 +289,22 @@ class DAT_IMG:
 
     def _crop_img(self, arr):
         """
-        crop an image, by remove all rows which contain only zeros.
+        crop an image, by removing all rows which contain only zeros.
         """
         return arr[~np.all(arr == 0, axis=1)]
 
+    def get_offset(self):
+        """
+        return offset relatvie to the whole range in angstrom in the format of 
+        (y_offset, x_offset)
+        """
+        x_offset = np.float(self.meta['Scanrotoffx / OffsetX'])
+        y_offset = np.float(self.meta['Scanrotoffy / OffsetY'])
+
+        x_piezo_const = np.float(self.meta['Xpiezoconst'])
+        y_piezo_const = np.float(self.meta['YPiezoconst'])
+
+        x_offset = -x_offset*cgc['g_XY_volt']*x_piezo_const/2**cgc['g_XY_bits']
+        y_offset = -y_offset*cgc['g_XY_volt']*y_piezo_const/2**cgc['g_XY_bits']
+
+        return (y_offset, x_offset)
