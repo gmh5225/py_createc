@@ -13,6 +13,7 @@ import pandas as pd
 from itertools import compress
 import io
 import os
+from collections import namedtuple
 
 dir = os.path.dirname(__file__)
 cgc_file = os.path.join(dir, 'Createc_global_const.yaml')
@@ -171,7 +172,9 @@ class DAT_IMG:
         # imgs are numpy arrays, with rows with only zeros cropped off
         self.imgs = [self._crop_img(arr) for arr in self.img_array_list]
         assert(len(set(img.shape for img in self.imgs)) <= 1)
-        self.img_pixels = self.imgs[0].shape # size in (y, x)
+        Pixels = namedtuple('Pixels', ['y', 'x'])
+        self.img_pixels = Pixels(self.imgs[0].shape[0], self.imgs[0].shape[1]) # size in (y, x)
+        
         
     def _extracted_meta(self):
         """
@@ -307,4 +310,5 @@ class DAT_IMG:
         x_offset = -x_offset*cgc['g_XY_volt']*x_piezo_const/2**cgc['g_XY_bits']
         y_offset = -y_offset*cgc['g_XY_volt']*y_piezo_const/2**cgc['g_XY_bits']
 
-        return (y_offset, x_offset)
+        Offset = namedtuple('Offset', ['y', 'x'])
+        return Offset(y_offset, x_offset)
