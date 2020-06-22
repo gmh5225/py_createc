@@ -322,3 +322,12 @@ class DAT_IMG:
         y = float(self.meta['Length y[A]']) * self.img_pixels.y / self.yPixel
         Size = namedtuple('Size', ['y', 'x'])
         return Size(y, x)
+
+    def get_nom_size(self):
+        """
+        return nominal size of image in angstrom in Size(y, x)
+        assuming no pre-termination while scanning
+        """
+        Size = namedtuple('Size', ['y', 'x'])
+        return Size(float(self.meta['Length y[A]']), 
+                    float(self.meta['Length x[A]']))
