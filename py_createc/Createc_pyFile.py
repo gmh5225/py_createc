@@ -193,7 +193,8 @@ class DAT_IMG:
         self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
         self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
         self.channels_code = self.meta['Channelselectval / Channelselectval']   
-        
+        self.scan_ymode = int(self.meta['ScanYMode / ScanYMode'])
+
     def _read_binary(self):
         """
         Open .dat file in raw binary format
