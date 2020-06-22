@@ -1,7 +1,8 @@
-Personal scripts to interface with Createc STM
+Modules and scripts to interface with Createc STM
 
-- py_createc contains the main modules to interface with Createc STM
-- scripts contains useful scripts
+- py_createc: contains the main modules to interface with 
+Createc STM
+- scripts: contains useful scripts
 which can be excuted starting in the top directory using e.g.
 python -m scripts.osc.oscilloscope -z
 
