@@ -68,7 +68,7 @@ for ch_zoff in Height_Range_Angstrom:
         idx += 1
         logger.info('ch_bias %.2f' % round(ch_bias,2))
         logger.info('scan for alignment to template')
-        createc.pre_scan_config_01(img_des.chmode, img_des.rotation, img_des.ddeltaX,
+        createc.pre_scan_01(img_des.chmode, img_des.rotation, img_des.ddeltaX,
                                    img_des.deltaX_dac, img_des.channels_code)
         createc.do_scan_01()
         time.sleep(2)
@@ -104,7 +104,7 @@ for ch_zoff in Height_Range_Angstrom:
 
 
         logger.info('const current mode scan')
-        createc.pre_scan_config_01(params['Ccmode']['mode'],
+        createc.pre_scan_01(params['Ccmode']['mode'],
                                    img_des.rotation,
                                    img_des.ddeltaX,
                                    params['deltaX_dac'],
@@ -116,7 +116,7 @@ for ch_zoff in Height_Range_Angstrom:
         img_previous = DAT_IMG(createc.client.savedatfilename)
 
         logger.info('const height mode scan')
-        createc.pre_scan_config_01(params['Chmode']['mode'],
+        createc.pre_scan_01(params['Chmode']['mode'],
                                    img_des.rotation,
                                    params['Chmode']['ddeltaX'],
                                    params['deltaX_dac'],
@@ -128,7 +128,7 @@ for ch_zoff in Height_Range_Angstrom:
         logger.info('ch: ' + createc.client.savedatfilename[-params['g_filename_len']:])
 
 logger.info('Final template scan')        
-createc.pre_scan_config_01(img_des.chmode,
+createc.pre_scan_01(img_des.chmode,
                            img_des.rotation,
                            img_des.ddeltaX,
                            img_des.deltaX_dac,
