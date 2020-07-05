@@ -215,7 +215,7 @@ class DAT_IMG:
         input: self
         output: None
         """
-        meta_list = self._meta_binary.decode('cp1252').split('\n')
+        meta_list = self._meta_binary.decode('cp1252', errors='ignore').split('\n')
         self.meta['file_version'] = meta_list[0]
         for line in meta_list:
             temp = line.split('=')
