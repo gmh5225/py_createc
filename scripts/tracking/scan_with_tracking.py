@@ -79,7 +79,7 @@ for ch_zoff in Height_Range_Angstrom:
         logger.info('Align to template')
         img_src = DAT_IMG(cc_file_4align)
 
-        shift = find_shift(img_src, img_des, img_previous, params['g_reposition_delay']
+        shift = find_shift(img_src, img_des, img_previous, params['g_reposition_delay'],
                            continuous_drift=True)
 
         logger.info('[dy, dx] = {}'.format(shift))
