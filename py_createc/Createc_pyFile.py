@@ -151,7 +151,10 @@ class DAT_IMG_v2:
 class DAT_IMG:
     """
     Read .dat file and generate meta data and images as numpy arrays.
-    input: full .dat file path.
+    input: option 1: one arg, i.e. the full .dat file path
+           option 2: two named args
+           a. the binary content of the file together
+           b. the file_name as a string
     output: dat_file_object with meta data and image numpy arrays.
     Meta data is a dict, one can expand the dict at will, see the constructor.
     Images are a list of numpy arrays.
