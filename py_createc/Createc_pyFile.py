@@ -156,13 +156,18 @@ class DAT_IMG:
     Meta data is a dict, one can expand the dict at will, see the constructor.
     Images are a list of numpy arrays.
     """
-    def __init__(self, file_path):
+    def __init__(self, file_path=None, file_binary=None, file_name=None):
         self.meta = dict()
         self.img_array_list = []
         
-        self.fp = file_path
-        _, self.fn = os.path.split(self.fp)
-        self._meta_binary, self._data_binary = self._read_binary()
+        if file_path is not None:
+            self.fp = file_path
+            _, self.fn = os.path.split(self.fp)
+            self._meta_binary, self._data_binary = self._read_binary()
+        else:
+            self.fn = file_name
+            self._meta_binary = file_binary[:int(cgc['g_file_meta_binary_len'])]
+            self._data_binary = file_binary[int(cgc['g_file_data_bin_offset']):]
 
         self._bin2meta_dict()
         self._extracted_meta()
