@@ -1,30 +1,70 @@
-from bokeh.server.server import Server
-from bokeh.application import Application
-from bokeh.application.handlers.function import FunctionHandler
-from bokeh.plotting import figure, ColumnDataSource
+from bokeh.io import output_file, curdoc, show
+from bokeh.models import FileInput
+from bokeh.plotting import figure
 from bokeh.layouts import column
-import py_createc.Createc_pyFile as cpf
+from bokeh.server.server import Server
+from bokeh.models.tools import PanTool, BoxZoomTool, WheelZoomTool, \
+UndoTool, RedoTool, ResetTool, SaveTool, HoverTool
+from bokeh.palettes import Greys256
 
-
+import base64
+from collections import deque
+import matplotlib.pyplot as plt
+import tornado.web
+import numpy as np
+import os
+import secrets
+from py_createc.Createc_pyFile import DAT_IMG
+from utils.misc import Point2D, point_rot2D
+from utils.image_utils import level_correction
 
 def make_document(doc):
-    import numpy as np
-    from bokeh.plotting import figure, show
 
-    img = cpf.DAT_IMG('./data/A200619.213320.dat')
-    p = figure(match_aspect=True)
+    def upload_data(attr, old, new):
 
-    # must give a vector of image data for image parameter
-    p.image(image=[img.imgs[0]], x=0, y=0, dw=img.get_size().x, dh=img.get_size().y, palette="Greys256")
-    doc.add_root(column(p, sizing_mode='stretch_both'))
+        file = DAT_IMG(file_binary=base64.b64decode(file_input.value), file_name=file_input.filename)
+        img = level_correction(file.imgs[0])
+        img[img>np.mean(img)] = np.mean(img)   
+        
+        temp = file.get_nom_size().y-file.get_size().y if file.scan_ymode == 2 else 0
+        anchor = Point2D(x=file.get_offset().x-file.get_nom_size().x/2, 
+                         y=-(file.get_offset().y+temp))
 
+        anchor = point_rot2D(anchor, Point2D(file.get_offset().x, -file.get_offset().y), 
+                             np.deg2rad(file.rotation))
+
+        temp_file_name = 'image' + file_input.filename + '.png'
+        path = os.path.join(os.path.dirname(__file__), 'temp', temp_file_name)
+        
+        plt.imsave(path, img, cmap='gray')
+        p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='top_left',
+                                 w=file.get_size().x, h=file.get_size().y, 
+                                 angle=file.rotation, angle_units='deg')
+        path_que.append(path)
+        # p.image(image=[np.flipud(img)], x=anchor.x, y=anchor.y, 
+        #         dw=file.get_size().x, dh=file.get_size().y, palette="Greys256")
+
+    file_input = FileInput(accept=".dat")
+    file_input.on_change('value', upload_data)
+
+    p = figure(match_aspect=True, tools='pan,hover,wheel_zoom', active_scroll='wheel_zoom')
+    p.image_url(['image_dummy.png'], 0, 0, 0, 1)
+    doc.add_root(column([p, file_input], sizing_mode='stretch_width'))
+
+path_que = deque()
 apps = {'/': make_document}
-
-server = Server(apps)
+extra_patterns = [(r"/(image(.*))", tornado.web.StaticFileHandler, 
+                  {"path": os.path.join(os.path.dirname(__file__), 'temp')}),
+                  (r"/(favicon.ico)", tornado.web.StaticFileHandler, 
+                  {"path": os.path.join(os.path.dirname(__file__), 'temp')})]
+server = Server(apps, extra_patterns=extra_patterns)
 server.start()
 server.io_loop.add_callback(server.show, "/")
 try:
     server.io_loop.start()
 except KeyboardInterrupt:
     print('keyboard interruption')
-print('Done')
+finally:
+    while len(path_que):
+        os.remove(path_que.pop())    
+    print('Done')
