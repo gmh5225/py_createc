@@ -10,6 +10,5 @@ To do:
 - adjust annotation font size in oscilloscope
 - refactor list of z_off for tracking script
 - refactor pyFile for inheritance
-- create a map script
 - isolate confidential parameters
 - take gain into consideration for ramping current
