@@ -282,30 +282,14 @@ class DAT_IMG:
             for i in range(self.channels):
                 self.img_array_list.append(img_array[self.yPixel*i:self.yPixel*(i+1)])
 
-    def get_datetime(self):
-        """
-        return datetime objext of the file using the file name
-        """
-        import textwrap, datetime
-        temp = textwrap.wrap(''.join(filter(str.isdigit, self.fn)), 2)
-        temp = [int(s) for s in temp]
-        temp[0] += cgc['g_file_year_pre']
-        return datetime.datetime(*temp)
-
-    def get_timestamp(self):
-        """
-        same as get_datetime, but it converts to seconds since 1970, 1, 1.
-        """
-        import datetime
-        return self.get_datetime().timestamp()
-
     def _crop_img(self, arr):
         """
         crop an image, by removing all rows which contain only zeros.
         """
         return arr[~np.all(arr == 0, axis=1)]
-
-    def get_offset(self):
+    
+    @property
+    def offset(self):
         """
         return offset relatvie to the whole range in angstrom in the format of 
         Offset(y, x)
@@ -322,7 +306,8 @@ class DAT_IMG:
         Offset = namedtuple('Offset', ['y', 'x'])
         return Offset(y_offset, x_offset)
 
-    def get_size(self):
+    @property
+    def size(self):
         """
         return the true size of image in angstrom in Size(y, x)
         """
@@ -331,7 +316,8 @@ class DAT_IMG:
         Size = namedtuple('Size', ['y', 'x'])
         return Size(y, x)
 
-    def get_nom_size(self):
+    @property
+    def nom_size(self):
         """
         return nominal size of image in angstrom in Size(y, x)
         assuming no pre-termination while scanning
@@ -339,3 +325,22 @@ class DAT_IMG:
         Size = namedtuple('Size', ['y', 'x'])
         return Size(float(self.meta['Length y[A]']), 
                     float(self.meta['Length x[A]']))
+
+    @property
+    def datetime(self):
+        """
+        return datetime objext of the file using the file name
+        """
+        import textwrap, datetime
+        temp = textwrap.wrap(''.join(filter(str.isdigit, self.fn)), 2)
+        temp = [int(s) for s in temp]
+        temp[0] += cgc['g_file_year_pre']
+        return datetime.datetime(*temp)
+
+    @property
+    def timestamp(self):
+        """
+        same as datetime, but it converts to seconds since 1970, 1, 1.
+        """
+        import datetime
+        return self.datetime.timestamp()
