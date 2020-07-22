@@ -26,11 +26,11 @@ def make_document(doc):
         img = level_correction(file.imgs[0])
         img[img>np.mean(img)] = np.mean(img)   
         
-        temp = file.get_nom_size().y-file.get_size().y if file.scan_ymode == 2 else 0
-        anchor = Point2D(x=file.get_offset().x-file.get_nom_size().x/2, 
-                         y=-(file.get_offset().y+temp))
+        temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
+        anchor = Point2D(x=file.offset.x-file.nom_size.x/2, 
+                         y=-(file.offset.y+temp))
 
-        anchor = point_rot2D(anchor, Point2D(file.get_offset().x, -file.get_offset().y), 
+        anchor = point_rot2D(anchor, Point2D(file.offset.x, -file.offset.y), 
                              np.deg2rad(file.rotation))
 
         temp_file_name = 'image' + file_input.filename + '.png'
@@ -38,11 +38,11 @@ def make_document(doc):
         
         plt.imsave(path, img, cmap='gray')
         p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='top_left',
-                                 w=file.get_size().x, h=file.get_size().y, 
+                                 w=file.size.x, h=file.size.y, 
                                  angle=file.rotation, angle_units='deg')
         path_que.append(path)
         # p.image(image=[np.flipud(img)], x=anchor.x, y=anchor.y, 
-        #         dw=file.get_size().x, dh=file.get_size().y, palette="Greys256")
+        #         dw=file.size.x, dh=file.size.y, palette="Greys256")
 
     file_input = FileInput(accept=".dat")
     file_input.on_change('value', upload_data)

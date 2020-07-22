@@ -37,8 +37,8 @@ def find_shift(img_src, img_des, img_previous, extra_sec, continuous_drift=True)
               for src, des in zip([img_src.img_array_list[i] for i in params['shift_reg_channel']], 
                                   [img_des.img_array_list[i] for i in params['shift_reg_channel']])]
     shift = np.mean(shift, axis=0)
-    dt1 = img_src.get_timestamp() - img_previous.get_timestamp()
-    dt2 = time.time() + extra_sec - img_previous.get_timestamp()
+    dt1 = img_src.timestamp - img_previous.timestamp
+    dt2 = time.time() + extra_sec - img_previous.timestamp
     shift_c = shift * dt2 / dt1
     return shift_c if continuous_drift else shift
 
