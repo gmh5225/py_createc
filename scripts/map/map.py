@@ -66,5 +66,7 @@ except KeyboardInterrupt:
     print('keyboard interruption')
 finally:
     while len(path_que):
-        os.remove(path_que.pop())    
+        file = path_que.pop()
+        if os.path.isfile(file):
+            os.remove(file)
     print('Done')
