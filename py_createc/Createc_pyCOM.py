@@ -7,6 +7,7 @@ Created on Thu May 16 17:07:44 2019
 import numpy as np
 import time
 import win32com.client as win32
+from utils.misc import XY2D
 
 class CreatecWin32():
     """
@@ -146,4 +147,22 @@ class CreatecWin32():
         output: None
         """
         self.client.scanstart()
-        self.client.scanwaitfinished()   
+        self.client.scanwaitfinished()
+
+    @property
+    def nom_size(self):
+        """
+        return nominal size of image in angstrom in namedtuple (x, y)
+        """
+        x = float(self.client.getparam('Length x[A]'))
+        y = float(self.client.getparam('Length y[A]'))
+        return XY2D(x=x, y=y)
+
+    @property
+    def angle(self):
+        """
+        return the angle in deg
+        """
+        return float(self.client.getparam('Rotation'))
+    
+    
