@@ -89,12 +89,14 @@ class CreatecWin32():
             self.client.setparam('FBLogIset', 10**(now/speed))
         self.client.setparam('FBLogIset', end_FBLogIset)
     
+    @property
     def current_pA(self):
         """
         Return current in pA
         """
         return self.client.getparam('FBLogIset')
 
+    @property
     def bias_mV(self):
         """
         Return the bias in mV
