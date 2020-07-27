@@ -15,7 +15,7 @@ import numpy as np
 import os
 import secrets
 from py_createc.Createc_pyFile import DAT_IMG
-from utils.misc import Point2D, point_rot2D
+from utils.misc import XY2D, point_rot2D
 from utils.image_utils import level_correction
 
 def make_document(doc):
@@ -27,10 +27,10 @@ def make_document(doc):
         img[img>np.mean(img)] = np.mean(img)   
         
         temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
-        anchor = Point2D(x=file.offset.x-file.nom_size.x/2, 
+        anchor = XY2D(x=file.offset.x-file.nom_size.x/2, 
                          y=-(file.offset.y+temp))
 
-        anchor = point_rot2D(anchor, Point2D(file.offset.x, -file.offset.y), 
+        anchor = point_rot2D(anchor, XY2D(file.offset.x, -file.offset.y), 
                              np.deg2rad(file.rotation))
 
         temp_file_name = 'image' + file_input.filename + '.png'

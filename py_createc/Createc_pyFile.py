@@ -14,6 +14,7 @@ from itertools import compress
 import io
 import os
 from collections import namedtuple
+from utils.misc import XY2D
 
 dir = os.path.dirname(__file__)
 cgc_file = os.path.join(dir, 'Createc_global_const.yaml')
@@ -180,8 +181,8 @@ class DAT_IMG:
         # imgs are numpy arrays, with rows with only zeros cropped off
         self.imgs = [self._crop_img(arr) for arr in self.img_array_list]
         assert(len(set(img.shape for img in self.imgs)) <= 1)
-        Pixels = namedtuple('Pixels', ['y', 'x'])
-        self.img_pixels = Pixels(self.imgs[0].shape[0], self.imgs[0].shape[1]) # size in (y, x)
+        # Pixels = namedtuple('Pixels', ['y', 'x'])
+        self.img_pixels = XY2D(self.imgs[0].shape[0], self.imgs[0].shape[1]) # size in (y, x)
         
         
     def _extracted_meta(self):
@@ -303,8 +304,8 @@ class DAT_IMG:
         x_offset = -x_offset*cgc['g_XY_volt']*x_piezo_const/2**cgc['g_XY_bits']
         y_offset = -y_offset*cgc['g_XY_volt']*y_piezo_const/2**cgc['g_XY_bits']
 
-        Offset = namedtuple('Offset', ['y', 'x'])
-        return Offset(y_offset, x_offset)
+        # Offset = namedtuple('Offset', ['y', 'x'])
+        return XY2D(y_offset, x_offset)
 
     @property
     def size(self):
@@ -313,8 +314,8 @@ class DAT_IMG:
         """
         x = float(self.meta['Length x[A]']) * self.img_pixels.x / self.xPixel
         y = float(self.meta['Length y[A]']) * self.img_pixels.y / self.yPixel
-        Size = namedtuple('Size', ['y', 'x'])
-        return Size(y, x)
+        # Size = namedtuple('Size', ['y', 'x'])
+        return XY2D(y, x)
 
     @property
     def nom_size(self):
@@ -322,8 +323,8 @@ class DAT_IMG:
         return nominal size of image in angstrom in Size(y, x)
         assuming no pre-termination while scanning
         """
-        Size = namedtuple('Size', ['y', 'x'])
-        return Size(float(self.meta['Length y[A]']), 
+        # Size = namedtuple('Size', ['y', 'x'])
+        return XY2D(float(self.meta['Length y[A]']), 
                     float(self.meta['Length x[A]']))
 
     @property
