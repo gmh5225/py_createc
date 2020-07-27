@@ -182,7 +182,8 @@ class DAT_IMG:
         self.imgs = [self._crop_img(arr) for arr in self.img_array_list]
         assert(len(set(img.shape for img in self.imgs)) <= 1)
         # Pixels = namedtuple('Pixels', ['y', 'x'])
-        self.img_pixels = XY2D(self.imgs[0].shape[0], self.imgs[0].shape[1]) # size in (y, x)
+        self.img_pixels = XY2D(y=self.imgs[0].shape[0], 
+                               x=self.imgs[0].shape[1]) # size in (y, x)
         
         
     def _extracted_meta(self):
@@ -305,7 +306,7 @@ class DAT_IMG:
         y_offset = -y_offset*cgc['g_XY_volt']*y_piezo_const/2**cgc['g_XY_bits']
 
         # Offset = namedtuple('Offset', ['y', 'x'])
-        return XY2D(y_offset, x_offset)
+        return XY2D(y=y_offset, x=x_offset)
 
     @property
     def size(self):
@@ -315,7 +316,7 @@ class DAT_IMG:
         x = float(self.meta['Length x[A]']) * self.img_pixels.x / self.xPixel
         y = float(self.meta['Length y[A]']) * self.img_pixels.y / self.yPixel
         # Size = namedtuple('Size', ['y', 'x'])
-        return XY2D(y, x)
+        return XY2D(y=y, x=x)
 
     @property
     def nom_size(self):
@@ -324,8 +325,8 @@ class DAT_IMG:
         assuming no pre-termination while scanning
         """
         # Size = namedtuple('Size', ['y', 'x'])
-        return XY2D(float(self.meta['Length y[A]']), 
-                    float(self.meta['Length x[A]']))
+        return XY2D(y=float(self.meta['Length y[A]']), 
+                    x=float(self.meta['Length x[A]']))
 
     @property
     def datetime(self):

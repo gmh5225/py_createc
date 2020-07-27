@@ -28,9 +28,9 @@ def make_document(doc):
         
         temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
         anchor = XY2D(x=file.offset.x-file.nom_size.x/2, 
-                         y=-(file.offset.y+temp))
+                      y=-(file.offset.y+temp))
 
-        anchor = point_rot2D(anchor, XY2D(file.offset.x, -file.offset.y), 
+        anchor = point_rot2D(anchor, XY2D(x=file.offset.x, y=-file.offset.y), 
                              np.deg2rad(file.rotation))
 
         temp_file_name = 'image' + file_input.filename + '.png'
