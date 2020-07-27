@@ -7,7 +7,7 @@ from bokeh.models.tools import PanTool, BoxZoomTool, WheelZoomTool, \
 UndoTool, RedoTool, ResetTool, SaveTool, HoverTool
 from bokeh.palettes import Greys256
 from bokeh.models import Button, HoverTool, TapTool, TextInput, CustomJS
-from bokeh.events import Tap
+from bokeh.events import Tap, DoubleTap
 
 import base64
 from collections import deque
@@ -89,7 +89,7 @@ def make_document(doc):
     hover_tool = HoverTool(callback=callback_hover, tooltips=None)
     p.add_tools(hover_tool)
     taptool = p.select(type=TapTool)
-    p.on_event(Tap, tap_callback)
+    p.on_event(DoubleTap, tap_callback)
     p.toolbar.active_scroll = p.select_one(WheelZoomTool)
     p.add_tools(UndoTool())
     controls = row([textxy, button, file_input], sizing_mode='stretch_width')
