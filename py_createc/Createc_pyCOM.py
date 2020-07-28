@@ -19,7 +19,10 @@ class CreatecWin32():
     def __init__(self):
         self.client = win32.gencache.EnsureDispatch("pstmafm.stmafmrem")
         self.savedatfilename = self.client.savedatfilename
-        
+        self.xPiezoConst = float(self.client.getparam('XPiezoconst')) # different from py_File where it's 'Xpiezoconst'
+        self.yPiezoConst = float(self.client.getparam('YPiezoconst'))
+        self.zPiezoConst = float(self.client.getparam('ZPiezoconst'))
+
     def _ramp_bias_same_pole(self, _end_bias_mV, _init_bias_mV, _speed):
         """
         To be used by ramp_bias_mV(). 
