@@ -72,7 +72,7 @@ class GENERIC_FILE:
         self.rotation = float(self.meta['Rotation / Rotation'])
         self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
         self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
-        self.channels_code = self.meta['Channelselectval / Channelselectval']      
+        self.channels_code = self.meta['Channelselectval / Channelselectval']
                         
     def _file2meta_dict(self):
         """
@@ -204,7 +204,10 @@ class DAT_IMG:
         self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
         self.channels_code = self.meta['Channelselectval / Channelselectval']   
         self.scan_ymode = int(self.meta['ScanYMode / ScanYMode'])
-
+        self.xPiezoConst = float(self.meta['Xpiezoconst']) # Createc software error
+        self.yPiezoConst = float(self.meta['YPiezoconst'])
+        self.zPiezoConst = float(self.meta['ZPiezoconst'])
+        
     def _read_binary(self):
         """
         Open .dat file in raw binary format
@@ -299,11 +302,11 @@ class DAT_IMG:
         x_offset = np.float(self.meta['Scanrotoffx / OffsetX'])
         y_offset = np.float(self.meta['Scanrotoffy / OffsetY'])
 
-        x_piezo_const = np.float(self.meta['Xpiezoconst'])
-        y_piezo_const = np.float(self.meta['YPiezoconst'])
+        # x_piezo_const = np.float(self.meta['Xpiezoconst'])
+        # y_piezo_const = np.float(self.meta['YPiezoconst'])
 
-        x_offset = -x_offset*cgc['g_XY_volt']*x_piezo_const/2**cgc['g_XY_bits']
-        y_offset = -y_offset*cgc['g_XY_volt']*y_piezo_const/2**cgc['g_XY_bits']
+        x_offset = -x_offset*cgc['g_XY_volt']*self.xPiezoConst/2**cgc['g_XY_bits']
+        y_offset = -y_offset*cgc['g_XY_volt']*self.yPiezoConst/2**cgc['g_XY_bits']
 
         # Offset = namedtuple('Offset', ['y', 'x'])
         return XY2D(y=y_offset, x=x_offset)
