@@ -18,35 +18,54 @@ import os
 import secrets
 from py_createc.Createc_pyFile import DAT_IMG
 from py_createc.Createc_pyCOM import CreatecWin32
-from utils.misc import XY2D, point_rot2D
+from utils.misc import XY2D, point_rot2D_y_inv
 from utils.image_utils import level_correction
 
 def make_document(doc):
 
-    def tap_callback(event):
-        x, y = textxy.value.split(',')
+    def mark_area_callback(event):
+        """
+        Callback for Double tap to mark a new scan area in the map
+        """
+        assert ',' in textxy_tap.value, 'A valid coordinate string should contain a comma'
+        x, y = textxy_tap.value.split(',')
         x = float(x)
         y = float(y)
         x0 = x + np.sin(np.deg2rad(stm.angle)) * stm.nom_size.y / 2
-        y0 = y - np.cos(np.deg2rad(stm.angle)) * stm.nom_size.y / 2
+        y0 = y + np.cos(np.deg2rad(stm.angle)) * stm.nom_size.y / 2
 
         plot = p.rect(x=x0, y=y0, width=stm.nom_size.x, height=stm.nom_size.y, 
                       angle=stm.angle, angle_units='deg',
                       fill_alpha=0, line_color='green')
         rect_que.append(plot)
 
-        # print(f'x={x}, y={y}')
-        # print(f'x0={x0}, y0={y0}')
-        # print(f'size.x={stm.nom_size.x}, size.y={stm.nom_size.y}')
-
     def clear_callback(event):
+        """
+        Callback to clear all marks on map
+        """
         while len(rect_que) > 0:
             temp = rect_que.pop()
             temp.visible = False
         print('cleared')
 
-    def upload_data(attr, old, new):
+    def send_xy_callback(event):
+        """
+        Callback to send x y coordinates to STM software
+        """
+        assert ',' in textxy_tap.value, 'A valid coordinate string should contain a comma'
+        x, y = textxy_tap.value.split(',')
+        x_volt = float(x) / stm.xPiezoConst
+        y_volt = float(y) / stm.yPiezoConst
 
+        stm.client.setxyoffvolt(x_volt, y_volt)
+        stm.client.setparam('RotCMode', 0)
+        print('XY coordinate sent')
+        print(f'x={x} y={y}')
+
+    def upload_data(attr, old, new):
+        """
+        Callback to upload image to the map
+        """
         file = DAT_IMG(file_binary=base64.b64decode(file_input.value), file_name=file_input.filename)
         img = level_correction(file.imgs[0])
         threshold = np.mean(img)+3*np.std(img)
@@ -54,9 +73,9 @@ def make_document(doc):
         
         temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
         anchor = XY2D(x=file.offset.x-file.nom_size.x/2, 
-                      y=-(file.offset.y+temp))
+                      y=(file.offset.y+temp))
 
-        anchor = point_rot2D(anchor, XY2D(x=file.offset.x, y=-file.offset.y), 
+        anchor = point_rot2D_y_inv(anchor, XY2D(x=file.offset.x, y=file.offset.y), 
                              np.deg2rad(file.rotation))
 
         temp_file_name = 'image' + file_input.filename + '.png'
@@ -65,34 +84,41 @@ def make_document(doc):
         plt.imsave(path, img, cmap='gray')
         p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='top_left',
                                  w=file.size.x, h=file.size.y, 
-                                 angle=file.rotation, angle_units='deg')
+                                 angle=file.rotation, angle_units='deg',
+                                 name = file_input.filename)
         path_que.append(path)
 
 
     rect_que = deque()
 
+    # setup a map with y-axis inverted, dummy for initialization
     p = figure(match_aspect=True)
-    p.image_url(['image_dummy.png'], 0, 0, 0, 1) 
-       
-    textxy = TextInput(title='', value='',disabled=True)
-    callback_hover = CustomJS(args=dict(textxy=textxy), code="""
-        textxy.value = cb_data['geometry'].x + ',' + cb_data['geometry'].y;
-        console.log(textxy.value);
-        """)
+    p.y_range.flipped = True
+    p.image_url(['image_dummy.png'], 0, 0, 0, 0)
+    p.toolbar.active_scroll = p.select_one(WheelZoomTool)
+    
 
+    # for upload file
     file_input = FileInput(accept=".dat")
     file_input.on_change('value', upload_data)
 
-    button = Button(label="Clear", button_type="success")
-    button.on_click(clear_callback)
+    # buttons for clear marks and send xy coordinates
+    clear_marks_bn = Button(label="Clear Marks", button_type="success")
+    clear_marks_bn.on_click(clear_callback)
+    send_xy_bn = Button(label="Send XY to STM", button_type="success")
+    send_xy_bn.on_click(send_xy_callback)
 
-    hover_tool = HoverTool(callback=callback_hover, tooltips=None)
-    p.add_tools(hover_tool)
-    taptool = p.select(type=TapTool)
-    p.on_event(DoubleTap, tap_callback)
-    p.toolbar.active_scroll = p.select_one(WheelZoomTool)
-    p.add_tools(UndoTool())
-    controls = row([textxy, button, file_input], sizing_mode='stretch_width')
+    # A tapping on the map will show the xy coordinates as well as mark a scanning area
+    textxy_tap = TextInput(title='', value='', disabled=True)
+    show_coord_cb = CustomJS(args=dict(textxy_tap=textxy_tap), code="""
+                            textxy_tap.value = cb_obj.x + ',' + cb_obj.y
+                            """)
+    p.js_on_event(DoubleTap, show_coord_cb)
+    p.on_event(DoubleTap, mark_area_callback)
+
+    # layout includes the map and the controls below
+    controls = row([file_input, textxy_tap, clear_marks_bn, send_xy_bn], 
+                   sizing_mode='stretch_width')
     doc.add_root(column([p, controls], sizing_mode='stretch_width'))
 
 
