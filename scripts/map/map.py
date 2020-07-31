@@ -21,6 +21,10 @@ from py_createc.Createc_pyCOM import CreatecWin32
 from utils.misc import XY2D, point_rot2D_y_inv
 from utils.image_utils import level_correction
 
+IMAGE_CHANNEL = 1 # channel number of image to show
+SCAN_BOUNDARY_X = 6000 # scanner range in angstrom
+SCAN_BOUNDARY_Y = 6000
+
 def make_document(doc):
 
     def mark_area_callback(event):
@@ -68,7 +72,7 @@ def make_document(doc):
         """
         for value, filename in zip(file_input.value, file_input.filename):
             file = DAT_IMG(file_binary=base64.b64decode(value), file_name=filename)
-            img = level_correction(file.imgs[0])
+            img = level_correction(file.imgs[IMAGE_CHANNEL])
             threshold = np.mean(img)+3*np.std(img)
             img[img>threshold] = threshold  
             
@@ -92,10 +96,11 @@ def make_document(doc):
 
     rect_que = deque()
 
-    # setup a map with y-axis inverted, dummy for initialization
+    # setup a map with y-axis inverted, and a virtual boundary of the scanner range
     p = figure(match_aspect=True)
     p.y_range.flipped = True
-    p.image_url(['image_dummy.png'], 0, 0, 0, 0)
+    plot = p.rect(x=0, y=0, width=SCAN_BOUNDARY_X, height=SCAN_BOUNDARY_Y, 
+                  fill_alpha=0, line_color='gray')
     p.toolbar.active_scroll = p.select_one(WheelZoomTool)
     
 
@@ -120,9 +125,9 @@ def make_document(doc):
     p.on_event(DoubleTap, mark_area_callback)
 
     # layout includes the map and the controls below
-    controls = row([file_input, textxy_tap_show, clear_marks_bn, send_xy_bn], 
+    controls = row([file_input, clear_marks_bn, textxy_tap_show, send_xy_bn], 
                    sizing_mode='stretch_width')
-    doc.add_root(column([p, controls], sizing_mode='stretch_width'))
+    doc.add_root(column([p, controls], sizing_mode='stretch_both'))
 
 
 stm = CreatecWin32()
