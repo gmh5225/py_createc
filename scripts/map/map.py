@@ -77,8 +77,8 @@ def make_document(doc):
             img[img>threshold] = threshold  
             
             temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
-            anchor = XY2D(x=file.offset.x-file.nom_size.x/2, 
-                          y=(file.offset.y+temp))
+            anchor = XY2D(x=file.offset.x, 
+                          y=(file.offset.y+temp+file.size.y/2))
 
             anchor = point_rot2D_y_inv(anchor, XY2D(x=file.offset.x, y=file.offset.y), 
                                  np.deg2rad(file.rotation))
@@ -87,7 +87,7 @@ def make_document(doc):
             path = os.path.join(os.path.dirname(__file__), 'temp', temp_file_name)
             
             plt.imsave(path, img, cmap='gray')
-            p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='top_left',
+            p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='center',
                                      w=file.size.x, h=file.size.y, 
                                      angle=file.rotation, 
                                      angle_units='deg',
