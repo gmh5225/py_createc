@@ -66,27 +66,28 @@ def make_document(doc):
         """
         Callback to upload image to the map
         """
-        file = DAT_IMG(file_binary=base64.b64decode(file_input.value), file_name=file_input.filename)
-        img = level_correction(file.imgs[0])
-        threshold = np.mean(img)+3*np.std(img)
-        img[img>threshold] = threshold  
-        
-        temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
-        anchor = XY2D(x=file.offset.x-file.nom_size.x/2, 
-                      y=(file.offset.y+temp))
+        for value, filename in zip(file_input.value, file_input.filename):
+            file = DAT_IMG(file_binary=base64.b64decode(value), file_name=filename)
+            img = level_correction(file.imgs[0])
+            threshold = np.mean(img)+3*np.std(img)
+            img[img>threshold] = threshold  
+            
+            temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
+            anchor = XY2D(x=file.offset.x-file.nom_size.x/2, 
+                          y=(file.offset.y+temp))
 
-        anchor = point_rot2D_y_inv(anchor, XY2D(x=file.offset.x, y=file.offset.y), 
-                             np.deg2rad(file.rotation))
+            anchor = point_rot2D_y_inv(anchor, XY2D(x=file.offset.x, y=file.offset.y), 
+                                 np.deg2rad(file.rotation))
 
-        temp_file_name = 'image' + file_input.filename + '.png'
-        path = os.path.join(os.path.dirname(__file__), 'temp', temp_file_name)
-        
-        plt.imsave(path, img, cmap='gray')
-        p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='top_left',
-                                 w=file.size.x, h=file.size.y, 
-                                 angle=file.rotation, angle_units='deg',
-                                 name = file_input.filename)
-        path_que.append(path)
+            temp_file_name = 'image' + filename + '.png'
+            path = os.path.join(os.path.dirname(__file__), 'temp', temp_file_name)
+            
+            plt.imsave(path, img, cmap='gray')
+            p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='top_left',
+                                     w=file.size.x, h=file.size.y, 
+                                     angle=file.rotation, angle_units='deg',
+                                     name = filename)
+            path_que.append(path)
 
 
     rect_que = deque()
@@ -99,7 +100,7 @@ def make_document(doc):
     
 
     # for upload file
-    file_input = FileInput(accept=".dat")
+    file_input = FileInput(accept=".dat", multiple=True)
     file_input.on_change('value', upload_data)
 
     # buttons for clear marks and send xy coordinates
