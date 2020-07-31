@@ -82,14 +82,15 @@ def make_document(doc):
 
             anchor = point_rot2D_y_inv(anchor, XY2D(x=file.offset.x, y=file.offset.y), 
                                  np.deg2rad(file.rotation))
-
+            print('anchor:', anchor)
             temp_file_name = 'image' + filename + '.png'
             path = os.path.join(os.path.dirname(__file__), 'temp', temp_file_name)
             
             plt.imsave(path, img, cmap='gray')
             p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='top_left',
                                      w=file.size.x, h=file.size.y, 
-                                     angle=file.rotation, angle_units='deg',
+                                     angle=file.rotation, 
+                                     angle_units='deg',
                                      name = filename)
             path_que.append(path)
 
@@ -124,8 +125,14 @@ def make_document(doc):
     p.js_on_event(DoubleTap, show_coord_cb)
     p.on_event(DoubleTap, mark_area_callback)
 
+    textxy_hover = TextInput(title='', value='', disabled=True)
+    hover_coord_cb = CustomJS(args=dict(textxy_hover=textxy_hover), code="""
+                              textxy_hover.value =  cb_data['geometry'].x + ',' + cb_data['geometry'].y;
+                              """)
+    p.add_tools(HoverTool(callback=hover_coord_cb, tooltips=None))
+
     # layout includes the map and the controls below
-    controls = row([file_input, clear_marks_bn, textxy_tap_show, send_xy_bn], 
+    controls = row([file_input, clear_marks_bn, textxy_tap_show, send_xy_bn, textxy_hover], 
                    sizing_mode='stretch_width')
     doc.add_root(column([p, controls], sizing_mode='stretch_both'))
 
