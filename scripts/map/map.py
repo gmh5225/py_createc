@@ -111,14 +111,16 @@ def make_document(doc):
 
     # A tapping on the map will show the xy coordinates as well as mark a scanning area
     textxy_tap = TextInput(title='', value='', disabled=True)
-    show_coord_cb = CustomJS(args=dict(textxy_tap=textxy_tap), code="""
-                            textxy_tap.value = cb_obj.x + ',' + cb_obj.y
+    textxy_tap_show = TextInput(title='', value='', disabled=True)
+    show_coord_cb = CustomJS(args=dict(textxy_tap=textxy_tap, textxy_tap_show=textxy_tap_show), code="""
+                            textxy_tap.value = cb_obj.x + ',' + cb_obj.y;
+                            textxy_tap_show.value = 'x=' + cb_obj.x + ', y=' + cb_obj.y;
                             """)
     p.js_on_event(DoubleTap, show_coord_cb)
     p.on_event(DoubleTap, mark_area_callback)
 
     # layout includes the map and the controls below
-    controls = row([file_input, textxy_tap, clear_marks_bn, send_xy_bn], 
+    controls = row([file_input, textxy_tap_show, clear_marks_bn, send_xy_bn], 
                    sizing_mode='stretch_width')
     doc.add_root(column([p, controls], sizing_mode='stretch_width'))
 
