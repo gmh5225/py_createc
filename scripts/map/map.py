@@ -119,15 +119,19 @@ def make_document(doc):
     textxy_tap = TextInput(title='', value='', disabled=True)
     textxy_tap_show = TextInput(title='', value='', disabled=True)
     show_coord_cb = CustomJS(args=dict(textxy_tap=textxy_tap, textxy_tap_show=textxy_tap_show), code="""
-                            textxy_tap.value = cb_obj.x + ',' + cb_obj.y;
-                            textxy_tap_show.value = 'x=' + cb_obj.x + ', y=' + cb_obj.y;
+                            var x=cb_obj.x;
+                            var y=cb_obj.y;
+                            textxy_tap.value = x + ',' + y;
+                            textxy_tap_show.value = 'x='+ x.toFixed(2) + ', y=' + y.toFixed(2);
                             """)
     p.js_on_event(DoubleTap, show_coord_cb)
     p.on_event(DoubleTap, mark_area_callback)
 
     textxy_hover = TextInput(title='', value='', disabled=True)
     hover_coord_cb = CustomJS(args=dict(textxy_hover=textxy_hover), code="""
-                              textxy_hover.value =  cb_data['geometry'].x + ',' + cb_data['geometry'].y;
+                              var x=cb_data['geometry'].x;
+                              var y=cb_data['geometry'].y;
+                              textxy_hover.value = 'x='+ x.toFixed(2) + ', y=' + y.toFixed(2);
                               """)
     p.add_tools(HoverTool(callback=hover_coord_cb, tooltips=None))
 
