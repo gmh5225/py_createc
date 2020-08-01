@@ -19,9 +19,9 @@ class CreatecWin32():
     def __init__(self):
         self.client = win32.gencache.EnsureDispatch("pstmafm.stmafmrem")
         self.savedatfilename = self.client.savedatfilename
-        self.xPiezoConst = float(self.client.getparam('XPiezoconst')) # different from py_File where it's 'Xpiezoconst'
-        self.yPiezoConst = float(self.client.getparam('YPiezoconst'))
-        self.zPiezoConst = float(self.client.getparam('ZPiezoconst'))
+        # self.xPiezoConst = float(self.client.getparam('XPiezoconst')) # different from py_File where it's 'Xpiezoconst'
+        # self.yPiezoConst = float(self.client.getparam('YPiezoconst'))
+        # self.zPiezoConst = float(self.client.getparam('ZPiezoconst'))
 
     def _ramp_bias_same_pole(self, _end_bias_mV, _init_bias_mV, _speed):
         """
@@ -168,4 +168,15 @@ class CreatecWin32():
         """
         return float(self.client.getparam('Rotation'))
     
+
+    @property
+    def xPiezoConst(self):
+        return float(self.client.getparam('XPiezoconst')) # different from py_File where it's 'Xpiezoconst'
     
+    @property
+    def yPiezoConst(self):
+        return float(self.client.getparam('YPiezoconst'))
+
+    @property
+    def zPiezoConst(self):
+        return float(self.client.getparam('ZPiezoconst'))
