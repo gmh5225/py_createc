@@ -8,6 +8,13 @@ import numpy as np
 import time
 import win32com.client as win32
 from utils.misc import XY2D
+import yaml
+import os 
+
+dir = os.path.dirname(__file__)
+cgc_file = os.path.join(dir, 'Createc_global_const.yaml')
+with open(cgc_file, 'rt') as f:
+    cgc = yaml.safe_load(f.read())
 
 class CreatecWin32():
     """
@@ -180,3 +187,17 @@ class CreatecWin32():
     @property
     def zPiezoConst(self):
         return float(self.client.getparam('ZPiezoconst'))
+
+    @property
+    def offset(self):
+        """
+        return offset relatvie to the whole range in angstrom in the format of 
+        namedtuple (x, y)
+        """
+        x_offset = float(self.client.getparam('OffsetX'))
+        y_offset = float(self.client.getparam('OffsetY'))
+
+        x_offset = -x_offset*cgc['g_XY_volt']*self.xPiezoConst/2**cgc['g_XY_bits']
+        y_offset = -y_offset*cgc['g_XY_volt']*self.yPiezoConst/2**cgc['g_XY_bits']
+
+        return XY2D(y=y_offset, x=x_offset)
