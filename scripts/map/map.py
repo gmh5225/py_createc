@@ -27,6 +27,18 @@ SCAN_BOUNDARY_Y = 6000
 
 def make_document(doc):
 
+    def show_area_callback(event):
+        """
+        Show current STM scan area
+        """
+        x0 = stm.offset.x + np.sin(np.deg2rad(stm.angle)) * stm.nom_size.y / 2
+        y0 = stm.offset.y + np.cos(np.deg2rad(stm.angle)) * stm.nom_size.y / 2
+
+        plot = p.rect(x=x0, y=y0, width=stm.nom_size.x, height=stm.nom_size.y, 
+                      angle=stm.angle, angle_units='deg',
+                      fill_alpha=0, line_color='blue')
+        rect_que.append(plot)
+
     def mark_area_callback(event):
         """
         Callback for Double tap to mark a new scan area in the map
@@ -114,6 +126,9 @@ def make_document(doc):
     clear_marks_bn.on_click(clear_callback)
     send_xy_bn = Button(label="Send XY to STM", button_type="success")
     send_xy_bn.on_click(send_xy_callback)
+    show_stm_area_bn = Button(label="Show STM Location", button_type="success")
+    show_stm_area_bn.on_click(show_area_callback)
+
 
     # A tapping on the map will show the xy coordinates as well as mark a scanning area
     textxy_tap = TextInput(title='', value='', disabled=True)
@@ -136,7 +151,7 @@ def make_document(doc):
     p.add_tools(HoverTool(callback=hover_coord_cb, tooltips=None))
 
     # layout includes the map and the controls below
-    controls = row([file_input, clear_marks_bn, textxy_tap_show, send_xy_bn, textxy_hover], 
+    controls = row([file_input, show_stm_area_bn, clear_marks_bn, textxy_tap_show, send_xy_bn, textxy_hover], 
                    sizing_mode='stretch_width')
     doc.add_root(column([p, controls], sizing_mode='stretch_both'))
 
