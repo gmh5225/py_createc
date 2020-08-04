@@ -110,7 +110,7 @@ def make_document(doc):
     rect_que = deque()
 
     # setup a map with y-axis inverted, and a virtual boundary of the scanner range
-    p = figure(match_aspect=True)
+    p = figure(match_aspect=True, tools=[PanTool(), UndoTool(), RedoTool(), ResetTool(), SaveTool()])
     p.y_range.flipped = True
     plot = p.rect(x=0, y=0, width=SCAN_BOUNDARY_X, height=SCAN_BOUNDARY_Y, 
                   fill_alpha=0, line_color='gray')
