@@ -38,6 +38,7 @@ def make_document(doc):
                       angle=stm.angle, angle_units='deg',
                       fill_alpha=0, line_color='blue')
         rect_que.append(plot)
+        textxy_show.value = 'x='+ str(stm.offset.x) + ', y=' + str(stm.offset.y)
 
     def mark_area_callback(event):
         """
@@ -135,12 +136,12 @@ def make_document(doc):
 
     # A tapping on the map will show the xy coordinates as well as mark a scanning area
     textxy_tap = TextInput(title='', value='', disabled=True)
-    textxy_tap_show = TextInput(title='', value='', disabled=True)
-    show_coord_cb = CustomJS(args=dict(textxy_tap=textxy_tap, textxy_tap_show=textxy_tap_show), code="""
+    textxy_show = TextInput(title='', value='', disabled=True)
+    show_coord_cb = CustomJS(args=dict(textxy_tap=textxy_tap, textxy_show=textxy_show), code="""
                             var x=cb_obj.x;
                             var y=cb_obj.y;
                             textxy_tap.value = x + ',' + y;
-                            textxy_tap_show.value = 'x='+ x.toFixed(2) + ', y=' + y.toFixed(2);
+                            textxy_show.value = 'x='+ x.toFixed(2) + ', y=' + y.toFixed(2);
                             """)
     p.js_on_event(DoubleTap, show_coord_cb)
     p.on_event(DoubleTap, mark_area_callback)
@@ -154,7 +155,7 @@ def make_document(doc):
     p.add_tools(HoverTool(callback=hover_coord_cb, tooltips=None))
     p.toolbar_location = None
     # layout includes the map and the controls below
-    controls_1 = row([file_input, show_stm_area_bn, textxy_tap_show], sizing_mode='stretch_width')
+    controls_1 = row([file_input, show_stm_area_bn, textxy_show], sizing_mode='stretch_width')
     controls_2 = row([textxy_hover, clear_marks_bn, send_xy_bn], sizing_mode='stretch_width')
     doc.add_root(column([p, controls_1, controls_2], sizing_mode='stretch_both'))
 
