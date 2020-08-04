@@ -114,9 +114,12 @@ def make_document(doc):
     p.y_range.flipped = True
     plot = p.rect(x=0, y=0, width=SCAN_BOUNDARY_X, height=SCAN_BOUNDARY_Y, 
                   fill_alpha=0, line_color='gray')
-    p.toolbar.active_scroll = p.select_one(WheelZoomTool)
+	
+	# add wheel zoom tool
+    wheel_zoom_tool = WheelZoomTool(zoom_on_axis=False)
+    p.add_tools(wheel_zoom_tool)
+    p.toolbar.active_scroll = wheel_zoom_tool
     
-
     # for upload file
     file_input = FileInput(accept=".dat", multiple=True)
     file_input.on_change('value', upload_data)
