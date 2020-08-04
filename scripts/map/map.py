@@ -152,7 +152,7 @@ def make_document(doc):
                               textxy_hover.value = 'x='+ x.toFixed(2) + ', y=' + y.toFixed(2);
                               """)
     p.add_tools(HoverTool(callback=hover_coord_cb, tooltips=None))
-
+    p.toolbar_location = None
     # layout includes the map and the controls below
     controls_1 = row([file_input, show_stm_area_bn, textxy_tap_show], sizing_mode='stretch_width')
     controls_2 = row([textxy_hover, clear_marks_bn, send_xy_bn], sizing_mode='stretch_width')
