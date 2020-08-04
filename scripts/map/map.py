@@ -38,7 +38,7 @@ def make_document(doc):
                       angle=stm.angle, angle_units='deg',
                       fill_alpha=0, line_color='blue')
         rect_que.append(plot)
-        textxy_show.value = 'x='+ str(stm.offset.x) + ', y=' + str(stm.offset.y)
+        textxy_show.value = f'x={stm.offset.x:.2f}, y={stm.offset.y:.2f}'
 
     def mark_area_callback(event):
         """
