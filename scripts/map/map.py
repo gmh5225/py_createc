@@ -154,9 +154,9 @@ def make_document(doc):
     p.add_tools(HoverTool(callback=hover_coord_cb, tooltips=None))
 
     # layout includes the map and the controls below
-    controls = row([file_input, show_stm_area_bn, clear_marks_bn, textxy_tap_show, send_xy_bn, textxy_hover], 
-                   sizing_mode='stretch_width')
-    doc.add_root(column([p, controls], sizing_mode='stretch_both'))
+    controls_1 = row([file_input, show_stm_area_bn, textxy_tap_show], sizing_mode='stretch_width')
+    controls_2 = row([textxy_hover, clear_marks_bn, send_xy_bn], sizing_mode='stretch_width')
+    doc.add_root(column([p, controls_1, controls_2], sizing_mode='stretch_both'))
 
 
 stm = CreatecWin32()
