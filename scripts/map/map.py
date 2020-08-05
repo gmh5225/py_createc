@@ -21,7 +21,9 @@ from py_createc.Createc_pyCOM import CreatecWin32
 from utils.misc import XY2D, point_rot2D_y_inv
 from utils.image_utils import level_correction
 
-IMAGE_CHANNEL = 1 # channel number of image to show
+SIZE_THRESHOLD = 100 # Angstrom. Threshold for which channel to show
+IMAGE_CHANNEL0 = 0 # channel topo
+IMAGE_CHANNEL1 = 1 # channel current
 SCAN_BOUNDARY_X = 6000 # scanner range in angstrom
 SCAN_BOUNDARY_Y = 6000
 
@@ -85,9 +87,14 @@ def make_document(doc):
         """
         for value, filename in zip(file_input.value, file_input.filename):
             file = DAT_IMG(file_binary=base64.b64decode(value), file_name=filename)
-            img = level_correction(file.imgs[IMAGE_CHANNEL])
-            threshold = np.mean(img)+3*np.std(img)
-            img[img>threshold] = threshold  
+            if file.nom_size.x > SIZE_THRESHOLD or file.nom_size.y > SIZE_THRESHOLD:
+                img = file.imgs[IMAGE_CHANNEL1]               
+            else:
+                img = file.imgs[IMAGE_CHANNEL0]
+                # img = level_correction(file.imgs[IMAGE_CHANNEL0])
+            # remove any outlier
+            threshold = np.mean(img)+6*np.std(img)
+            img[img>threshold] = threshold
             
             temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
             anchor = XY2D(x=file.offset.x, 
