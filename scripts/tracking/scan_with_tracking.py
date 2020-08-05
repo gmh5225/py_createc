@@ -105,11 +105,11 @@ for ch_zoff in Height_Range_Angstrom:
 
 
         logger.info('const current mode scan')
-        createc.pre_scan_01(params['Ccmode']['mode'],
-                                   img_des.rotation,
-                                   img_des.ddeltaX,
-                                   params['deltaX_dac'],
-                                   params['Ccmode']['channels_code'])
+        createc.pre_scan_01(chmode=params['Ccmode']['mode'],
+                            rotation=img_des.rotation,
+                            ddeltaX=img_des.ddeltaX,
+                            deltaX_dac=params['deltaX_dac'],
+                            channels_code=params['Ccmode']['channels_code'])
         createc.do_scan_01()
         time.sleep(2)
         createc.client.quicksave()
@@ -117,23 +117,24 @@ for ch_zoff in Height_Range_Angstrom:
         img_previous = DAT_IMG(createc.client.savedatfilename)
 
         logger.info('const height mode scan')
-        createc.pre_scan_01(params['Chmode']['mode'],
-                                   img_des.rotation,
-                                   params['Chmode']['ddeltaX'],
-                                   params['deltaX_dac'],
-                                   params['Chmode']['channels_code'],
-                                   ch_zoff, ch_bias)
+        createc.pre_scan_01(chmode=params['Chmode']['mode'],
+                            rotation=img_des.rotation,
+                            ddeltaX=params['Chmode']['ddeltaX'],
+                            deltaX_dac=params['deltaX_dac'],
+                            channels_code=params['Chmode']['channels_code'],
+                            ch_zoff=ch_zoff, 
+                            ch_bias=ch_bias)
         createc.do_scan_01()
         time.sleep(2)
         createc.client.quicksave()
         logger.info('ch: ' + createc.client.savedatfilename[-params['g_filename_len']:])
 
 logger.info('Final template scan')        
-createc.pre_scan_01(img_des.chmode,
-                           img_des.rotation,
-                           img_des.ddeltaX,
-                           img_des.deltaX_dac,
-                           img_des.channels_code)
+createc.pre_scan_01(chmode=img_des.chmode,
+                    rotation=img_des.rotation,
+                    ddeltaX=img_des.ddeltaX,
+                    deltaX_dac=img_des.deltaX_dac,
+                    channels_code=img_des.channels_code)
 createc.do_scan_01()
 time.sleep(2)
 createc.client.quicksave()
