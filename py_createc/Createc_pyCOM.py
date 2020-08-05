@@ -128,25 +128,28 @@ class CreatecWin32():
         """
         self.client.setxyoffpixel(dx, dy)
     
-    def pre_scan_01(self, chmode, rotation, ddeltaX, deltaX_dac, channels_code, ch_zoff=None, ch_bias=None):
+    def pre_scan_01(self, chmode=None, rotation=None, ddeltaX=None, 
+                    deltaX_dac=None, deltaY_dac=None, channels_code=None, 
+                    ch_zoff=None, ch_bias=None):
         """
         Parameters configuration before scanning an image.
         input: 
             chmod: constant height mode, int 0 or 1, which is false or true
             rotation: float number -360 ~ 360
             ddeltaX: scan speed, int, usually 16, 32, 64 ...
-            deltaX_dac: scan size, assume deltaY_dac is the same, int, usually take 32, 64, 128...
+            deltaX_dac: scan size, int, usually take 32, 64, 128...
+            deltaY_dac: scan size, int, usually take 32, 64, 128...
             channels_code: int, 3 for const current mode, 30 for const height mode, see online manual for detail
             ch_zoff: optional, const height mode z offset in angstrom, float
             ch_bias: optional, const height mode bias in mV, float
         output: None
         """
-        self.client.setparam('CHMode', chmode)        
-        self.client.setparam('Rotation', rotation)
-        self.client.setparam('DX/DDeltaX', ddeltaX)
-        self.client.setparam('Delta X [Dac]', deltaX_dac)
-        self.client.setparam('Delta Y [Dac]', deltaX_dac) #square shaped pixel
-        self.client.setparam('ChannelSelectVal', channels_code)
+        if chmode is not None: self.client.setparam('CHMode', chmode)        
+        if rotation is not None: self.client.setparam('Rotation', rotation)
+        if ddeltaX is not None: self.client.setparam('DX/DDeltaX', ddeltaX)
+        if deltaX_dac is not None: self.client.setparam('Delta X [Dac]', deltaX_dac)
+        if deltaY_dac is not None: self.client.setparam('Delta Y [Dac]', deltaY_dac)
+        if channels_code is not None:self.client.setparam('ChannelSelectVal', channels_code)
         if ch_zoff is not None: self.client.setchmodezoff(ch_zoff)
         if ch_bias is not None: self.client.setparam('CHModeBias[mV]', ch_bias)
         
