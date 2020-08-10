@@ -43,6 +43,7 @@ def make_document(doc):
                       fill_alpha=0, line_color='blue')
         rect_que.append(plot)
         textxy_show.value = f'x={stm.offset.x:.2f}, y={stm.offset.y:.2f}'
+        textxy_tap.value = f'{stm.offset.x:.2f},{stm.offset.y:.2f}'
 
     def mark_area_callback(event):
         """
