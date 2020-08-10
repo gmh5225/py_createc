@@ -176,7 +176,7 @@ def make_document(doc):
     show_coord_cb = CustomJS(args=dict(textxy_tap=textxy_tap, textxy_show=textxy_show), code="""
                             var x=cb_obj.x;
                             var y=cb_obj.y;
-                            textxy_tap.value = x + ',' + y;
+                            textxy_tap.value = x.toFixed(2) + ',' + y.toFixed(2);
                             textxy_show.value = 'x='+ x.toFixed(2) + ', y=' + y.toFixed(2);
                             """)
     p.js_on_event(DoubleTap, show_coord_cb)
