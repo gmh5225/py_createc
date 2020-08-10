@@ -21,11 +21,13 @@ from py_createc.Createc_pyCOM import CreatecWin32
 from utils.misc import XY2D, point_rot2D_y_inv
 from utils.image_utils import level_correction
 
+
 SIZE_THRESHOLD = 100 # Angstrom. Threshold for which channel to show
 IMAGE_CHANNEL0 = 0 # channel topo
 IMAGE_CHANNEL1 = 1 # channel current
 SCAN_BOUNDARY_X = 6000 # scanner range in angstrom
 SCAN_BOUNDARY_Y = 6000
+NUM_SIGMA = 3 # remove any outlier pixels of an image beyond a defined several sigmas
 
 def make_document(doc):
 
@@ -93,26 +95,52 @@ def make_document(doc):
                 img = file.imgs[IMAGE_CHANNEL0]
                 # img = level_correction(file.imgs[IMAGE_CHANNEL0])
             # remove any outlier
-            threshold = np.mean(img)+6*np.std(img)
+            threshold = np.mean(img)+NUM_SIGMA*np.std(img)
             img[img>threshold] = threshold
-            
+            threshold = np.mean(img)-NUM_SIGMA*np.std(img)
+            img[img<threshold] = threshold
+
             temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
             anchor = XY2D(x=file.offset.x, 
                           y=(file.offset.y+temp+file.size.y/2))
 
             anchor = point_rot2D_y_inv(anchor, XY2D(x=file.offset.x, y=file.offset.y), 
                                  np.deg2rad(file.rotation))
-            print('anchor:', anchor)
-            temp_file_name = 'image' + filename + '.png'
-            path = os.path.join(os.path.dirname(__file__), 'temp', temp_file_name)
-            
-            plt.imsave(path, img, cmap='gray')
-            p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='center',
-                                     w=file.size.x, h=file.size.y, 
-                                     angle=file.rotation, 
-                                     angle_units='deg',
-                                     name = filename)
-            path_que.append(path)
+            # print('offset:', file.offset)
+            # print('angle:', file.rotation)
+            if int(file.rotation*100) not in [0, 9000, -9000, 18000, -18000]:
+                temp_file_name = 'image' + filename + '.png'
+                path = os.path.join(os.path.dirname(__file__), 'temp', temp_file_name)
+                
+                plt.imsave(path, img, cmap='gray')
+                p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='center',
+                                         w=file.size.x, h=file.size.y, 
+                                         angle=file.rotation, 
+                                         angle_units='deg',
+                                         name = filename)
+                path_que.append(path)
+                continue                
+            elif int(file.rotation*100) == 0:
+                anchor = XY2D(x=anchor.x-file.size.x/2, y=anchor.y+file.size.y/2)
+                width = file.size.x
+                height = file.size.y
+            elif int(file.rotation*100) == 9000:
+                img = img.swapaxes(-2,-1)[...,::-1,:]
+                anchor = XY2D(x=anchor.x-file.size.y/2, y=anchor.y+file.size.x/2)
+                width = file.size.y
+                height = file.size.x
+            elif int(file.rotation*100) == -9000:
+                img = img.swapaxes(-2,-1)[...,::-1]
+                anchor = XY2D(x=anchor.x-file.size.y/2, y=anchor.y+file.size.x/2)
+                width = file.size.y
+                height = file.size.x
+            else:
+                img = img[...,::-1,::-1]
+                anchor = XY2D(x=anchor.x-file.size.x/2, y=anchor.y+file.size.y/2)
+                width = file.size.x
+                height = file.size.y
+            p.image(image=[np.flipud(img)], x=anchor.x, y=anchor.y, 
+                    dw=width, dh=height, palette="Greys256")
 
 
     rect_que = deque()
@@ -122,8 +150,8 @@ def make_document(doc):
     p.y_range.flipped = True
     plot = p.rect(x=0, y=0, width=SCAN_BOUNDARY_X, height=SCAN_BOUNDARY_Y, 
                   fill_alpha=0, line_color='gray')
-	
-	# add wheel zoom tool
+    
+    # add wheel zoom tool
     wheel_zoom_tool = WheelZoomTool(zoom_on_axis=False)
     p.add_tools(wheel_zoom_tool)
     p.toolbar.active_scroll = wheel_zoom_tool
