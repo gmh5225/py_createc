@@ -179,8 +179,8 @@ if __name__ == '__main__':
     print('Start')
 
     # Main thread for graphing
-    print('Opening Bokeh application on http://localhost:5006/')
-    server = Server({'/': partial(make_document, buffer_q=graph_q, labels=y_labels)})
+    # print('Opening Bokeh application on http://localhost:5006/')
+    server = Server({'/': partial(make_document, buffer_q=graph_q, labels=y_labels)}, port=5001)
     server.start()
     server.io_loop.add_callback(server.show, "/")
     try:
