@@ -38,7 +38,7 @@ def make_document(doc):
         Show current STM scan area
         """
         if stm is None or not stm.is_active():
-            print('No STM is connected')
+            status_text.value = 'No STM is connected'
             send_xy_bn.disabled = True
             show_stm_area_bn.disabled = True
             return
@@ -58,7 +58,7 @@ def make_document(doc):
         Callback for Double tap to mark a new scan area in the map
         """
         if stm is None or not stm.is_active():
-            print('No STM is connected')
+            status_text.value = 'No STM is connected'
             send_xy_bn.disabled = True
             show_stm_area_bn.disabled = True
             return
@@ -82,27 +82,31 @@ def make_document(doc):
         while len(rect_que) > 0:
             temp = rect_que.pop()
             temp.visible = False
-        print('cleared')
+        status_text.value = 'Marks cleared'
 
     def send_xy_callback(event):
         """
         Callback to send x y coordinates to STM software
         """
         if stm is None or not stm.is_active():
-            print('No STM is connected')
+            status_text.value = 'No STM is connected'
             send_xy_bn.disabled = True
             show_stm_area_bn.disabled = True
             return
-
-        assert ',' in textxy_tap.value, 'A valid coordinate string should contain a comma'
+        if textxy_tap.value == '':
+            status_text.value = 'Coordinate invalid'
+            return
+        if ',' not in textxy_tap.value:
+            status_text.value = 'Coordinate invalid'
+            return            
+        # assert ',' in textxy_tap.value, 'A valid coordinate string should contain a comma'
         x, y = textxy_tap.value.split(',')
         x_volt = float(x) / stm.xPiezoConst
         y_volt = float(y) / stm.yPiezoConst
 
         stm.client.setxyoffvolt(x_volt, y_volt)
         stm.client.setparam('RotCMode', 0)
-        print('XY coordinate sent')
-        print(f'x={x} y={y}')
+        status_text.value = 'XY coordinate sent'
 
     def plot_img():
         """
@@ -222,7 +226,6 @@ def make_document(doc):
     show_stm_area_bn = Button(label="Show STM Location", button_type="success", disabled=True)
     show_stm_area_bn.on_click(show_area_callback)
 
-
     # A tapping on the map will show the xy coordinates as well as mark a scanning area
     textxy_tap = TextInput(title='', value='', disabled=True)
     textxy_show = TextInput(title='', value='', disabled=True)
@@ -250,11 +253,12 @@ def make_document(doc):
     connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success")
     connect_stm_bn.on_click(connnect_stm_callback)
 
-
+    status_text = TextInput(title='', value='ready', disabled=True)
     # layout includes the map and the controls below
-    controls_1 = row([textxy_hover, file_input, ch_select, textxy_show], sizing_mode='stretch_width')
-    controls_2 = row([clear_marks_bn, connect_stm_bn, show_stm_area_bn, send_xy_bn], sizing_mode='stretch_width')
-    doc.add_root(column([p, controls_1, controls_2], sizing_mode='stretch_both'))
+    controls_1 = row([file_input, ch_select, textxy_show], sizing_mode='stretch_width')
+    controls_2 = row([textxy_hover, clear_marks_bn, status_text], sizing_mode='stretch_width')
+    controls_3 = row([connect_stm_bn, show_stm_area_bn, send_xy_bn], sizing_mode='stretch_width')
+    doc.add_root(column([p, controls_1, controls_2, controls_3], sizing_mode='stretch_both'))
 
 
 path_que = deque()
