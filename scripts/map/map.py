@@ -37,6 +37,12 @@ def make_document(doc):
         """
         Show current STM scan area
         """
+        if stm is None or not stm.is_active():
+            print('No STM is connected')
+            send_xy_bn.disabled = True
+            show_stm_area_bn.disabled = True
+            return
+
         x0 = stm.offset.x + np.sin(np.deg2rad(stm.angle)) * stm.nom_size.y / 2
         y0 = stm.offset.y + np.cos(np.deg2rad(stm.angle)) * stm.nom_size.y / 2
 
@@ -51,9 +57,12 @@ def make_document(doc):
         """
         Callback for Double tap to mark a new scan area in the map
         """
-        if stm is None:
+        if stm is None or not stm.is_active():
             print('No STM is connected')
+            send_xy_bn.disabled = True
+            show_stm_area_bn.disabled = True
             return
+
         assert ',' in textxy_tap.value, 'A valid coordinate string should contain a comma'
         x, y = textxy_tap.value.split(',')
         x = float(x)
@@ -79,6 +88,12 @@ def make_document(doc):
         """
         Callback to send x y coordinates to STM software
         """
+        if stm is None or not stm.is_active():
+            print('No STM is connected')
+            send_xy_bn.disabled = True
+            show_stm_area_bn.disabled = True
+            return
+
         assert ',' in textxy_tap.value, 'A valid coordinate string should contain a comma'
         x, y = textxy_tap.value.split(',')
         x_volt = float(x) / stm.xPiezoConst
@@ -232,7 +247,7 @@ def make_document(doc):
     ch_select = Select(title="", value="ch0", options=[f'ch{number}' for number in range(MAX_CH)])
     ch_select.on_change('value', channel_selection_callback)
 
-    connect_stm_bn = Button(label="Connect STM", button_type="success")
+    connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success")
     connect_stm_bn.on_click(connnect_stm_callback)
 
 
