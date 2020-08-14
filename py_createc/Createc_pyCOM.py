@@ -10,6 +10,7 @@ import win32com.client as win32
 from utils.misc import XY2D
 import yaml
 import os 
+from pywintypes import com_error
 
 dir = os.path.dirname(__file__)
 cgc_file = os.path.join(dir, 'Createc_global_const.yaml')
@@ -29,6 +30,13 @@ class CreatecWin32():
         # self.xPiezoConst = float(self.client.getparam('XPiezoconst')) # different from py_File where it's 'Xpiezoconst'
         # self.yPiezoConst = float(self.client.getparam('YPiezoconst'))
         # self.zPiezoConst = float(self.client.getparam('ZPiezoconst'))
+    
+    def is_active(self):
+        try: 
+            self.client.scanstatus
+            return True
+        except com_error:
+            return False
 
     def _ramp_bias_same_pole(self, _end_bias_mV, _init_bias_mV, _speed):
         """
