@@ -198,7 +198,8 @@ def make_document(doc):
         stm = CreatecWin32()
         send_xy_bn.disabled=False
         show_stm_area_bn.disabled=False
-
+        status_text.value = 'STM connected'
+		
     rect_que = deque()
     file_holder = None
     stm = None
@@ -253,7 +254,7 @@ def make_document(doc):
     connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success")
     connect_stm_bn.on_click(connnect_stm_callback)
 
-    status_text = TextInput(title='', value='ready', disabled=True)
+    status_text = TextInput(title='', value='Ready', disabled=True)
     # layout includes the map and the controls below
     controls_1 = row([file_input, ch_select, textxy_show], sizing_mode='stretch_width')
     controls_2 = row([textxy_hover, clear_marks_bn, status_text], sizing_mode='stretch_width')
