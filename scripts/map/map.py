@@ -1,5 +1,5 @@
 from bokeh.io import output_file, curdoc, show
-from bokeh.models import FileInput
+from bokeh.models import FileInput, ColumnDataSource
 from bokeh.plotting import figure
 from bokeh.layouts import column, row
 from bokeh.server.server import Server
@@ -124,7 +124,7 @@ def make_document(doc):
             ch_select.value = f'{ch_select.value[:-1]}{channel}'
 
         img = file.imgs[channel]
-            # img = level_correction(file.imgs[IMAGE_CHANNEL0])
+        # img = level_correction(file.imgs[IMAGE_CHANNEL0])
 
         # remove any outlier
         threshold = np.mean(img)+NUM_SIGMA*np.std(img)
@@ -151,7 +151,8 @@ def make_document(doc):
                                      angle_units='deg',
                                      name = filename)
             path_que.append(path)
-            return None                
+            return None
+
         elif int(file.rotation*100) == 0:
             anchor = XY2D(x=anchor.x-file.size.x/2, y=anchor.y+file.size.y/2)
             width = file.size.x
@@ -171,8 +172,12 @@ def make_document(doc):
             anchor = XY2D(x=anchor.x-file.size.x/2, y=anchor.y+file.size.y/2)
             width = file.size.x
             height = file.size.y
-        p.image(image=[np.flipud(img)], x=anchor.x, y=anchor.y, 
-                dw=width, dh=height, palette="Greys256")
+        source.stream(dict(image=[img],
+                           name=[filename],
+                           x=[anchor.x],
+                           y=[anchor.y],
+                           dw=[width],
+                           dh=[height]))
 
     def file_input_callback(attr, old, new):
         """
@@ -203,12 +208,22 @@ def make_document(doc):
     rect_que = deque()
     file_holder = None
     stm = None
-
+    
+    dummy_img = np.random.rand(10, 10)
+    source = ColumnDataSource(dict(image=[dummy_img],
+                                   name=[''],
+                                   x=[0],
+                                   y=[0],
+                                   dw=[0],
+                                   dh=[0]))
     # setup a map with y-axis inverted, and a virtual boundary of the scanner range
     p = figure(match_aspect=True, tools=[PanTool(), UndoTool(), RedoTool(), ResetTool(), SaveTool()])
     p.y_range.flipped = True
     plot = p.rect(x=0, y=0, width=SCAN_BOUNDARY_X, height=SCAN_BOUNDARY_Y, 
                   fill_alpha=0, line_color='gray')
+    p.image(source=source, image='image', 
+            x='x', y='y', dw='dw', dh='dh', 
+            name='name', palette="Greys256")
     
     # add wheel zoom tool
     wheel_zoom_tool = WheelZoomTool(zoom_on_axis=False)
@@ -253,6 +268,17 @@ def make_document(doc):
 
     connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success")
     connect_stm_bn.on_click(connnect_stm_callback)
+
+    # TOOLTIPS = [
+    #     ('name', '@name')
+    # ]
+    # p.add_tools(HoverTool(tooltips=TOOLTIPS))
+
+    # text_name = TextInput(title='', value='', disabled=True)
+    # text_name_cb = CustomJS(args=dict(text_name=text_name, source=source), code="""
+    #                         text_name.value = source.data.name;
+    #                         """)
+    # p.js_on_event(Tap, text_name_cb)
 
     status_text = TextInput(title='', value='Ready', disabled=True)
     # layout includes the map and the controls below
