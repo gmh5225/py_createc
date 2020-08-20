@@ -74,6 +74,7 @@ def make_document(doc):
                       angle=stm.angle, angle_units='deg',
                       fill_alpha=0, line_color='green')
         rect_que.append(plot)
+        status_text.value = 'Area selected'
 
     def clear_callback(event):
         """
