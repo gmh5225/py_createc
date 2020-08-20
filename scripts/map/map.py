@@ -52,6 +52,7 @@ def make_document(doc):
         rect_que.append(plot)
         textxy_show.value = f'x={stm.offset.x:.2f}, y={stm.offset.y:.2f}'
         textxy_tap.value = f'{stm.offset.x:.2f},{stm.offset.y:.2f}'
+        status_text.value = 'STM location shown'
 
     def mark_area_callback(event):
         """
@@ -189,12 +190,14 @@ def make_document(doc):
             nonlocal file_holder
             file_holder = FILE_TUPLE(file=file, filename=filename)
             plot_img()
+        status_text.value = 'File uploaded'
 
     def channel_selection_callback(attr, old, new):
         """
         Callback to change channel of image to show
         """
         plot_img()
+        status_text.value = 'Channel changed'
 
     def connnect_stm_callback(event):
         """
