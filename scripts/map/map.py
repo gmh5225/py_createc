@@ -273,15 +273,15 @@ def make_document(doc):
     connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success")
     connect_stm_bn.on_click(connnect_stm_callback)
 
-    filename_hover = HoverTool()
-    filename_hover.tooltips = """
-        <style>
-            .bk-tooltip>div:not(:last-child) {display:none;}
-        </style>
+    # filename_hover = HoverTool()
+    # filename_hover.tooltips = """
+    #     <style>
+    #         .bk-tooltip>div:not(:last-child) {display:none;}
+    #     </style>
 
-        <b>name: </b> @name <br>
-    """
-    p.add_tools(filename_hover)
+    #     <b>name: </b> @name <br>
+    # """
+    # p.add_tools(filename_hover)
 
     status_text = TextInput(title='', value='Ready', disabled=True)
     # layout includes the map and the controls below
