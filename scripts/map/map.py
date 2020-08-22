@@ -22,13 +22,10 @@ from utils.misc import XY2D, point_rot2D_y_inv
 from utils.image_utils import level_correction
 
 
-SIZE_THRESHOLD = 100 # Angstrom. Threshold for which channel to show
-IMAGE_CHANNEL0 = 0 # channel topo
-IMAGE_CHANNEL1 = 1 # channel current
 SCAN_BOUNDARY_X = 6000 # scanner range in angstrom
 SCAN_BOUNDARY_Y = 6000
 NUM_SIGMA = 3 # remove any outlier pixels of an image beyond a defined several sigmas
-MAX_CH = 8
+MAX_CH = 8 # maxium channel number, temp variable
 FILE_TUPLE = namedtuple('FILE_TUPLE', ['file', 'filename'])
 
 def make_document(doc):
@@ -126,7 +123,7 @@ def make_document(doc):
             ch_select.value = f'{ch_select.value[:-1]}{channel}'
 
         img = file.imgs[channel]
-        # img = level_correction(file.imgs[IMAGE_CHANNEL0])
+        # img = level_correction(file.imgs[channel])
 
         # remove any outlier
         threshold = np.mean(img)+NUM_SIGMA*np.std(img)
