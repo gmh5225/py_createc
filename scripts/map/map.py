@@ -1,5 +1,5 @@
 from bokeh.io import output_file, curdoc, show
-from bokeh.models import FileInput, ColumnDataSource
+from bokeh.models import FileInput, ColumnDataSource, CustomJSHover
 from bokeh.plotting import figure
 from bokeh.layouts import column, row
 from bokeh.server.server import Server
@@ -22,8 +22,8 @@ from utils.misc import XY2D, point_rot2D_y_inv
 from utils.image_utils import level_correction
 
 
-SCAN_BOUNDARY_X = 6000 # scanner range in angstrom
-SCAN_BOUNDARY_Y = 6000
+SCAN_BOUNDARY_X = 3000 # scanner range in angstrom
+SCAN_BOUNDARY_Y = 3000
 NUM_SIGMA = 3 # remove any outlier pixels of an image beyond a defined several sigmas
 MAX_CH = 8 # maxium channel number, temp variable
 FILE_TUPLE = namedtuple('FILE_TUPLE', ['file', 'filename'])
@@ -205,7 +205,7 @@ def make_document(doc):
         send_xy_bn.disabled=False
         show_stm_area_bn.disabled=False
         status_text.value = 'STM connected'
-		
+        
     rect_que = deque()
     file_holder = None
     stm = None
@@ -220,8 +220,12 @@ def make_document(doc):
     # setup a map with y-axis inverted, and a virtual boundary of the scanner range
     p = figure(match_aspect=True, tools=[PanTool(), UndoTool(), RedoTool(), ResetTool(), SaveTool()])
     p.y_range.flipped = True
-    plot = p.rect(x=0, y=0, width=SCAN_BOUNDARY_X, height=SCAN_BOUNDARY_Y, 
-                  fill_alpha=0, line_color='gray')
+    # plot = p.rect(x=0, y=0, width=SCAN_BOUNDARY_X, height=SCAN_BOUNDARY_Y, 
+    #               fill_alpha=0, line_color='gray', name='none')
+    p.line([-SCAN_BOUNDARY_X, -SCAN_BOUNDARY_X, SCAN_BOUNDARY_X, SCAN_BOUNDARY_X, -SCAN_BOUNDARY_X], 
+           [SCAN_BOUNDARY_Y, -SCAN_BOUNDARY_Y, -SCAN_BOUNDARY_Y, SCAN_BOUNDARY_Y, SCAN_BOUNDARY_Y])
+
+
     p.image(source=source, image='image', 
             x='x', y='y', dw='dw', dh='dh', 
             name='name', palette="Greys256")
@@ -270,16 +274,15 @@ def make_document(doc):
     connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success")
     connect_stm_bn.on_click(connnect_stm_callback)
 
-    # TOOLTIPS = [
-    #     ('name', '@name')
-    # ]
-    # p.add_tools(HoverTool(tooltips=TOOLTIPS))
+    filename_hover = HoverTool()
+    filename_hover.tooltips = """
+        <style>
+            .bk-tooltip>div:not(:last-child) {display:none;}
+        </style>
 
-    # text_name = TextInput(title='', value='', disabled=True)
-    # text_name_cb = CustomJS(args=dict(text_name=text_name, source=source), code="""
-    #                         text_name.value = source.data.name;
-    #                         """)
-    # p.js_on_event(Tap, text_name_cb)
+        <b>name: </b> @name <br>
+    """
+    p.add_tools(filename_hover)
 
     status_text = TextInput(title='', value='Ready', disabled=True)
     # layout includes the map and the controls below
