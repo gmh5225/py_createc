@@ -171,7 +171,7 @@ def make_document(doc):
             anchor = XY2D(x=anchor.x-file.size.x/2, y=anchor.y+file.size.y/2)
             width = file.size.x
             height = file.size.y
-        source.stream(dict(image=[img],
+        source.stream(dict(image=[np.flipud(img)],
                            name=[filename],
                            x=[anchor.x],
                            y=[anchor.y],
