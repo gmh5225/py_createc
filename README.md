@@ -12,3 +12,4 @@ To do:
 - refactor pyFile for inheritance
 - isolate confidential parameters
 - take gain into consideration for ramping current
+- hover to show file name does not work for tilted image in map script
