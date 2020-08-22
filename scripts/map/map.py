@@ -222,9 +222,8 @@ def make_document(doc):
     p.y_range.flipped = True
     # plot = p.rect(x=0, y=0, width=SCAN_BOUNDARY_X, height=SCAN_BOUNDARY_Y, 
     #               fill_alpha=0, line_color='gray', name='none')
-    p.line([-SCAN_BOUNDARY_X, -SCAN_BOUNDARY_X, SCAN_BOUNDARY_X, SCAN_BOUNDARY_X, -SCAN_BOUNDARY_X], 
-           [SCAN_BOUNDARY_Y, -SCAN_BOUNDARY_Y, -SCAN_BOUNDARY_Y, SCAN_BOUNDARY_Y, SCAN_BOUNDARY_Y])
-
+    # p.line([-SCAN_BOUNDARY_X, -SCAN_BOUNDARY_X, SCAN_BOUNDARY_X, SCAN_BOUNDARY_X, -SCAN_BOUNDARY_X], 
+    #        [SCAN_BOUNDARY_Y, -SCAN_BOUNDARY_Y, -SCAN_BOUNDARY_Y, SCAN_BOUNDARY_Y, SCAN_BOUNDARY_Y])
 
     p.image(source=source, image='image', 
             x='x', y='y', dw='dw', dh='dh', 
