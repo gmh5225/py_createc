@@ -107,6 +107,54 @@ def make_document(doc):
         stm.client.setparam('RotCMode', 0)
         status_text.value = 'XY coordinate sent'
 
+    def plot_image_url():
+        """
+        The function to plot image onto the frame using image_url
+        """
+        if file_holder is None:
+            return
+        file = file_holder.file
+        filename = file_holder.filename
+
+        channel = int(ch_select.value[-1])
+        if channel >= file.channels:
+            channel = file.channels-1
+            ch_select.value = f'{ch_select.value[:-1]}{channel}'
+
+        img = file.imgs[channel]
+
+        # remove any outlier
+        threshold = np.mean(img)+NUM_SIGMA*np.std(img)
+        img[img>threshold] = threshold
+        threshold = np.mean(img)-NUM_SIGMA*np.std(img)
+        img[img<threshold] = threshold
+
+        temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
+        anchor = XY2D(x=file.offset.x, 
+                      y=(file.offset.y+temp+file.size.y/2))
+
+        anchor = point_rot2D_y_inv(anchor, XY2D(x=file.offset.x, y=file.offset.y), 
+                             np.deg2rad(file.rotation))
+        # print('offset:', file.offset)
+        # print('angle:', file.rotation)
+        temp_file_name = f'image{filename}_{channel}.png'
+        path = os.path.join(os.path.dirname(__file__), 'temp', temp_file_name)
+        
+        plt.imsave(path, img, cmap='gray')
+        # p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='center',
+        #                          w=file.size.x, h=file.size.y, 
+        #                          angle=file.rotation, 
+        #                          angle_units='deg',
+        #                          name = filename)
+        path_que.append(path)
+        source.stream(dict(url=[temp_file_name],
+                           name=[filename],
+                           x=[anchor.x],
+                           y=[anchor.y],
+                           w=[file.size.x],
+                           h=[file.size.y],
+                           angle=[file.rotation]))
+
     def plot_img():
         """
         The main function to plot image onto the frame
@@ -186,14 +234,14 @@ def make_document(doc):
             file = DAT_IMG(file_binary=base64.b64decode(value), file_name=filename)
             nonlocal file_holder
             file_holder = FILE_TUPLE(file=file, filename=filename)
-            plot_img()
+            plot_image_url()
         status_text.value = 'File uploaded'
 
     def channel_selection_callback(attr, old, new):
         """
         Callback to change channel of image to show
         """
-        plot_img()
+        plot_image_url()
         status_text.value = 'Channel changed'
 
     def connnect_stm_callback(event):
@@ -211,12 +259,19 @@ def make_document(doc):
     stm = None
     
     dummy_img = np.random.rand(10, 10)
-    source = ColumnDataSource(dict(image=[dummy_img],
+    # source = ColumnDataSource(dict(image=[dummy_img],
+    #                                name=[''],
+    #                                x=[0],
+    #                                y=[0],
+    #                                dw=[0],
+    #                                dh=[0]))
+    source = ColumnDataSource(dict(url=['image_dummy.png'],
                                    name=[''],
                                    x=[0],
                                    y=[0],
-                                   dw=[0],
-                                   dh=[0]))
+                                   w=[0],
+                                   h=[0],
+                                   angle=[0]))
     # setup a map with y-axis inverted, and a virtual boundary of the scanner range
     p = figure(match_aspect=True, tools=[PanTool(), UndoTool(), RedoTool(), ResetTool(), SaveTool()])
     p.y_range.flipped = True
@@ -225,10 +280,18 @@ def make_document(doc):
     p.line([-SCAN_BOUNDARY_X, -SCAN_BOUNDARY_X, SCAN_BOUNDARY_X, SCAN_BOUNDARY_X, -SCAN_BOUNDARY_X], 
            [SCAN_BOUNDARY_Y, -SCAN_BOUNDARY_Y, -SCAN_BOUNDARY_Y, SCAN_BOUNDARY_Y, SCAN_BOUNDARY_Y])
 
-    main_renderer=p.image(source=source, image='image', 
-                    x='x', y='y', dw='dw', dh='dh', 
-                    name='name', palette="Greys256")
-    
+    # main_renderer=p.image(source=source, image='image', 
+    #                 x='x', y='y', dw='dw', dh='dh', 
+    #                 name='name', palette="Greys256")
+
+    main_renderer=p.image_url(source=source, url='url', 
+                              x='x', y='y', 
+                              w='w', h='h', 
+                              name='name',
+                              angle='angle',
+                              anchor='center',
+                              angle_units='deg')
+
     # add wheel zoom tool
     wheel_zoom_tool = WheelZoomTool(zoom_on_axis=False)
     p.add_tools(wheel_zoom_tool)
