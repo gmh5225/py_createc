@@ -225,9 +225,9 @@ def make_document(doc):
     # p.line([-SCAN_BOUNDARY_X, -SCAN_BOUNDARY_X, SCAN_BOUNDARY_X, SCAN_BOUNDARY_X, -SCAN_BOUNDARY_X], 
     #        [SCAN_BOUNDARY_Y, -SCAN_BOUNDARY_Y, -SCAN_BOUNDARY_Y, SCAN_BOUNDARY_Y, SCAN_BOUNDARY_Y])
 
-    p.image(source=source, image='image', 
-            x='x', y='y', dw='dw', dh='dh', 
-            name='name', palette="Greys256")
+    main_renderer=p.image(source=source, image='image', 
+                    x='x', y='y', dw='dw', dh='dh', 
+                    name='name', palette="Greys256")
     
     # add wheel zoom tool
     wheel_zoom_tool = WheelZoomTool(zoom_on_axis=False)
@@ -273,15 +273,25 @@ def make_document(doc):
     connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success")
     connect_stm_bn.on_click(connnect_stm_callback)
 
-    # filename_hover = HoverTool()
-    # filename_hover.tooltips = """
-    #     <style>
-    #         .bk-tooltip>div:not(:last-child) {display:none;}
-    #     </style>
-
-    #     <b>name: </b> @name <br>
-    # """
-    # p.add_tools(filename_hover)
+    hover_fiexed_position_cb = CustomJS(code="""
+                                        var tooltips = document.getElementsByClassName("bk-tooltip");
+                                        for (var i = 0, len = tooltips.length; i < len; i ++) {
+                                        tooltips[i].style.top = ""; // unset what bokeh.js sets
+                                        tooltips[i].style.left = "";
+                                        tooltips[i].style.top = "0vh";
+                                        tooltips[i].style.left = "4vh";
+                                        }
+                                        """)
+    filename_hover = HoverTool(renderers=[main_renderer], 
+                               callback=hover_fiexed_position_cb,
+                               point_policy='snap_to_data')
+    filename_hover.tooltips = """
+        <style>
+            .bk-tooltip>div:not(:last-child) {display:none;}
+        </style>
+        @name
+    """
+    p.add_tools(filename_hover)
 
     status_text = TextInput(title='', value='Ready', disabled=True)
     # layout includes the map and the controls below
