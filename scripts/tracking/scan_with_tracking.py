@@ -68,10 +68,15 @@ for ch_zoff in Height_Range_Angstrom:
         idx += 1
         logger.info('ch_bias %.2f' % round(ch_bias,2))
         logger.info('scan for alignment to template')
-        createc.pre_scan_01(img_des.chmode, img_des.rotation, img_des.ddeltaX,
-                                   img_des.deltaX_dac, img_des.channels_code)
-        createc.do_scan_01()
-        time.sleep(2)
+        createc.pre_scan_01(chmode=img_des.chmode, 
+		                    ddeltaX=img_des.ddeltaX,
+                            deltaX_dac=img_des.deltaX_dac, 
+							channels_code=img_des.channels_code)
+        time_to_wait = float(createc.client.getparam('Sec/Image:'))
+        createc.client.scanstart()
+        time.sleep(time_to_wait)
+        while createc.client.scanstatus:
+            time.sleep(5)
         createc.client.quicksave()
         cc_file_4align = createc.client.savedatfilename
         logger.info('cc_file_4align: ' + cc_file_4align[-params['g_filename_len']:])
@@ -90,8 +95,11 @@ for ch_zoff in Height_Range_Angstrom:
         # for testing shift registration
         """
         import random
-        createc.do_scan_01()
-        time.sleep(2)
+        time_to_wait = float(createc.client.getparam('Sec/Image:'))
+        createc.client.scanstart()
+        time.sleep(time_to_wait)
+        while createc.client.scanstatus:
+            time.sleep(5)
         createc.client.quicksave()
         cc_file_after_align = createc.client.savedatfilename
         logger.info('cc_file_after_align: '+ cc_file_after_align[-params['g_filename_len']:])
@@ -106,37 +114,41 @@ for ch_zoff in Height_Range_Angstrom:
 
         logger.info('const current mode scan')
         createc.pre_scan_01(chmode=params['Ccmode']['mode'],
-                            rotation=img_des.rotation,
-                            ddeltaX=img_des.ddeltaX,
                             deltaX_dac=params['deltaX_dac'],
                             channels_code=params['Ccmode']['channels_code'])
-        createc.do_scan_01()
-        time.sleep(2)
+        time_to_wait = float(createc.client.getparam('Sec/Image:'))
+        createc.client.scanstart()
+        time.sleep(time_to_wait)
+        while createc.client.scanstatus:
+            time.sleep(5)
         createc.client.quicksave()
         logger.info('cc: ' + createc.client.savedatfilename[-params['g_filename_len']:])
         img_previous = DAT_IMG(createc.client.savedatfilename)
 
         logger.info('const height mode scan')
         createc.pre_scan_01(chmode=params['Chmode']['mode'],
-                            rotation=img_des.rotation,
                             ddeltaX=params['Chmode']['ddeltaX'],
-                            deltaX_dac=params['deltaX_dac'],
                             channels_code=params['Chmode']['channels_code'],
                             ch_zoff=ch_zoff, 
                             ch_bias=ch_bias)
-        createc.do_scan_01()
-        time.sleep(2)
+        time_to_wait = float(createc.client.getparam('Sec/Image:'))
+        createc.client.scanstart()
+        time.sleep(time_to_wait)
+        while createc.client.scanstatus:
+            time.sleep(5)
         createc.client.quicksave()
         logger.info('ch: ' + createc.client.savedatfilename[-params['g_filename_len']:])
 
 logger.info('Final template scan')        
 createc.pre_scan_01(chmode=img_des.chmode,
-                    rotation=img_des.rotation,
                     ddeltaX=img_des.ddeltaX,
                     deltaX_dac=img_des.deltaX_dac,
                     channels_code=img_des.channels_code)
-createc.do_scan_01()
-time.sleep(2)
+time_to_wait = float(createc.client.getparam('Sec/Image:'))
+createc.client.scanstart()
+time.sleep(time_to_wait)
+while createc.client.scanstatus:
+	time.sleep(5)
 createc.client.quicksave()
 logger.info(createc.client.savedatfilename[-params['g_filename_len']:])                      
 logger.info('Done.')
