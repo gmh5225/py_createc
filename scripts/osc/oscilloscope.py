@@ -23,7 +23,7 @@ import queue
 import argparse
 
 
-Scope_Points = 1200  # total points to show in each channel in the scope
+Scope_Points = 6000  # total points to show in each channel in the scope
 Log_Avg_Len = 5  # Average through recent X points for logging
 Log_Interval = 60  # Logging every X seconds
 Stream_Interval = 0.2  # I/O data fetching interval in seconds (Stream_Interval <= Consumer_Timeout)
