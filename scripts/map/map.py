@@ -254,6 +254,11 @@ def make_document(doc):
         show_stm_area_bn.disabled=False
         status_text.value = 'STM connected'
         
+
+    """
+    Main body below
+    """
+    
     rect_que = deque()
     file_holder = None
     stm = None
@@ -292,16 +297,16 @@ def make_document(doc):
                               anchor='center',
                               angle_units='deg')
 
-    # add wheel zoom tool
+    # Add the wheel zoom tool
     wheel_zoom_tool = WheelZoomTool(zoom_on_axis=False)
     p.add_tools(wheel_zoom_tool)
     p.toolbar.active_scroll = wheel_zoom_tool
     
-    # for upload file
+    # Button for uploading file
     file_input = FileInput(accept=".dat", multiple=True)
     file_input.on_change('value', file_input_callback)
 
-    # buttons for clear marks and send xy coordinates
+    # buttons for clearing marks and sending xy coordinates
     clear_marks_bn = Button(label="Clear Marks", button_type="success")
     clear_marks_bn.on_click(clear_callback)
     send_xy_bn = Button(label="Send XY to STM", button_type="success", disabled=True)
@@ -309,7 +314,7 @@ def make_document(doc):
     show_stm_area_bn = Button(label="Show STM Location", button_type="success", disabled=True)
     show_stm_area_bn.on_click(show_area_callback)
 
-    # A tapping on the map will show the xy coordinates as well as mark a scanning area
+    # A double-tapping on the map will show the xy coordinates as well as mark a scanning area
     textxy_tap = TextInput(title='', value='', disabled=True)
     textxy_show = TextInput(title='', value='', disabled=True)
     show_coord_cb = CustomJS(args=dict(textxy_tap=textxy_tap, textxy_show=textxy_show), code="""
@@ -320,7 +325,8 @@ def make_document(doc):
                             """)
     p.js_on_event(DoubleTap, show_coord_cb)
     p.on_event(DoubleTap, mark_area_callback)
-
+    
+    # Show coordinates when hovering over the canvas
     textxy_hover = TextInput(title='', value='', disabled=True)
     hover_coord_cb = CustomJS(args=dict(textxy_hover=textxy_hover), code="""
                               var x=cb_data['geometry'].x;
@@ -328,34 +334,47 @@ def make_document(doc):
                               textxy_hover.value = 'x='+ x.toFixed(2) + ', y=' + y.toFixed(2);
                               """)
     p.add_tools(HoverTool(callback=hover_coord_cb, tooltips=None))
-    p.toolbar_location = None
 
+    # Hide the toolbar
+    p.toolbar_location = None
+    
+    # Dropdown menu to select which channel to show
     ch_select = Select(title="", value="ch0", options=[f'ch{number}' for number in range(MAX_CH)])
     ch_select.on_change('value', channel_selection_callback)
-
+    
+    # A button to (re)connect to the STM software
     connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success")
     connect_stm_bn.on_click(connnect_stm_callback)
 
-    hover_fiexed_position_cb = CustomJS(code="""
-                                        var tooltips = document.getElementsByClassName("bk-tooltip");
-                                        for (var i = 0, len = tooltips.length; i < len; i ++) {
-                                        tooltips[i].style.top = ""; // unset what bokeh.js sets
-                                        tooltips[i].style.left = "";
-                                        tooltips[i].style.top = "0vh";
-                                        tooltips[i].style.left = "4vh";
-                                        }
-                                        """)
-    filename_hover = HoverTool(renderers=[main_renderer], 
-                               callback=hover_fiexed_position_cb,
-                               point_policy='snap_to_data')
-    filename_hover.tooltips = """
-        <style>
-            .bk-tooltip>div:not(:last-child) {display:none;}
-        </style>
-        @name
     """
-    p.add_tools(filename_hover)
+    # show the filename of the topmost image, but it doesn't work for rotated image.
+    # something needs to be done on the bokeh package to resolve the issue.
+    # so this code below is not in use.
+    """
+    
+    # hover_fiexed_position_cb = CustomJS(code="""
+    #                                     var tooltips = document.getElementsByClassName("bk-tooltip");
+    #                                     for (var i = 0, len = tooltips.length; i < len; i ++) {
+    #                                     tooltips[i].style.top = ""; // unset what bokeh.js sets
+    #                                     tooltips[i].style.left = "";
+    #                                     tooltips[i].style.top = "0vh";
+    #                                     tooltips[i].style.left = "4vh";
+    #                                     }
+    #                                     """)
+    # filename_hover = HoverTool(renderers=[main_renderer], 
+    #                            callback=hover_fiexed_position_cb,
+    #                            point_policy='snap_to_data')
+    # filename_hover.tooltips = """
+    #     <style>
+    #         .bk-tooltip>div:not(:last-child) {display:none;}
+    #     </style>
+    #     @name
+    # """
+    # 
+    # p.add_tools(filename_hover)
 
+
+    # show the status of the interface
     status_text = TextInput(title='', value='Ready', disabled=True)
     # layout includes the map and the controls below
     controls_1 = row([file_input, ch_select, textxy_show], sizing_mode='stretch_width')
