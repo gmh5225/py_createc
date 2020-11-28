@@ -26,6 +26,8 @@ def createc_fbz():
 def createc_adc(channel, kelvin=False, board=1):
     """   
     function returning Createc channel ADC value
+	Note that the kelvin param is for the old software.
+	For the new version STMAFM 4.3, only ADC values are meant to be read out.
     """
     import py_createc.Createc_pyCOM as cp
     createc = cp.CreatecWin32()
@@ -35,7 +37,24 @@ def createc_adc(channel, kelvin=False, board=1):
         data = py_createc.DT670.Volt2Kelvin(data)
     return data
 
-
+def createc_auxadc_6():
+    """
+	function to return the STM temperature as float number in Kelvin
+	"""
+    import py_createc.Createc_pyCOM as cp
+    createc = cp.CreatecWin32()
+    createc.client.setparam('MEMO_STMAFM','') # dummy function to 'manually' update the temperature reading
+    return float(createc.client.getparam('T_AUXADC6[K]'))
+    
+def createc_auxadc_7():
+    """
+	function to return the LHe temperature as float number in Kelvin
+	"""
+    import py_createc.Createc_pyCOM as cp
+    createc = cp.CreatecWin32()
+    createc.client.setparam('MEMO_STMAFM','') # dummy function to 'manually' update the temperature reading
+    return float(createc.client.getparam('T_AUXADC7[K]'))
+	
 def f_cpu():
     """   
     function returning cpu in percetage
