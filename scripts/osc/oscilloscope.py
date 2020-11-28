@@ -139,8 +139,8 @@ if __name__ == '__main__':
         y_labels = ['Feedback Z', 'Current']
         logger_name = 'zi'  
     elif args.temperature:
-        producer_funcs = [partial(dp.createc_adc, channel=2, kelvin=True, board=1), 
-                          partial(dp.createc_adc, channel=3, kelvin=True, board=1)]
+        producer_funcs = [dp.createc_auxadc_6, # new version STMAFM 4.3 provides direct read of temperature as string.
+                          dp.createc_auxadc_7] # these two get the temperature as float number in Kelvin
         y_labels = ['STM(K)', 'LHe(K)']
         logger_name = 'temperature' 
     elif args.cpu:
