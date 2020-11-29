@@ -2,11 +2,11 @@
 #      Oscilloscope with logging (graphing by Bokeh)
 #      implemeted with producer/consumer model
 #      individual thread for each producer/consumer
-#                               --->(consumer)Bokeh server for graphing
-#                             /
-#       data_producer-
-#                             \
-#                               --->(consumer)Logger
+#                         --->(consumer)Bokeh server for graphing
+#                       /
+#       data_producer--
+#                       \
+#                         --->(consumer)Logger
 ###########################
 
 import py_createc.data_producer as dp
@@ -18,7 +18,7 @@ from functools import partial
 import time
 import numpy as np
 import datetime as dt
-from threading import Thread, main_thread
+from threading import Thread, main_thread, Event
 import queue
 import argparse
 
@@ -30,7 +30,7 @@ Stream_Interval = 0.2  # I/O data fetching interval in seconds (Stream_Interval 
 Consumer_Timeout = None  # timeout for consumers in second, None for never timeout
 
 
-def data_producer(funcs, graph_q, logger_q):
+def data_producer(funcs, graph_q, logger_q, quit):
     """
     To produce data
     :param funcs: data producer functions
@@ -38,14 +38,14 @@ def data_producer(funcs, graph_q, logger_q):
     :param logger_q: q queue to hold the same data for logger
     :return: None
     """
-    while main_thread().is_alive():
+    while not quit.is_set():
         data_pak = tuple((dt.datetime.now(), func()) for func in funcs)
         graph_q.put(data_pak)
         logger_q.put(data_pak)
         time.sleep(Stream_Interval)
 
 
-def logger(buffer_q, labels, logger_name):
+def logger(buffer_q, labels, logger_name, quit):
     """
     A logger function logging result to stdout and/or file
     :param buffer_q: a queue of data from data producer
@@ -69,7 +69,7 @@ def logger(buffer_q, labels, logger_name):
         msg = f'{labels[index]}\t{data[0]:%Y-%m-%d %H:%M:%S}\t{data[1]:.3f}'
         logger.info(msg)
 
-    while main_thread().is_alive():
+    while not quit.is_set():
         try:
             data_pak = buffer_q.get(timeout=Consumer_Timeout)
         except queue.Empty:
@@ -172,9 +172,10 @@ if __name__ == '__main__':
     logger_q = queue.Queue()
 
     # Start the data producer thread and the logger thread
-    producer = Thread(target=data_producer, args=(producer_funcs, graph_q, logger_q))
+    quit = Event() # signal for terminating all threads
+    producer = Thread(target=data_producer, args=(producer_funcs, graph_q, logger_q, quit))
     producer.start()
-    logging = Thread(target=logger, args=(logger_q, y_labels, logger_name))
+    logging = Thread(target=logger, args=(logger_q, y_labels, logger_name, quit))
     logging.start()
     print('Start')
 
@@ -186,5 +187,6 @@ if __name__ == '__main__':
     try:
         server.io_loop.start()
     except KeyboardInterrupt:
-        print('keyboard interruption')
+        quit.set()
+        print('Keyboard interruption')
     print('Done')
