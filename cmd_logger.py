@@ -16,7 +16,7 @@ class Tee(object):
   def write(self, data):
     sys.__stdout__.write(data)
     sys.__stdout__.flush()
-    if data!='>>> ':
+    if data!=sys.ps1:
         self.log.write(data)
         self.log.flush()
 
