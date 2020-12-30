@@ -18,8 +18,8 @@ import os
 import secrets
 from createc.Createc_pyFile import DAT_IMG
 from createc.Createc_pyCOM import CreatecWin32
-from utils.misc import XY2D, point_rot2D_y_inv
-from utils.image_utils import level_correction
+from createc.utils.misc import XY2D, point_rot2D_y_inv
+from createc.utils.image_utils import level_correction
 
 
 SCAN_BOUNDARY_X = 3000 # scanner range in angstrom
