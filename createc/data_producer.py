@@ -18,9 +18,9 @@ def createc_fbz():
     """   
     function returning Createc channel feedback z value
     """
-    import py_createc.Createc_pyCOM as cp
-    createc = cp.CreatecWin32()
-    return createc.client.getdacvalfb()
+    import createc.Createc_pyCOM as cp
+    stm = cp.CreatecWin32()
+    return stm.client.getdacvalfb()
 
 
 def createc_adc(channel, kelvin=False, board=1):
@@ -29,31 +29,31 @@ def createc_adc(channel, kelvin=False, board=1):
 	Note that the kelvin param is for the old software.
 	For the new version STMAFM 4.3, only ADC values are meant to be read out.
     """
-    import py_createc.Createc_pyCOM as cp
-    createc = cp.CreatecWin32()
-    data = createc.client.getadcvalf(board, channel)
+    import createc.Createc_pyCOM as cp
+    stm = cp.CreatecWin32()
+    data = stm.client.getadcvalf(board, channel)
     if kelvin:
-        import py_createc.DT670
-        data = py_createc.DT670.Volt2Kelvin(data)
+        import createc.DT670
+        data = createc.DT670.Volt2Kelvin(data)
     return data
 
 def createc_auxadc_6():
     """
 	function to return the STM temperature as float number in Kelvin
 	"""
-    import py_createc.Createc_pyCOM as cp
-    createc = cp.CreatecWin32()
-    createc.client.setparam('MEMO_STMAFM','') # dummy function to 'manually' update the temperature reading
-    return float(createc.client.getparam('T_AUXADC6[K]'))
+    import createc.Createc_pyCOM as cp
+    stm = cp.CreatecWin32()
+    stm.client.setparam('MEMO_STMAFM','') # dummy function to 'manually' update the temperature reading
+    return float(stm.client.getparam('T_AUXADC6[K]'))
     
 def createc_auxadc_7():
     """
 	function to return the LHe temperature as float number in Kelvin
 	"""
-    import py_createc.Createc_pyCOM as cp
-    createc = cp.CreatecWin32()
-    createc.client.setparam('MEMO_STMAFM','') # dummy function to 'manually' update the temperature reading
-    return float(createc.client.getparam('T_AUXADC7[K]'))
+    import createc.Createc_pyCOM as cp
+    stm = cp.CreatecWin32()
+    stm.client.setparam('MEMO_STMAFM','') # dummy function to 'manually' update the temperature reading
+    return float(stm.client.getparam('T_AUXADC7[K]'))
 	
 def f_cpu():
     """   
@@ -175,11 +175,11 @@ def createc_ADC1_T():
     (datetime, float)
         A tuple of datetime object and the current streaming data
     """
-    import Createc_pyCOM as cp
+    import createc.Createc_pyCOM as cp
     import DT670
-    createc = cp.CreatecWin32()
+    stm = cp.CreatecWin32()
     while True:
-        ADC1 = createc.client.getadcvalf(1, 1)
+        ADC1 = stm.client.getadcvalf(1, 1)
         yield(datetime.datetime.now(), DT670.Volt2Kelvin(ADC1))
 
 
@@ -192,11 +192,11 @@ def createc_ADC2_T():
     (datetime, float)
         A tuple of datetime object and the current streaming data
     """
-    import Createc_pyCOM as cp
+    import createc.Createc_pyCOM as cp
     import DT670
-    createc = cp.CreatecWin32()
+    stm = cp.CreatecWin32()
     while True:
-        ADC2 = createc.client.getadcvalf(1, 2)
+        ADC2 = stm.client.getadcvalf(1, 2)
         yield(datetime.datetime.now(), DT670.Volt2Kelvin(ADC2))
 
 
