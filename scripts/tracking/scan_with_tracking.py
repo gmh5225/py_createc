@@ -52,8 +52,8 @@ with open('./scripts/tracking/parameters.yaml', 'rt') as f:
     params = yaml.safe_load(f.read())
     
 logger.info('Start.'+'*'*30)    
-createc = CreatecWin32()
-template = createc.savedatfilename if params['use_last_as_template'] else params['template_folder']+params['template_file']
+stm = CreatecWin32()
+template = stm.savedatfilename if params['use_last_as_template'] else params['template_folder']+params['template_file']
 img_des = DAT_IMG(template)
 img_previous = img_des
 logger.info('template: '+ template[-params['g_filename_len']:])
@@ -68,17 +68,17 @@ for ch_zoff in Height_Range_Angstrom:
         idx += 1
         logger.info('ch_bias %.2f' % round(ch_bias,2))
         logger.info('scan for alignment to template')
-        createc.pre_scan_01(chmode=img_des.chmode, 
+        stm.pre_scan_01(chmode=img_des.chmode, 
 		                    ddeltaX=img_des.ddeltaX,
                             deltaX_dac=img_des.deltaX_dac, 
 							channels_code=img_des.channels_code)
-        time_to_wait = float(createc.client.getparam('Sec/Image:'))
-        createc.client.scanstart()
+        time_to_wait = float(stm.client.getparam('Sec/Image:'))
+        stm.client.scanstart()
         time.sleep(time_to_wait)
-        while createc.client.scanstatus:
+        while stm.client.scanstatus:
             time.sleep(5)
-        createc.client.quicksave()
-        cc_file_4align = createc.client.savedatfilename
+        stm.client.quicksave()
+        cc_file_4align = stm.client.savedatfilename
         logger.info('cc_file_4align: ' + cc_file_4align[-params['g_filename_len']:])
         
         logger.info('Align to template')
@@ -88,67 +88,67 @@ for ch_zoff in Height_Range_Angstrom:
                            continuous_drift=True)
 
         logger.info('[dy, dx] = {}'.format(shift))
-        createc.setxyoffpixel(dx=shift[1], dy=shift[0])
+        stm.setxyoffpixel(dx=shift[1], dy=shift[0])
         time.sleep(params['g_reposition_delay'])
             
 
         # for testing shift registration
         """
         import random
-        time_to_wait = float(createc.client.getparam('Sec/Image:'))
-        createc.client.scanstart()
+        time_to_wait = float(stm.client.getparam('Sec/Image:'))
+        stm.client.scanstart()
         time.sleep(time_to_wait)
-        while createc.client.scanstatus:
+        while stm.client.scanstatus:
             time.sleep(5)
-        createc.client.quicksave()
-        cc_file_after_align = createc.client.savedatfilename
+        stm.client.quicksave()
+        cc_file_after_align = stm.client.savedatfilename
         logger.info('cc_file_after_align: '+ cc_file_after_align[-params['g_filename_len']:])
         
         logger.info('Mock drifting')
         shift = random.choice([50, -50]), random.choice([50, -50])
         logger.info('[dy, dx] = {}'.format(shift))
-        createc.setxyoffpixel(dx=shift[1], dy=shift[0])
+        stm.setxyoffpixel(dx=shift[1], dy=shift[0])
         time.sleep(params['g_reposition_delay'])        
         """
 
 
         logger.info('const current mode scan')
-        createc.pre_scan_01(chmode=params['Ccmode']['mode'],
+        stm.pre_scan_01(chmode=params['Ccmode']['mode'],
                             deltaX_dac=params['deltaX_dac'],
                             channels_code=params['Ccmode']['channels_code'])
-        time_to_wait = float(createc.client.getparam('Sec/Image:'))
-        createc.client.scanstart()
+        time_to_wait = float(stm.client.getparam('Sec/Image:'))
+        stm.client.scanstart()
         time.sleep(time_to_wait)
-        while createc.client.scanstatus:
+        while stm.client.scanstatus:
             time.sleep(5)
-        createc.client.quicksave()
-        logger.info('cc: ' + createc.client.savedatfilename[-params['g_filename_len']:])
-        img_previous = DAT_IMG(createc.client.savedatfilename)
+        stm.client.quicksave()
+        logger.info('cc: ' + stm.client.savedatfilename[-params['g_filename_len']:])
+        img_previous = DAT_IMG(stm.client.savedatfilename)
 
         logger.info('const height mode scan')
-        createc.pre_scan_01(chmode=params['Chmode']['mode'],
+        stm.pre_scan_01(chmode=params['Chmode']['mode'],
                             ddeltaX=params['Chmode']['ddeltaX'],
                             channels_code=params['Chmode']['channels_code'],
                             ch_zoff=ch_zoff, 
                             ch_bias=ch_bias)
-        time_to_wait = float(createc.client.getparam('Sec/Image:'))
-        createc.client.scanstart()
+        time_to_wait = float(stm.client.getparam('Sec/Image:'))
+        stm.client.scanstart()
         time.sleep(time_to_wait)
-        while createc.client.scanstatus:
+        while stm.client.scanstatus:
             time.sleep(5)
-        createc.client.quicksave()
-        logger.info('ch: ' + createc.client.savedatfilename[-params['g_filename_len']:])
+        stm.client.quicksave()
+        logger.info('ch: ' + stm.client.savedatfilename[-params['g_filename_len']:])
 
 logger.info('Final template scan')        
-createc.pre_scan_01(chmode=img_des.chmode,
+stm.pre_scan_01(chmode=img_des.chmode,
                     ddeltaX=img_des.ddeltaX,
                     deltaX_dac=img_des.deltaX_dac,
                     channels_code=img_des.channels_code)
-time_to_wait = float(createc.client.getparam('Sec/Image:'))
-createc.client.scanstart()
+time_to_wait = float(stm.client.getparam('Sec/Image:'))
+stm.client.scanstart()
 time.sleep(time_to_wait)
-while createc.client.scanstatus:
+while stm.client.scanstatus:
 	time.sleep(5)
-createc.client.quicksave()
-logger.info(createc.client.savedatfilename[-params['g_filename_len']:])                      
+stm.client.quicksave()
+logger.info(stm.client.savedatfilename[-params['g_filename_len']:])                      
 logger.info('Done.')
