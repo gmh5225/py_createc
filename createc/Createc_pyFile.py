@@ -14,7 +14,7 @@ from itertools import compress
 import io
 import os
 from collections import namedtuple
-from utils.misc import XY2D
+from .utils.misc import XY2D
 
 dir = os.path.dirname(__file__)
 cgc_file = os.path.join(dir, 'Createc_global_const.yaml')

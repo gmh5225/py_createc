@@ -7,7 +7,7 @@ Created on Thu May 16 17:07:44 2019
 import numpy as np
 import time
 import win32com.client as win32
-from utils.misc import XY2D
+from .utils.misc import XY2D
 import yaml
 import os 
 from pywintypes import com_error
