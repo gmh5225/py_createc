@@ -8,14 +8,14 @@ Scan with tracking
 Autofilesave should be OFF
 
 """
-from py_createc.Createc_pyFile import DAT_IMG
+from createc.Createc_pyFile import DAT_IMG
 #from skimage.feature import register_translation as rt
 from skimage.registration import phase_cross_correlation as pcc
 from skimage.exposure import rescale_intensity as ri
 from skimage.filters import gaussian
 import numpy as np
 import time
-from py_createc.Createc_pyCOM import CreatecWin32
+from createc.Createc_pyCOM import CreatecWin32
 import logging
 import logging.config
 import yaml
