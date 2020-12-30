@@ -16,8 +16,8 @@ import tornado.web
 import numpy as np
 import os
 import secrets
-from py_createc.Createc_pyFile import DAT_IMG
-from py_createc.Createc_pyCOM import CreatecWin32
+from createc.Createc_pyFile import DAT_IMG
+from createc.Createc_pyCOM import CreatecWin32
 from utils.misc import XY2D, point_rot2D_y_inv
 from utils.image_utils import level_correction
 
