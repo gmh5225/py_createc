@@ -198,6 +198,7 @@ class DAT_IMG:
         self.yPixel = int(self.meta['Num.Y / Num.Y'])
         self.channels = int(self.meta['Channels / Channels'])
         self.ch_zoff = float(self.meta['CHModeZoff / CHModeZoff'])
+        self.ch_bias = float(self.meta['CHModeBias[mV] / CHModeBias[mV]'])
         self.chmode = int(self.meta['CHMode / CHMode'])
         self.rotation = float(self.meta['Rotation / Rotation'])
         self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
