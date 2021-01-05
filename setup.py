@@ -12,9 +12,9 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://version.aalto.fi/gitlab/xuc1/py_createc",
-    packages=setuptools.find_packages(where='createc'),
-    package_dir={
-        '': 'createc',        
+    packages=setuptools.find_packages(),
+    package_data={
+        'createc': ['*.yaml'],        
     },
     classifiers=[
         "Programming Language :: Python :: 3",
