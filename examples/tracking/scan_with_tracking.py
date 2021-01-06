@@ -43,12 +43,12 @@ def find_shift(img_src, img_des, img_previous, extra_sec, continuous_drift=True)
     return shift_c if continuous_drift else shift
 
 
-with open('./scripts/tracking/logging_tracking.yaml', 'rt') as f:
+with open('./logging_tracking.yaml', 'rt') as f:
     config = yaml.safe_load(f.read())
 logging.config.dictConfig(config)    
 logger = logging.getLogger('main')
  
-with open('./scripts/tracking/parameters.yaml', 'rt') as f:
+with open('./parameters.yaml', 'rt') as f:
     params = yaml.safe_load(f.read())
     
 logger.info('Start.'+'*'*30)    
