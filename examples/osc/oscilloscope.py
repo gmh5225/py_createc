@@ -55,7 +55,7 @@ def logger(buffer_q, labels, logger_name, quit):
     import logging.config
     import logging
 
-    logging.config.fileConfig('./scripts/osc/logger.config', defaults={'logfilename': './logs/osc_'+logger_name+'.log'})
+    logging.config.fileConfig('./logger.config', defaults={'logfilename': logger_name+'.log'})
     logger = logging.getLogger('this_logger')
 
     try:
