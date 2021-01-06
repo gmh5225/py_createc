@@ -5,6 +5,7 @@ Modules and scripts to interface with Createc STM
    
         After `import createc` an instance can be created using
         `stm = createc.Createc_pyCOM.CreatecWin32()`
+
         By calling `stm.client.stmbeep()`, the testing beep sound will be heard.
         All other availabe remote operation can be found at [spm-wiki](http://spm-wiki.createc.de/index.php?title=STMAFM_Remote_Operation)
         
