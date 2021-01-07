@@ -19,7 +19,7 @@ from createc.Createc_pyCOM import CreatecWin32
 import logging
 import logging.config
 import yaml
-
+import sys
 
 def level_correction(Y):
     m, n = Y.shape
@@ -51,11 +51,21 @@ logger = logging.getLogger('main')
 with open('./parameters.yaml', 'rt') as f:
     params = yaml.safe_load(f.read())
     
-logger.info('Start.'+'*'*30)    
+   
 stm = CreatecWin32()
 template = stm.savedatfilename if params['use_last_as_template'] else params['template_folder']+params['template_file']
-img_des = DAT_IMG(template)
+if template == '':
+    print('There is no most recent image to be used as template')
+    sys.exit()
+    
+try:
+    img_des = DAT_IMG(template)
+except FileNotFoundError:
+    print('Template file cannot be opened.')
+    sys.exit()
+    
 img_previous = img_des
+logger.info('Start.'+'*'*30) 
 logger.info('template: '+ template[-params['g_filename_len']:])
 
 idx = 0
