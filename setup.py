@@ -5,7 +5,6 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="createc",
-    version="0.0.1",
     author="Chen Xu",
     author_email="chen.xu@aalto.fi",
     description="A python interface with Createc scanning probe microscope",
