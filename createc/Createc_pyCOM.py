@@ -9,25 +9,33 @@ import time
 import win32com.client as win32
 from .utils.misc import XY2D
 import yaml
-import os 
+import os
 from pywintypes import com_error
 
-dir = os.path.dirname(__file__)
-cgc_file = os.path.join(dir, 'Createc_global_const.yaml')
+this_dir = os.path.dirname(__file__)
+cgc_file = os.path.join(this_dir, 'Createc_global_const.yaml')
 with open(cgc_file, 'rt') as f:
     cgc = yaml.safe_load(f.read())
 
-class CreatecWin32():
-    """
-    A Createc wrapper class
-    input: None
-    output:  Createc Win32COM object with some customized methods
-    See http://spm-wiki.createc.de for a complete list for factory default methods
+
+class CreatecWin32:
+    r""" A Createc wrapper class
+    The remote operation from http://spm-wiki.createc.de already provides lots of methods,
+    this class is just a wrapper so many more custom methods can be added.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    out : CreatecWin32
+        Createc Win32COM object with some customized methods
     """
     def __init__(self):
-        #self.client = win32.gencache.EnsureDispatch("pstmafm.stmafmrem") # does not work for the new version STMAFM 4.3
+
+        # self.client = win32.gencache.EnsureDispatch("pstmafm.stmafmrem") # does not work for the new version STMAFM 4.3
         try:
-            self.client = win32.DispatchEx("pstmafm.stmafmrem") # Works for the new version STMAFM 4.3
+            self.client = win32.DispatchEx("pstmafm.stmafmrem")  # Works for the new version STMAFM 4.3
         except com_error as error:
             print('com_error')
             print(error)
@@ -37,9 +45,16 @@ class CreatecWin32():
         # self.xPiezoConst = float(self.client.getparam('XPiezoconst')) # different from py_File where it's 'Xpiezoconst'
         # self.yPiezoConst = float(self.client.getparam('YPiezoconst'))
         # self.zPiezoConst = float(self.client.getparam('ZPiezoconst'))
-    
+
     def is_active(self):
-        try: 
+        """
+        To check if the STM software is still listening to python
+
+        Returns
+        -------
+        out : Boolean
+        """
+        try:
             self.client.scanstatus
             return True
         except com_error:
@@ -52,16 +67,29 @@ class CreatecWin32():
         input: _end_bias in mV and _init_bias in mV, which are of the same polarity.
                _speed can be any integer larger than 0. 1 means the fastest, default to 100
         output: None
+
+        Parameters
+        ----------
+        _end_bias_mV: float
+            target bias in mV
+        _init_bias_mV: float
+            starting bias in mV
+        _speed: int
+            speed is actually steps, can be any integer larger than 0.
+            1 means the fastest, default to 100
+        Returns
+        -------
+        out: None
         """
         bias_pole = np.sign(_init_bias_mV)
         init = _speed * np.log10(np.abs(_init_bias_mV))
         end = _speed * np.log10(np.abs(_end_bias_mV))
-        sign = np.int(np.sign(end-init))
-        for i in range(np.int(init)+sign, np.int(end)+ sign, sign):
+        sign = np.int(np.sign(end - init))
+        for i in range(np.int(init) + sign, np.int(end) + sign, sign):
             time.sleep(0.01)
-            self.client.setparam('Biasvolt.[mV]', bias_pole*10**((i)/_speed))
+            self.client.setparam('Biasvolt.[mV]', bias_pole * 10 ** ((i) / _speed))
         self.client.setparam('Biasvolt.[mV]', _end_bias_mV)
-        
+
     def ramp_bias_mV(self, end_bias_mV, speed=100):
         """
         Ramp bias from one value to another value
@@ -70,11 +98,13 @@ class CreatecWin32():
         output: None
         """
         speed = int(speed)
-        assert speed > 0, 'speed should be larger than 0' 
+        assert speed > 0, "speed should be larger than 0"
 
         init_bias_mV = float(self.client.getparam('Biasvolt.[mV]'))
-        if init_bias_mV * end_bias_mV == 0: pass
-        elif init_bias_mV == end_bias_mV: pass
+        if init_bias_mV * end_bias_mV == 0:
+            pass
+        elif init_bias_mV == end_bias_mV:
+            pass
         elif init_bias_mV * end_bias_mV > 0:
             self._ramp_bias_same_pole(end_bias_mV, init_bias_mV, speed)
         else:
@@ -86,7 +116,7 @@ class CreatecWin32():
                 self.client.setparam('Biasvolt.[mV]', end_bias_mV)
             else:
                 self.client.setparam('Biasvolt.[mV]', end_bias_mV)
-                
+
     def ramp_current_pA(self, end_FBLogIset, speed=100):
         """
         Ramp current from one value to another value
@@ -96,7 +126,7 @@ class CreatecWin32():
         """
         speed = int(speed)
         assert speed > 0, 'speed should be larger than 0'
-        
+
         init_FBLogIset = np.float(self.client.getparam('FBLogIset').split()[-1])
         if init_FBLogIset == end_FBLogIset: return
         if end_FBLogIset < 0: return
@@ -109,12 +139,12 @@ class CreatecWin32():
         end = np.int(speed * np.log10(np.abs(_end_FBLogIset)))
         one_step = np.int(np.sign(end - init))
         now = init
-        while now!=end:
+        while now != end:
             time.sleep(0.01)
             now += one_step
-            self.client.setparam('FBLogIset', 10**(now/speed))
+            self.client.setparam('FBLogIset', 10 ** (now / speed))
         self.client.setparam('FBLogIset', end_FBLogIset)
-    
+
     @property
     def current_pA(self):
         """
@@ -134,7 +164,7 @@ class CreatecWin32():
         Not in use.
         """
         pass
-    
+
     def setxyoffpixel(self, dx=0, dy=0):
         """
         Set xy offset by pixel
@@ -142,9 +172,9 @@ class CreatecWin32():
         output: None
         """
         self.client.setxyoffpixel(dx, dy)
-    
-    def pre_scan_01(self, chmode=None, rotation=None, ddeltaX=None, 
-                    deltaX_dac=None, deltaY_dac=None, channels_code=None, 
+
+    def pre_scan_01(self, chmode=None, rotation=None, ddeltaX=None,
+                    deltaX_dac=None, deltaY_dac=None, channels_code=None,
                     ch_zoff=None, ch_bias=None):
         """
         Parameters configuration before scanning an image.
@@ -159,15 +189,15 @@ class CreatecWin32():
             ch_bias: optional, const height mode bias in mV, float
         output: None
         """
-        if chmode is not None: self.client.setparam('CHMode', chmode)        
+        if chmode is not None: self.client.setparam('CHMode', chmode)
         if rotation is not None: self.client.setparam('Rotation', rotation)
         if ddeltaX is not None: self.client.setparam('DX/DDeltaX', ddeltaX)
         if deltaX_dac is not None: self.client.setparam('Delta X [Dac]', deltaX_dac)
         if deltaY_dac is not None: self.client.setparam('Delta Y [Dac]', deltaY_dac)
-        if channels_code is not None:self.client.setparam('ChannelSelectVal', channels_code)
+        if channels_code is not None: self.client.setparam('ChannelSelectVal', channels_code)
         if ch_zoff is not None: self.client.setchmodezoff(ch_zoff)
         if ch_bias is not None: self.client.setparam('CHModeBias[mV]', ch_bias)
-        
+
     def do_scan_01(self):
         """
         Do the scan, and return the .dat file name with full path
@@ -178,7 +208,15 @@ class CreatecWin32():
         self.client.scanwaitfinished()
 
     @property
-    def nom_size(self):
+    def nom_size(self) -> XY2D:
+        """
+        Get the nominal size of the image in Angstrom
+
+        Returns
+        -------
+        out : XY2D
+            2D XY coordinates
+        """
         """
         return nominal size of image in angstrom in namedtuple (x, y)
         """
@@ -192,12 +230,11 @@ class CreatecWin32():
         return the angle in deg
         """
         return float(self.client.getparam('Rotation'))
-    
 
     @property
     def xPiezoConst(self):
-        return float(self.client.getparam('XPiezoconst')) # different from py_File where it's 'Xpiezoconst'
-    
+        return float(self.client.getparam('XPiezoconst'))  # different from py_File where it's 'Xpiezoconst'
+
     @property
     def yPiezoConst(self):
         return float(self.client.getparam('YPiezoconst'))
@@ -215,7 +252,7 @@ class CreatecWin32():
         x_offset = float(self.client.getparam('OffsetX'))
         y_offset = float(self.client.getparam('OffsetY'))
 
-        x_offset = -x_offset*cgc['g_XY_volt']*self.xPiezoConst/2**cgc['g_XY_bits']
-        y_offset = -y_offset*cgc['g_XY_volt']*self.yPiezoConst/2**cgc['g_XY_bits']
+        x_offset = -x_offset * cgc['g_XY_volt'] * self.xPiezoConst / 2 ** cgc['g_XY_bits']
+        y_offset = -y_offset * cgc['g_XY_volt'] * self.yPiezoConst / 2 ** cgc['g_XY_bits']
 
         return XY2D(y=y_offset, x=x_offset)
