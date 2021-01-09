@@ -113,7 +113,7 @@ class GENERIC_FILE:
                 self.spec_channel_code
                 self.spec_headers
         """
-        result = re.findall('(\d+)', self._line_list[pos])
+        result = re.findall(r'(\d+)', self._line_list[pos])
         self.spec_total_pt = int(result[0])
         self.spec_pos_x = int(result[1])
         self.spec_pos_y = int(result[2])
@@ -245,7 +245,7 @@ class DAT_IMG:
         output: None
         """
         decompressed_data = zlib.decompress(self._data_binary)
-        img_array = np.fromstring(decompressed_data, np.dtype(cgc['g_file_dat_img_pixel_data_npdtype']))
+        img_array = np.frombuffer(decompressed_data, np.dtype(cgc['g_file_dat_img_pixel_data_npdtype']))
         img_array = np.reshape(img_array[1: self.xPixel*self.yPixel*self.channels+1], (self.channels*self.yPixel, self.xPixel))
         for i in range(self.channels):
             self.img_array_list.append(img_array[self.yPixel*i:self.yPixel*(i+1)])   
