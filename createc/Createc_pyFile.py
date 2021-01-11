@@ -16,10 +16,11 @@ import os
 from collections import namedtuple
 from .utils.misc import XY2D
 
-dir = os.path.dirname(__file__)
-cgc_file = os.path.join(dir, 'Createc_global_const.yaml')
+this_dir = os.path.dirname(__file__)
+cgc_file = os.path.join(this_dir, 'Createc_global_const.yaml')
 with open(cgc_file, 'rt') as f:
     cgc = yaml.safe_load(f.read())
+
 
 class GENERIC_FILE:
     """
@@ -27,7 +28,9 @@ class GENERIC_FILE:
     input: full file_path.
     output: generic file obj.
     """
+
     def __init__(self, file_path):
+        self._line_list = None
         self.fp = file_path
         self.meta = dict()
 
@@ -41,7 +44,7 @@ class GENERIC_FILE:
         with open(self.fp, 'rb') as f:
             _binary = f.read()
             return _binary
- 
+
     def _bin2meta_dict(self, start=0, end=cgc['g_file_meta_binary_len']):
         """
         Convert meta binary to meta info using ansi encoding, filling out the meta dictionary
@@ -55,7 +58,7 @@ class GENERIC_FILE:
             temp = line.split('=')
             if len(temp) == 2:
                 self.meta[temp[0]] = temp[1][:-1]
-                
+
     def _extracted_meta(self):
         """
         Assign meta data to easily readable properties
@@ -64,6 +67,7 @@ class GENERIC_FILE:
         One can expand these at will, one may use the method meta_key() to see what keys are available
         """
         self.file_version = self.meta['file_version']
+        self.file_version = ''.join(e for e in self.file_version if e.isalnum())
         self.xPixel = int(self.meta['Num.X / Num.X'])
         self.yPixel = int(self.meta['Num.Y / Num.Y'])
         self.channels = int(self.meta['Channels / Channels'])
@@ -73,7 +77,7 @@ class GENERIC_FILE:
         self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
         self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
         self.channels_code = self.meta['Channelselectval / Channelselectval']
-                        
+
     def _file2meta_dict(self):
         """
         Not in use
@@ -86,7 +90,7 @@ class GENERIC_FILE:
                 temp = f.readline().split('=')
                 if len(temp) == 2:
                     self.meta[temp[0]] = temp[1][:-1]
-    
+
     def _line_list2meta_dict(self, start, end):
         """
         Fill the self.meta dict from the line list
@@ -99,8 +103,8 @@ class GENERIC_FILE:
             temp = l.split('\n')[0].split('=')
             if len(temp) == 2:
                 self.meta[temp[0]] = temp[1]
-    
-    def _spec_meta(self, pos, index_header, vz_header, spec_headers):
+
+    def _spec_meta(self, pos: int, index_header: str, vz_header: str, spec_headers: str) -> None:
         """
         Extract the spec meta data from the file, it includes Number of spec pts, X_position, Y_position and 
         Channel code
@@ -112,21 +116,34 @@ class GENERIC_FILE:
                 self.spec_pos_y
                 self.spec_channel_code
                 self.spec_headers
+
+        Parameters
+        ----------
+        pos
+        index_header
+        vz_header
+        spec_headers
         """
         result = re.findall(r'(\d+)', self._line_list[pos])
         self.spec_total_pt = int(result[0])
         self.spec_pos_x = int(result[1])
         self.spec_pos_y = int(result[2])
         self.spec_channel_code = int(result[3])
+        try:
+            self.spec_out_channel_count = 'v' + result[6]
+        except IndexError:
+            self.spec_out_channel_count = 'v2' # dummy
         self._filter = [b == '1' for b in bin(self.spec_channel_code)[2:].rjust(len(cgc[spec_headers]))[::-1]]
-        self.spec_headers = cgc[index_header] +\
-                            cgc[vz_header]+\
-                            list(compress(cgc[spec_headers], self._filter))
-        
+        self.spec_headers = cgc[index_header] + \
+                            cgc[vz_header][self.file_version][self.spec_out_channel_count] + \
+                            list(compress(cgc[spec_headers][self.file_version], self._filter))
+
+
 class VERT_SPEC(GENERIC_FILE):
     """
     Read the .vert file and generate useful and managable stuff
     """
+
     def __init__(self, file_path):
         super().__init__(file_path)
         with open(self.fp, 'r') as f:
@@ -134,20 +151,23 @@ class VERT_SPEC(GENERIC_FILE):
 
         super()._line_list2meta_dict(start=0, end=cgc['g_file_meta_total_lines'])
         super()._extracted_meta()
-            
-        super()._spec_meta(pos = cgc['g_file_spec_meta_line'],
-                           index_header = 'g_file_spec_index_header',
-                           vz_header = 'g_file_spec_vz_header',
-                           spec_headers = 'g_file_spec_headers')
-        f_obj = io.StringIO('\n'.join(self._line_list[cgc['g_file_spec_skip_rows']:]))
-        self.spec = pd.read_csv(filepath_or_buffer = f_obj, sep = cgc['g_file_spec_delimiter'],
-                                header = None,
-                                names = self.spec_headers,
-                                index_col = cgc['g_file_spec_index_header'],
+
+        super()._spec_meta(pos=cgc['g_file_spec_meta_line'][self.file_version],
+                           index_header='g_file_spec_index_header',
+                           vz_header='g_file_spec_vz_header',
+                           spec_headers='g_file_spec_headers')
+        f_obj = io.StringIO('\n'.join(self._line_list[cgc['g_file_spec_skip_rows'][self.file_version]:]))
+        self.spec = pd.read_csv(filepath_or_buffer=f_obj, sep=cgc['g_file_spec_delimiter'],
+                                header=None,
+                                names=self.spec_headers,
+                                index_col=cgc['g_file_spec_index_header'],
                                 engine='python',
                                 usecols=range(len(self.spec_headers)))
+
+
 class DAT_IMG_v2:
     pass
+
 
 class DAT_IMG:
     """
@@ -160,10 +180,11 @@ class DAT_IMG:
     Meta data is a dict, one can expand the dict at will, see the constructor.
     Images are a list of numpy arrays.
     """
+
     def __init__(self, file_path=None, file_binary=None, file_name=None):
         self.meta = dict()
         self.img_array_list = []
-        
+
         if file_path is not None:
             self.fp = file_path
             _, self.fn = os.path.split(self.fp)
@@ -182,10 +203,9 @@ class DAT_IMG:
         self.imgs = [self._crop_img(arr) for arr in self.img_array_list]
         # assert(len(set(img.shape for img in self.imgs)) <= 1)
         # Pixels = namedtuple('Pixels', ['y', 'x'])
-        self.img_pixels = XY2D(y=self.imgs[0].shape[0], 
-                               x=self.imgs[0].shape[1]) # size in (y, x)
-        
-        
+        self.img_pixels = XY2D(y=self.imgs[0].shape[0],
+                               x=self.imgs[0].shape[1])  # size in (y, x)
+
     def _extracted_meta(self):
         """
         Assign meta data to easily readable properties
@@ -194,6 +214,7 @@ class DAT_IMG:
         One can expand these at will, one may use the method meta_key() to see what keys are available
         """
         self.file_version = self.meta['file_version']
+        self.file_version = ''.join(e for e in self.file_version if e.isalnum())
         self.xPixel = int(self.meta['Num.X / Num.X'])
         self.yPixel = int(self.meta['Num.Y / Num.Y'])
         self.channels = int(self.meta['Channels / Channels'])
@@ -203,12 +224,12 @@ class DAT_IMG:
         self.rotation = float(self.meta['Rotation / Rotation'])
         self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
         self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
-        self.channels_code = self.meta['Channelselectval / Channelselectval']   
+        self.channels_code = self.meta['Channelselectval / Channelselectval']
         self.scan_ymode = int(self.meta['ScanYMode / ScanYMode'])
-        self.xPiezoConst = float(self.meta['Xpiezoconst']) # Createc software error
+        self.xPiezoConst = float(self.meta['Xpiezoconst'])  # Createc software error
         self.yPiezoConst = float(self.meta['YPiezoconst'])
         self.zPiezoConst = float(self.meta['ZPiezoconst'])
-        
+
     def _read_binary(self):
         """
         Open .dat file in raw binary format
@@ -221,7 +242,7 @@ class DAT_IMG:
             f.seek(int(cgc['g_file_data_bin_offset']))
             _data_binary = f.read()
             return _meta_binary, _data_binary
-        
+
     def _bin2meta_dict(self):
         """
         Convert meta binary to meta info using ansi encoding, filling out the meta dictionary
@@ -235,7 +256,7 @@ class DAT_IMG:
             temp = line.split('=')
             if len(temp) == 2:
                 self.meta[temp[0]] = temp[1][:-1]
-                
+
     def _read_img(self):
         """
         Convert img binary to numpy array's, filling out the img_array_list.
@@ -246,10 +267,11 @@ class DAT_IMG:
         """
         decompressed_data = zlib.decompress(self._data_binary)
         img_array = np.frombuffer(decompressed_data, np.dtype(cgc['g_file_dat_img_pixel_data_npdtype']))
-        img_array = np.reshape(img_array[1: self.xPixel*self.yPixel*self.channels+1], (self.channels*self.yPixel, self.xPixel))
+        img_array = np.reshape(img_array[1: self.xPixel * self.yPixel * self.channels + 1],
+                               (self.channels * self.yPixel, self.xPixel))
         for i in range(self.channels):
-            self.img_array_list.append(img_array[self.yPixel*i:self.yPixel*(i+1)])   
-        
+            self.img_array_list.append(img_array[self.yPixel * i:self.yPixel * (i + 1)])
+
     def meta_keys(self):
         """
         Print all available keys in meta
@@ -257,7 +279,7 @@ class DAT_IMG:
         output: None
         """
         return [k for k in self.meta]
-    
+
     def _file2meta_dict(self):
         """
         Not in use
@@ -270,7 +292,7 @@ class DAT_IMG:
                 temp = f.readline().split('=')
                 if len(temp) == 2:
                     self.meta[temp[0]] = temp[1][:-1]
-    
+
     def _file2img_arrays(self):
         """
         Not in use
@@ -284,16 +306,17 @@ class DAT_IMG:
             f.seek(cgc['g_file_data_bin_offset'])
             decompressed_data = zlib.decompress(f.read())
             img_array = np.fromstring(decompressed_data, np.dtype(cgc['g_file_dat_img_pixel_data_npdtype']))
-            img_array = np.reshape(img_array[1: self.xPixel*self.yPixel*self.channels+1], (self.channels*self.yPixel, self.xPixel))
+            img_array = np.reshape(img_array[1: self.xPixel * self.yPixel * self.channels + 1],
+                                   (self.channels * self.yPixel, self.xPixel))
             for i in range(self.channels):
-                self.img_array_list.append(img_array[self.yPixel*i:self.yPixel*(i+1)])
+                self.img_array_list.append(img_array[self.yPixel * i:self.yPixel * (i + 1)])
 
     def _crop_img(self, arr):
         """
         crop an image, by removing all rows which contain only zeros.
         """
         return arr[~np.all(arr == 0, axis=1)]
-    
+
     @property
     def offset(self):
         """
@@ -306,8 +329,8 @@ class DAT_IMG:
         # x_piezo_const = np.float(self.meta['Xpiezoconst'])
         # y_piezo_const = np.float(self.meta['YPiezoconst'])
 
-        x_offset = -x_offset*cgc['g_XY_volt']*self.xPiezoConst/2**cgc['g_XY_bits']
-        y_offset = -y_offset*cgc['g_XY_volt']*self.yPiezoConst/2**cgc['g_XY_bits']
+        x_offset = -x_offset * cgc['g_XY_volt'] * self.xPiezoConst / 2 ** cgc['g_XY_bits']
+        y_offset = -y_offset * cgc['g_XY_volt'] * self.yPiezoConst / 2 ** cgc['g_XY_bits']
 
         # Offset = namedtuple('Offset', ['y', 'x'])
         return XY2D(y=y_offset, x=x_offset)
@@ -329,7 +352,7 @@ class DAT_IMG:
         assuming no pre-termination while scanning
         """
         # Size = namedtuple('Size', ['y', 'x'])
-        return XY2D(y=float(self.meta['Length y[A]']), 
+        return XY2D(y=float(self.meta['Length y[A]']),
                     x=float(self.meta['Length x[A]']))
 
     @property

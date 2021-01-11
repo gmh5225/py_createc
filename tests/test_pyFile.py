@@ -29,6 +29,10 @@ def test_VERT_SPEC():
     readin = pd.read_csv(os.path.join(this_dir, 'A190824.135614.csv'), index_col='idx')
     assert_frame_equal(readin, file.spec)
 
+    file = VERT_SPEC(os.path.join(this_dir, 'A201222.074849.vert'))
+    readin = pd.read_csv(os.path.join(this_dir, 'A201222.074849.csv'), index_col='idx')
+    assert_frame_equal(readin, file.spec)
+
 
 """
     with open('A200622.081914.npy', 'wb') as f:

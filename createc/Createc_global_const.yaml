@@ -27,15 +27,30 @@ g_file_dat_img_pixel_data_npdtype: '<f4' #little endian 32-bit float for .dat fi
 g_file_year_pre: 2000 # filename, data taken are in year range 2000~2099
 
 #.vert & .lat file
-g_file_spec_meta_line: 575  # spectrum meta position line
-g_file_spec_skip_rows: 576 # spectrum start line number
+g_file_spec_meta_line: # spectrum meta position line
+  ParVERT30: 575
+  ParVERT32: 617
+g_file_spec_skip_rows: # spectrum start line number
+  ParVERT30: 576
+  ParVERT32: 618
 g_file_spec_delimiter: '\t' # delimiter between numbers in file
 g_file_spec_index_header: ['idx'] # spec file index column header
-g_file_spec_vz_header: ['V', 'Z']
-g_file_spec_headers: ['I', 'dI/dV', 'd2I/dV2',
-                      'ADC0', 'ADC1', 'ADC2', 'ADC3',
-                      'NA01', 'NA02', 'NA03',
-                      'di_q', 'di2_q','DAC0']
+g_file_spec_vz_header:
+  ParVERT30:
+    v2: ['V', 'Z']
+    v3: ['V', 'Z']
+  ParVERT32:
+    v2: ['V', 'Z']
+    v3: ['V', 'Z', 'X']
+g_file_spec_headers:
+  ParVERT30: ['I', 'dI/dV', 'd2I/dV2',
+              'ADC0', 'ADC1', 'ADC2', 'ADC3',
+              'NA01', 'NA02', 'NA03',
+              'di_q', 'di2_q','DAC0']
+  ParVERT32: ['I', 'dI/dV', 'd2I/dV2',
+              'ADC0', 'ADC1', 'ADC2', 'ADC3',
+              'NA01', 'NA02', 'NA03',
+              'di_q', 'di2_q','DAC0']
 
 # scanner movement in XY range
 g_XY_bits: 20 # 20 bits
