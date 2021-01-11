@@ -11,7 +11,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://version.aalto.fi/gitlab/xuc1/py_createc",
-    packages=setuptools.find_packages(exclude=['scripts']),
+    packages=setuptools.find_packages(exclude=['examples']),
     package_data={
         'createc': ['*.yaml'],        
     },
