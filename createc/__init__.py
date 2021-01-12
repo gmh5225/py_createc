@@ -8,3 +8,4 @@ __version__ = '0.0.1'
 
 from .Createc_pyCOM import CreatecWin32
 from .Createc_pyFile import DAT_IMG
+from .Createc_pyFile import VERT_SPEC
