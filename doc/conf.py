@@ -23,9 +23,8 @@ author = 'Chen Xu'
 
 # The full version, including alpha/beta/rc tags
 import createc
+
 release = createc.__version__
-
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -43,7 +42,6 @@ autosummary_generate = True
 autosummary_imported_members = True
 autodoc_default_flags = ['members']
 
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -51,7 +49,6 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
 
 # -- Options for HTML output -------------------------------------------------
 
