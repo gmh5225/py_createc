@@ -278,6 +278,10 @@ class DAT_IMG:
         Print all available keys in meta
         input: self
         output: None
+
+        Returns
+        -------
+        object
         """
         return [k for k in self.meta]
 
