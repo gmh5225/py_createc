@@ -5,15 +5,16 @@ Created on Wed May  8 17:57:09 2019
 @author: xuc1
 """
 
-import zlib
-import numpy as np
-import yaml
-import re
-import pandas as pd
-from itertools import compress
 import io
 import os
-from collections import namedtuple
+import re
+import zlib
+from itertools import compress
+
+import numpy as np
+import pandas as pd
+import yaml
+
 from .utils.misc import XY2D
 
 this_dir = os.path.dirname(__file__)
@@ -371,5 +372,4 @@ class DAT_IMG:
         """
         same as datetime, but it converts to seconds since 1970, 1, 1.
         """
-        import datetime
         return self.datetime.timestamp()
