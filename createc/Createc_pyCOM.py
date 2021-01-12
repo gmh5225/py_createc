@@ -31,16 +31,24 @@ class CreatecWin32:
     out : CreatecWin32
         Createc Win32COM object with some customized methods
     """
+
     def __init__(self):
 
-        # self.client = win32.gencache.EnsureDispatch("pstmafm.stmafmrem") # does not work for the new version STMAFM 4.3
         try:
-            self.client = win32.DispatchEx("pstmafm.stmafmrem")  # Works for the new version STMAFM 4.3
-        except com_error as error:
-            print('com_error')
-            print(error)
-            print('Cannot connect to STMAFM software')
-            return
+            print('Trying EnsureDispatch')
+            self.client = win32.gencache.EnsureDispatch(
+                "pstmafm.stmafmrem")  # does not work for the new version STMAFM 4.3
+        except com_error:
+            print('EnsureDispatch failed')
+            try:
+                print('Trying again with DispatchEx')
+                self.client = win32.DispatchEx("pstmafm.stmafmrem")  # Works for the new version STMAFM 4.3
+            except com_error as error:
+                print('com_error')
+                print(error)
+                print('Cannot connect to STMAFM software')
+                return
+
         self.savedatfilename = self.client.savedatfilename
         # self.xPiezoConst = float(self.client.getparam('XPiezoconst')) # different from py_File where it's 'Xpiezoconst'
         # self.yPiezoConst = float(self.client.getparam('YPiezoconst'))
