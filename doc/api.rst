@@ -10,3 +10,4 @@ Documentation
 
     CreatecWin32
     DAT_IMG
+    VERT_SPEC
