@@ -22,18 +22,16 @@ class CreatecWin32:
     r""" A Createc wrapper class
     The remote operation from http://spm-wiki.createc.de already provides lots of methods,
     this class is just a wrapper so many more custom methods can be added.
-
-    Parameters
-    ----------
-
-    Returns
-    -------
-    out : CreatecWin32
-        Createc Win32COM object with some customized methods
     """
 
     def __init__(self):
+        """
+        Initiator for CreatecWin32 class.
 
+        Returns
+        -------
+        out: CreatecWin32
+        """
         try:
             print('Trying EnsureDispatch')
             self.client = win32.gencache.EnsureDispatch(
@@ -54,7 +52,7 @@ class CreatecWin32:
         # self.yPiezoConst = float(self.client.getparam('YPiezoconst'))
         # self.zPiezoConst = float(self.client.getparam('ZPiezoconst'))
 
-    def is_active(self):
+    def is_active(self) -> bool:
         """
         To check if the STM software is still listening to python
 
@@ -68,26 +66,24 @@ class CreatecWin32:
         except com_error:
             return False
 
-    def _ramp_bias_same_pole(self, _end_bias_mV, _init_bias_mV, _speed):
+    def _ramp_bias_same_pole(self, _end_bias_mV: float, _init_bias_mV: float, _speed: float) -> None:
         """
-        To be used by ramp_bias_mV(). 
-        The end result is that the machine will ramp the bias gradually.
-        input: _end_bias in mV and _init_bias in mV, which are of the same polarity.
-               _speed can be any integer larger than 0. 1 means the fastest, default to 100
-        output: None
+        To be called by ramp_bias_mV().
+        The end result is the machine will ramp the bias gradually to the target value.
 
         Parameters
         ----------
-        _end_bias_mV: float
+        _end_bias_mV : float
             target bias in mV
-        _init_bias_mV: float
-            starting bias in mV
-        _speed: int
-            speed is actually steps, can be any integer larger than 0.
-            1 means the fastest, default to 100
+        _init_bias_mV : float
+            starting bias in mV, it should be of the same polarity of _end_bias_mV
+        _speed : int
+            speed is actually steps, it can be any integer larger than 0.
+            1 means directly stepping to the final bias, it is default to 100.
+
         Returns
         -------
-        out: None
+        out : None
         """
         bias_pole = np.sign(_init_bias_mV)
         init = _speed * np.log10(np.abs(_init_bias_mV))
@@ -98,12 +94,21 @@ class CreatecWin32:
             self.client.setparam('Biasvolt.[mV]', bias_pole * 10 ** ((i) / _speed))
         self.client.setparam('Biasvolt.[mV]', _end_bias_mV)
 
-    def ramp_bias_mV(self, end_bias_mV, speed=100):
+    def ramp_bias_mV(self, end_bias_mV: float, speed: int = 100) -> None:
         """
-        Ramp bias from one value to another value
-        input: end_bias in mV
-               speed can be any integer larger than 0. 1 means the fastest, default to 100
-        output: None
+        Ramp bias from current value to another value
+
+        Parameters
+        ----------
+        end_bias_mV : float
+            target bias in mV
+        speed : int
+            speed is actually steps, it can be any integer larger than 0.
+            1 means directly stepping to the final bias, it is default to 100.
+
+        Returns
+        -------
+        None
         """
         speed = int(speed)
         assert speed > 0, "speed should be larger than 0"
@@ -125,13 +130,23 @@ class CreatecWin32:
             else:
                 self.client.setparam('Biasvolt.[mV]', end_bias_mV)
 
-    def ramp_current_pA(self, end_FBLogIset, speed=100):
+    def ramp_current_pA(self, end_FBLogIset: float, speed: int = 100) -> None:
         """
-        Ramp current from one value to another value
-        input: end_current in pA
-               speed can be any integer larger than 0. 1 means the fastest, default to 100
-        output: None
+        Ramp current to the target value
+
+        Parameters
+        ----------
+        end_FBLogIset : float
+            end_current in pA
+        speed : int
+            speed is actually steps, it can be any integer larger than 0.
+            1 means directly stepping to the final bias, it is default to 100.
+
+        Returns
+        -------
+        None
         """
+
         speed = int(speed)
         assert speed > 0, 'speed should be larger than 0'
 
@@ -173,29 +188,52 @@ class CreatecWin32:
         """
         pass
 
-    def setxyoffpixel(self, dx=0, dy=0):
+    def setxyoffpixel(self, dx: int = 0, dy: int = 0) -> None:
         """
         Set xy offset by pixel
-        input: dx , dy in pixel
-        output: None
+
+        Parameters
+        ----------
+        dx : int
+            dx , dy in pixel
+        dy : int
+            dx , dy in pixel
+
+        Returns
+        -------
+        None
+
         """
         self.client.setxyoffpixel(dx, dy)
 
-    def pre_scan_01(self, chmode=None, rotation=None, ddeltaX=None,
-                    deltaX_dac=None, deltaY_dac=None, channels_code=None,
-                    ch_zoff=None, ch_bias=None):
+    def pre_scan_01(self, chmode: int, rotation: float, ddeltaX: int,
+                    deltaX_dac: int, deltaY_dac: int, channels_code: int,
+                    ch_zoff: float = None, ch_bias: float = None) -> object:
         """
         Parameters configuration before scanning an image.
-        input: 
-            chmod: constant height mode, int 0 or 1, which is false or true
-            rotation: float number -360 ~ 360
-            ddeltaX: scan speed, int, usually 16, 32, 64 ...
-            deltaX_dac: scan size, int, usually take 32, 64, 128...
-            deltaY_dac: scan size, int, usually take 32, 64, 128...
-            channels_code: int, 3 for const current mode, 30 for const height mode, see online manual for detail
-            ch_zoff: optional, const height mode z offset in angstrom, float
-            ch_bias: optional, const height mode bias in mV, float
-        output: None
+
+        Parameters
+        ----------
+        chmode : int
+            constant height mode, int 0 or 1, which means false or true
+        rotation : float
+            angle in degree -360 ~ 360
+        ddeltaX : int
+            scan speed, int, usually 16, 32, 64 ...
+        deltaX_dac : int
+            scan size, usually take 32, 64, 128...
+        deltaY_dac : int
+            scan size, usually take 32, 64, 128...
+        channels_code : int
+            3 for const current mode, see online manual for more detail
+        ch_zoff : float
+            const height mode z offset in angstrom
+        ch_bias : gloat
+            const height mode bias in mV
+
+        Returns
+        -------
+        None
         """
         if chmode is not None: self.client.setparam('CHMode', chmode)
         if rotation is not None: self.client.setparam('Rotation', rotation)
@@ -206,11 +244,10 @@ class CreatecWin32:
         if ch_zoff is not None: self.client.setchmodezoff(ch_zoff)
         if ch_bias is not None: self.client.setparam('CHModeBias[mV]', ch_bias)
 
-    def do_scan_01(self):
+    def do_scan_01(self) -> None:
         """
         Do the scan, and return the .dat file name with full path
-        input: None
-        output: None
+        Not recommended to use because `scanwaitfinished` will freeze the STM software
         """
         self.client.scanstart()
         self.client.scanwaitfinished()
@@ -223,39 +260,63 @@ class CreatecWin32:
         Returns
         -------
         out : XY2D
-            2D XY coordinates
-        """
-        """
-        return nominal size of image in angstrom in namedtuple (x, y)
         """
         x = float(self.client.getparam('Length x[A]'))
         y = float(self.client.getparam('Length y[A]'))
         return XY2D(x=x, y=y)
 
     @property
-    def angle(self):
+    def angle(self) -> float:
         """
-        return the angle in deg
+        return the scan rotation angle in deg
+
+        Returns
+        -------
+        out : float
         """
         return float(self.client.getparam('Rotation'))
 
     @property
-    def xPiezoConst(self):
+    def xPiezoConst(self) -> float:
+        """
+        Get the X Piezo Constant
+
+        Returns
+        -------
+        out : float
+        """
         return float(self.client.getparam('XPiezoconst'))  # different from py_File where it's 'Xpiezoconst'
 
     @property
-    def yPiezoConst(self):
+    def yPiezoConst(self) -> float:
+        """
+        Get the Y Piezo Constant
+
+        Returns
+        -------
+        out : float
+        """
         return float(self.client.getparam('YPiezoconst'))
 
     @property
-    def zPiezoConst(self):
+    def zPiezoConst(self) -> float:
+        """
+        Get the Z Piezo Constant
+
+        Returns
+        -------
+        out: float
+        """
         return float(self.client.getparam('ZPiezoconst'))
 
     @property
-    def offset(self):
+    def offset(self) -> XY2D:
         """
-        return offset relatvie to the whole range in angstrom in the format of 
-        namedtuple (x, y)
+        Return offset relatvie to the whole scan range in angstrom
+
+        Returns
+        -------
+        out : XY2D
         """
         x_offset = float(self.client.getparam('OffsetX'))
         y_offset = float(self.client.getparam('OffsetY'))
