@@ -30,7 +30,7 @@ class CreatecWin32:
 
         Returns
         -------
-        out: CreatecWin32
+        CreatecWin32
         """
         try:
             print('Trying EnsureDispatch')
@@ -52,13 +52,13 @@ class CreatecWin32:
         # self.yPiezoConst = float(self.client.getparam('YPiezoconst'))
         # self.zPiezoConst = float(self.client.getparam('ZPiezoconst'))
 
-    def is_active(self) -> bool:
+    def is_active(self):
         """
         To check if the STM software is still listening to python
 
         Returns
         -------
-        out : Boolean
+        is_active : Boolean
         """
         try:
             self.client.scanstatus
@@ -66,7 +66,7 @@ class CreatecWin32:
         except com_error:
             return False
 
-    def _ramp_bias_same_pole(self, _end_bias_mV: float, _init_bias_mV: float, _speed: float) -> None:
+    def _ramp_bias_same_pole(self, _end_bias_mV: float, _init_bias_mV: float, _speed: float):
         """
         To be called by ramp_bias_mV().
         The end result is the machine will ramp the bias gradually to the target value.
@@ -83,7 +83,7 @@ class CreatecWin32:
 
         Returns
         -------
-        out : None
+        None : None
         """
         bias_pole = np.sign(_init_bias_mV)
         init = _speed * np.log10(np.abs(_init_bias_mV))
@@ -94,7 +94,7 @@ class CreatecWin32:
             self.client.setparam('Biasvolt.[mV]', bias_pole * 10 ** ((i) / _speed))
         self.client.setparam('Biasvolt.[mV]', _end_bias_mV)
 
-    def ramp_bias_mV(self, end_bias_mV: float, speed: int = 100) -> None:
+    def ramp_bias_mV(self, end_bias_mV: float, speed: int = 100):
         """
         Ramp bias from current value to another value
 
@@ -108,7 +108,7 @@ class CreatecWin32:
 
         Returns
         -------
-        None
+        None : None
         """
         speed = int(speed)
         assert speed > 0, "speed should be larger than 0"
@@ -130,7 +130,7 @@ class CreatecWin32:
             else:
                 self.client.setparam('Biasvolt.[mV]', end_bias_mV)
 
-    def ramp_current_pA(self, end_FBLogIset: float, speed: int = 100) -> None:
+    def ramp_current_pA(self, end_FBLogIset: float, speed: int = 100):
         """
         Ramp current to the target value
 
@@ -144,7 +144,7 @@ class CreatecWin32:
 
         Returns
         -------
-        None
+        None : None
         """
 
         speed = int(speed)
@@ -172,6 +172,10 @@ class CreatecWin32:
     def current_pA(self):
         """
         Return current in pA
+
+        Returns
+        -------
+        current : str
         """
         return self.client.getparam('FBLogIset')
 
@@ -179,6 +183,10 @@ class CreatecWin32:
     def bias_mV(self):
         """
         Return the bias in mV
+
+        Returns
+        -------
+        bias : str
         """
         return self.client.getparam('Biasvolt.[mV]')
 
@@ -188,7 +196,7 @@ class CreatecWin32:
         """
         pass
 
-    def setxyoffpixel(self, dx: int = 0, dy: int = 0) -> None:
+    def setxyoffpixel(self, dx: int = 0, dy: int = 0):
         """
         Set xy offset by pixel
 
@@ -201,14 +209,14 @@ class CreatecWin32:
 
         Returns
         -------
-        None
+        None : None
 
         """
         self.client.setxyoffpixel(dx, dy)
 
     def pre_scan_01(self, chmode: int, rotation: float, ddeltaX: int,
                     deltaX_dac: int, deltaY_dac: int, channels_code: int,
-                    ch_zoff: float = None, ch_bias: float = None) -> object:
+                    ch_zoff: float = None, ch_bias: float = None):
         """
         Parameters configuration before scanning an image.
 
@@ -233,7 +241,7 @@ class CreatecWin32:
 
         Returns
         -------
-        None
+        None : None
         """
         if chmode is not None: self.client.setparam('CHMode', chmode)
         if rotation is not None: self.client.setparam('Rotation', rotation)
@@ -244,79 +252,81 @@ class CreatecWin32:
         if ch_zoff is not None: self.client.setchmodezoff(ch_zoff)
         if ch_bias is not None: self.client.setparam('CHModeBias[mV]', ch_bias)
 
-    def do_scan_01(self) -> None:
+    def do_scan_01(self):
         """
         Do the scan, and return the .dat file name with full path
+
         Not recommended to use because `scanwaitfinished` will freeze the STM software
         """
         self.client.scanstart()
         self.client.scanwaitfinished()
 
     @property
-    def nom_size(self) -> XY2D:
+    def nom_size(self):
         """
         Get the nominal size of the image in Angstrom
 
         Returns
         -------
-        out : XY2D
+        nominal_size : XY2D
+
         """
         x = float(self.client.getparam('Length x[A]'))
         y = float(self.client.getparam('Length y[A]'))
         return XY2D(x=x, y=y)
 
     @property
-    def angle(self) -> float:
+    def angle(self):
         """
         return the scan rotation angle in deg
 
         Returns
         -------
-        out : float
+        angle : float
         """
         return float(self.client.getparam('Rotation'))
 
     @property
-    def xPiezoConst(self) -> float:
+    def xPiezoConst(self):
         """
         Get the X Piezo Constant
 
         Returns
         -------
-        out : float
+        xPiezoConst : float
         """
         return float(self.client.getparam('XPiezoconst'))  # different from py_File where it's 'Xpiezoconst'
 
     @property
-    def yPiezoConst(self) -> float:
+    def yPiezoConst(self):
         """
         Get the Y Piezo Constant
 
         Returns
         -------
-        out : float
+        yPiezoConst : float
         """
         return float(self.client.getparam('YPiezoconst'))
 
     @property
-    def zPiezoConst(self) -> float:
+    def zPiezoConst(self):
         """
         Get the Z Piezo Constant
 
         Returns
         -------
-        out: float
+        zPiezoConst : float
         """
         return float(self.client.getparam('ZPiezoconst'))
 
     @property
-    def offset(self) -> XY2D:
+    def offset(self):
         """
         Return offset relatvie to the whole scan range in angstrom
 
         Returns
         -------
-        out : XY2D
+        offset : XY2D
         """
         x_offset = float(self.client.getparam('OffsetX'))
         y_offset = float(self.client.getparam('OffsetY'))

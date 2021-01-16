@@ -26,11 +26,21 @@ with open(cgc_file, 'rt') as f:
 class GENERIC_FILE:
     """
     Generic file class, common for .dat, .vert files etc.
-    input: full file_path.
-    output: generic file obj.
     """
 
     def __init__(self, file_path):
+        """
+        Initiator for Generic file class
+
+        Parameters
+        ----------
+        file_path : str
+            Full file path
+
+        Returns
+        -------
+        generic_file : GENERIC_FILE
+        """
         self._line_list = None
         self.fp = file_path
         self.meta = dict()
@@ -38,9 +48,11 @@ class GENERIC_FILE:
     def _read_binary(self):
         """
         Open file in raw binary format
-        input: self
-        output: _binary, which is a binary stream of the entire file
-        
+
+        Returns
+        -------
+        _binary : bin
+            a binary stream of the entire file
         """
         with open(self.fp, 'rb') as f:
             _binary = f.read()
@@ -48,11 +60,20 @@ class GENERIC_FILE:
 
     def _bin2meta_dict(self, start=0, end=cgc['g_file_meta_binary_len']):
         """
-        Convert meta binary to meta info using ansi encoding, filling out the meta dictionary
+        Convert meta binary to meta info using ansi encoding, filling out the _meta dictionary
         Here ansi means Windows-1252 extended ascii code page CP-1252
-        input: self, start position and end position
-        output: None, it just fills the _meta dict
         prerequisite: _binary stream
+
+        Parameters
+        ----------
+        start : int
+            Start position
+        end : int
+            End position
+        Returns
+        -------
+        None : None
+
         """
         meta_list = self._binary[start:end].decode('cp1252').split('\n')
         for line in meta_list:
@@ -63,9 +84,12 @@ class GENERIC_FILE:
     def _extracted_meta(self):
         """
         Assign meta data to easily readable properties
-        input: None
-        output: None, it just populates all the self.properties
         One can expand these at will, one may use the method meta_key() to see what keys are available
+
+        Returns
+        -------
+        None : None
+            it just populates all the self.properties
         """
         self.file_version = self.meta['file_version']
         self.file_version = ''.join(e for e in self.file_version if e.isalnum())
@@ -83,8 +107,10 @@ class GENERIC_FILE:
         """
         Not in use
         Open .dat file with asci encoding, read meta data directly from .dat file, fill out the meta_dict  
-        input: self
-        output: None       
+
+        Returns
+        -------
+        None : None
         """
         with open(self.fp, 'r') as f:
             for i in range(cgc['g_file_meta_total_lines']):
@@ -94,36 +120,40 @@ class GENERIC_FILE:
 
     def _line_list2meta_dict(self, start, end):
         """
-        Fill the self.meta dict from the line list
-        input: self._line_list
-        output: None. It just fills out the self.dict.
+        Fill the self.meta dict from the line list.
         prerequisite: self._line_list
+
+        Returns
+        -------
+        None : None
+            It just fills out the self.dict.
         """
+
         self.meta['file_version'] = self._line_list[0]
         for l in self._line_list[start:end]:
             temp = l.split('\n')[0].split('=')
             if len(temp) == 2:
                 self.meta[temp[0]] = temp[1]
 
-    def _spec_meta(self, pos: int, index_header: str, vz_header: str, spec_headers: str) -> None:
+    def _spec_meta(self, pos: int, index_header: str, vz_header: str, spec_headers: str):
         """
-        Extract the spec meta data from the file, it includes Number of spec pts, X_position, Y_position and 
-        Channel code
-        input: line position number in the file, index_header, which is e.g. 'idx'
-        vz_header, which is e.g. ['V', 'Z']
-        and spec_headers, see Createc_global_const
-        output: self.spec_total_pt
-                self.spec_pos_x
-                self.spec_pos_y
-                self.spec_channel_code
-                self.spec_headers
+        Extract the spec meta data from the file, it includes Number of spec pts, X_position, Y_position and Channel code.
 
         Parameters
         ----------
-        pos
-        index_header
-        vz_header
-        spec_headers
+        pos : int
+            line position number in the file
+        index_header : str
+            which is e.g. 'idx'
+        vz_header : list[str]
+            which is e.g. ['V', 'Z']
+        spec_headers : list[str]
+            see Createc_global_const
+
+        Returns
+        -------
+        None : None
+            It populates: self.spec_total_pt, self.spec_pos_x, self.spec_pos_y, self.spec_channel_code, self.spec_headers
         """
         result = re.findall(r'(\d+)', self._line_list[pos])
         self.spec_total_pt = int(result[0])
@@ -143,9 +173,22 @@ class GENERIC_FILE:
 class VERT_SPEC(GENERIC_FILE):
     """
     Read the .vert file and generate useful and managable stuff
+
     """
 
     def __init__(self, file_path):
+        """
+        Initiator for VERT_SPEC file class
+
+        Parameters
+        ----------
+        file_path : str
+            Full file path
+
+        Returns
+        -------
+        vert_spec : VERT_SPEC
+        """
         super().__init__(file_path)
         with open(self.fp, 'r') as f:
             self._line_list = f.readlines()
@@ -173,16 +216,35 @@ class DAT_IMG_v2:
 class DAT_IMG:
     """
     Read .dat file and generate meta data and images as numpy arrays.
-    input: option 1: one arg, i.e. the full .dat file path
-           option 2: two named args
-           a. the binary content of the file together
-           b. the file_name as a string
-    output: dat_file_object with meta data and image numpy arrays.
-    Meta data is a dict, one can expand the dict at will, see the constructor.
-    Images are a list of numpy arrays.
+
     """
 
     def __init__(self, file_path=None, file_binary=None, file_name=None):
+        """
+        Initiator
+        input:
+        option 1: one arg, i.e. the full path to the .dat file
+        option 2: two named args
+        a. the binary content of the file together
+        b. the file_name as a string
+
+        Parameters
+        ----------
+        file_path : str
+            the full path to the .dat file
+        file_binary : bin
+            the binary content of the file together
+        file_name : str
+            the file_name as a string
+
+        Returns
+        -------
+        dat_img : DAT_IMG
+            dat_file_object with meta data and image numpy arrays.
+            Meta data is a dict, one can expand the dict at will.
+            Images are a list of numpy arrays.
+        """
+
         self.meta = dict()
         self.img_array_list = []
 
@@ -209,10 +271,13 @@ class DAT_IMG:
 
     def _extracted_meta(self):
         """
-        Assign meta data to easily readable properties
-        input: None
-        output: None, it just populates all the self.properties
+        Assign meta data to easily readable properties.
         One can expand these at will, one may use the method meta_key() to see what keys are available
+
+        Returns
+        -------
+        None : None
+            It just populates all the self.properties
         """
         self.file_version = self.meta['file_version']
         self.file_version = ''.join(e for e in self.file_version if e.isalnum())
@@ -234,10 +299,16 @@ class DAT_IMG:
     def _read_binary(self):
         """
         Open .dat file in raw binary format
-        input: self
-        output: _meta_binary, _data_binary
-        
+
+        Returns
+        -------
+        _meta_binary : bin
+            meta data in binary
+        _data_binary : bin
+            data in binary
+
         """
+
         with open(self.fp, 'rb') as f:
             _meta_binary = f.read(int(cgc['g_file_meta_binary_len']))
             f.seek(int(cgc['g_file_data_bin_offset']))
@@ -248,9 +319,12 @@ class DAT_IMG:
         """
         Convert meta binary to meta info using ansi encoding, filling out the meta dictionary
         Here ansi means Windows-1252 extended ascii code page CP-1252
-        input: self
-        output: None
+
+        Returns
+        -------
+        None : None
         """
+
         meta_list = self._meta_binary.decode('cp1252', errors='ignore').split('\n')
         self.meta['file_version'] = meta_list[0]
         for line in meta_list:
@@ -262,10 +336,13 @@ class DAT_IMG:
         """
         Convert img binary to numpy array's, filling out the img_array_list.
         The image was compressed using zlib. So here they are decompressed.
-        input: self
         prerequisite: self.xPixel, self.yPixel, self.channels
-        output: None
+
+        Returns
+        -------
+        None : None
         """
+
         decompressed_data = zlib.decompress(self._data_binary)
         img_array = np.frombuffer(decompressed_data, np.dtype(cgc['g_file_dat_img_pixel_data_npdtype']))
         img_array = np.reshape(img_array[1: self.xPixel * self.yPixel * self.channels + 1],
@@ -276,21 +353,22 @@ class DAT_IMG:
     def meta_keys(self):
         """
         Print all available keys in meta
-        input: self
-        output: None
 
         Returns
         -------
-        object
+        None : None
         """
+
         return [k for k in self.meta]
 
     def _file2meta_dict(self):
         """
         Not in use
         Open .dat file with asci encoding, read meta data directly from .dat file, fill out the meta_dict  
-        input: self
-        output: None       
+
+        Returns
+        -------
+        None : None
         """
         with open(self.fp, 'r') as f:
             for i in range(cgc['g_file_meta_total_lines']):
@@ -303,9 +381,11 @@ class DAT_IMG:
         Not in use
         Open .dat file in raw binary format, start from a global constant g_file_data_bin_offset = 16384
         fill out the img_array_list with images in the format of numpy array's
-        input: self
         prerequisite: self.xPixel, self.yPixel, self.channels
-        output: None
+
+        Returns
+        -------
+        None : None
         """
         with open(self.fp, 'rb') as f:
             f.seek(cgc['g_file_data_bin_offset'])
@@ -316,17 +396,31 @@ class DAT_IMG:
             for i in range(self.channels):
                 self.img_array_list.append(img_array[self.yPixel * i:self.yPixel * (i + 1)])
 
-    def _crop_img(self, arr):
+    @staticmethod
+    def _crop_img(arr):
         """
-        crop an image, by removing all rows which contain only zeros.
+        Crop an image, by removing all rows which contain only zeros.
+
+        Parameters
+        ----------
+        arr : numpy array
+            Individual image
+
+        Returns
+        -------
+        arr : numpy array
+            Cropped image
         """
         return arr[~np.all(arr == 0, axis=1)]
 
     @property
     def offset(self):
         """
-        return offset relatvie to the whole range in angstrom in the format of 
-        namedtuple (x, y)
+        Return offset relatvie to the whole range in angstrom in the format of namedtuple (x, y)
+
+        Returns
+        -------
+        offset : XY2D
         """
         x_offset = np.float(self.meta['Scanrotoffx / OffsetX'])
         y_offset = np.float(self.meta['Scanrotoffy / OffsetY'])
@@ -343,7 +437,11 @@ class DAT_IMG:
     @property
     def size(self):
         """
-        return the true size of image in angstrom in namedtuple (x, y)
+        Return the true size of image in angstrom in namedtuple (x, y)
+
+        Returns
+        -------
+        size : XY2D
         """
         x = float(self.meta['Length x[A]']) * self.img_pixels.x / self.xPixel
         y = float(self.meta['Length y[A]']) * self.img_pixels.y / self.yPixel
@@ -353,8 +451,11 @@ class DAT_IMG:
     @property
     def nom_size(self):
         """
-        return nominal size of image in angstrom in namedtuple (x, y)
-        assuming no pre-termination while scanning
+        Return the nominal size of image in angstrom in namedtuple (x, y) assuming no pre-termination while scanning.
+
+        Returns
+        -------
+        nom_size : XY2D
         """
         # Size = namedtuple('Size', ['y', 'x'])
         return XY2D(y=float(self.meta['Length y[A]']),
@@ -363,7 +464,11 @@ class DAT_IMG:
     @property
     def datetime(self):
         """
-        return datetime objext of the file using the file name
+        Return datetime objext of the file using the file name
+
+        Returns
+        -------
+        datatime : datatime.datetime
         """
         import textwrap, datetime
         temp = textwrap.wrap(''.join(filter(str.isdigit, self.fn)), 2)
@@ -374,6 +479,10 @@ class DAT_IMG:
     @property
     def timestamp(self):
         """
-        same as datetime, but it converts to seconds since 1970, 1, 1.
+        Same as datetime, but it converts to seconds since 1970, 1, 1.
+
+        Returns
+        -------
+        timestamp : datetime.timestamp
         """
         return self.datetime.timestamp()
