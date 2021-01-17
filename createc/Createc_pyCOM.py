@@ -33,18 +33,18 @@ class CreatecWin32:
         CreatecWin32
         """
         try:
-            print('Trying EnsureDispatch')
+            # print('Trying EnsureDispatch')
             self.client = win32.gencache.EnsureDispatch(
                 "pstmafm.stmafmrem")  # does not work for the new version STMAFM 4.3
         except com_error:
-            print('EnsureDispatch failed')
+            # print('EnsureDispatch failed')
             try:
-                print('Trying again with DispatchEx')
+                # print('Trying again with DispatchEx')
                 self.client = win32.DispatchEx("pstmafm.stmafmrem")  # Works for the new version STMAFM 4.3
             except com_error as error:
-                print('com_error')
-                print(error)
-                print('Cannot connect to STMAFM software')
+                # print('com_error')
+                # print(error)
+                # print('Cannot connect to STMAFM software')
                 return
 
         self.savedatfilename = self.client.savedatfilename
