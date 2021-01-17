@@ -16,7 +16,12 @@ Log_Interval = 60  # Logging every X seconds
 
 def createc_fbz():
     """   
-    function returning Createc channel feedback z value
+    Function returning Createc channel feedback z value
+
+    Returns
+    -------
+    value : str
+
     """
     import createc.Createc_pyCOM as cp
     stm = cp.CreatecWin32()
@@ -25,9 +30,23 @@ def createc_fbz():
 
 def createc_adc(channel, kelvin=False, board=1):
     """   
-    function returning Createc channel ADC value
-	Note that the kelvin param is for the old software.
-	For the new version STMAFM 4.3, only ADC values are meant to be read out.
+    Function returning Createc channel ADC value
+    Note that the kelvin param is for the old software.
+    For the new version STMAFM 4.3, only ADC values are meant to be read out.
+    
+    Parameters
+    ----------
+    channel : int
+        Channel number
+    kelvin : bool
+        Whether it is for temperature
+    board : int
+        Board number  
+        
+    Returns
+    -------
+    data : str
+
     """
     import createc.Createc_pyCOM as cp
     stm = cp.CreatecWin32()
@@ -37,27 +56,42 @@ def createc_adc(channel, kelvin=False, board=1):
         data = createc.DT670.Volt2Kelvin(data)
     return data
 
+
 def createc_auxadc_6():
     """
-	function to return the STM temperature as float number in Kelvin
-	"""
+    Function to return the STM temperature as float number in Kelvin
+
+    Returns
+    -------
+    temperature : float
+    """
     import createc.Createc_pyCOM as cp
     stm = cp.CreatecWin32()
-    stm.client.setparam('MEMO_STMAFM','') # dummy function to 'manually' update the temperature reading
+    stm.client.setparam('MEMO_STMAFM', '')  # dummy function to 'manually' update the temperature reading
     return float(stm.client.getparam('T_AUXADC6[K]'))
-    
+
+
 def createc_auxadc_7():
     """
-	function to return the LHe temperature as float number in Kelvin
-	"""
+    Function to return the LHe temperature as float number in Kelvin
+
+    Returns
+    -------
+    temperature : float
+    """
     import createc.Createc_pyCOM as cp
     stm = cp.CreatecWin32()
-    stm.client.setparam('MEMO_STMAFM','') # dummy function to 'manually' update the temperature reading
+    stm.client.setparam('MEMO_STMAFM', '')  # dummy function to 'manually' update the temperature reading
     return float(stm.client.getparam('T_AUXADC7[K]'))
-	
+
+
 def f_cpu():
     """   
-    function returning cpu in percetage
+    Function returning cpu in percetage
+
+    Returns
+    -------
+    cpu : float
     """
     import psutil
     return psutil.cpu_percent(percpu=False)
@@ -65,7 +99,11 @@ def f_cpu():
 
 def f_ram():
     """   
-    function returning RAM in percetage
+    Function returning RAM in percetage
+
+    Returns
+    -------
+    ram : float
     """
     import psutil
     return psutil.swap_memory().percent
@@ -73,7 +111,11 @@ def f_ram():
 
 def f_random():
     """   
-    function returning a random value
+    Function returning a random value
+
+    Returns
+    -------
+    value : float
     """
     return np.random.rand()
 
@@ -81,6 +123,10 @@ def f_random():
 def f_random2():
     """   
     Another function returning a random value
+
+    Returns
+    -------
+    value : float
     """
     try:
         data = f_random2.data
@@ -96,29 +142,27 @@ def f_sinewave():
     Testing func returning a sinewave stream based on current time.
 
     Returns
-    ------
-    float
-        the current streaming data
+    -------
+    value : float
     """
-    return np.sin(time.time()/1.)
-
+    return np.sin(time.time() / 1.)
 
 
 def f_emitter(p=0.1):
     """
     Testing func returning a random value with probability p, else 0.
+
     Parameters
     ----------
     p : float, optional
         probablility. The default is 0.1.
 
     Returns
-    ------
-    float
-        the current streaming data
+    -------
+    value : float
     """
-    v = np.random.rand()        
-    return 0. if v>p else v
+    v = np.random.rand()
+    return 0. if v > p else v
 
 
 """
@@ -129,6 +173,7 @@ The codes below are for archive
 def g_emitter(p=0.1):
     """
     Testing generator returning a random value with probability p, else 0.
+
     Parameters
     ----------
     p : float, optional
@@ -139,12 +184,22 @@ def g_emitter(p=0.1):
     (datetime, float)
         A tuple of datetime object and a random float between (0,1)
     """
+
     while True:
-        v = np.random.rand()        
-        yield (datetime.datetime.now(), 0. if v>p else v)
+        v = np.random.rand()
+        yield (datetime.datetime.now(), 0. if v > p else v)
 
 
 def g_random():
+    """
+    Testing generator returning a random value
+
+    Yields
+    ------
+    (datetime, float)
+        A tuple of datetime object and a random float between (0, 1)
+
+    """
     while True:
         data = np.random.rand()
         data = (datetime.datetime.now(), data)
@@ -161,7 +216,7 @@ def g_sinewave():
         A tuple of datetime object and the current streaming data
     """
     while True:
-        data = np.sin(time.time()/1.)
+        data = np.sin(time.time() / 1.)
         data = (datetime.datetime.now(), data)
         yield data
 
@@ -170,7 +225,7 @@ def createc_ADC1_T():
     """   
     Generator returning Createc channel ADC1 and converting to Temperature
     
-    Returns
+    Yields
     -------
     (datetime, float)
         A tuple of datetime object and the current streaming data
@@ -180,14 +235,14 @@ def createc_ADC1_T():
     stm = cp.CreatecWin32()
     while True:
         ADC1 = stm.client.getadcvalf(1, 1)
-        yield(datetime.datetime.now(), DT670.Volt2Kelvin(ADC1))
+        yield (datetime.datetime.now(), DT670.Volt2Kelvin(ADC1))
 
 
 def createc_ADC2_T():
     """   
     Generator returning Createc channel ADC2 and converting to Temperature
     
-    Returns
+    Yields
     -------
     (datetime, float)
         A tuple of datetime object and the current streaming data
@@ -197,16 +252,32 @@ def createc_ADC2_T():
     stm = cp.CreatecWin32()
     while True:
         ADC2 = stm.client.getadcvalf(1, 2)
-        yield(datetime.datetime.now(), DT670.Volt2Kelvin(ADC2))
+        yield (datetime.datetime.now(), DT670.Volt2Kelvin(ADC2))
 
 
 def identity(x):
+    """
+    An identity function return the variable itself
+
+    Parameters
+    ----------
+    x : object
+        any object
+    Returns
+    -------
+    x : object
+    """
     return x
 
 
 def logger():
     """
     Old logger generator, no use.
+
+    Yields
+    -------
+    (datetime, float)
+
     """
     import collections
     gen = g_sinewave()
@@ -215,10 +286,10 @@ def logger():
     while True:
         data = next(gen)
         old_data.append(data)
-        delta_t = data[0]-old_data[0][0]
+        delta_t = data[0] - old_data[0][0]
         if delta_t.total_seconds() >= Log_Interval:
             temp = list(zip(*old_data))[1]
-            ave = np.mean(temp[-(len(old_data) if len(old_data)<Log_Avg_Len else Log_Avg_Len):])
+            ave = np.mean(temp[-(len(old_data) if len(old_data) < Log_Avg_Len else Log_Avg_Len):])
             print(f'{data[0]:%Y-%m-%d %H:%M} {ave:.3f}')
             old_data.clear()
         yield data
@@ -227,12 +298,13 @@ def logger():
 if __name__ == '__main__':
     import itertools
     from multiprocessing import Process
+
     gen_logger, gen_plot = itertools.tee(g_sinewave())
 
 
     def p1():
         for _ in range(5):
-            print ('p1 ',next(gen_plot))
+            print('p1 ', next(gen_plot))
             time.sleep(0.2)
 
 
@@ -240,7 +312,8 @@ if __name__ == '__main__':
         for _ in range(5):
             print('p2 ', next(gen_logger))
             time.sleep(0.2)
-    
+
+
     process1 = Process(target=p1)
     process2 = Process(target=p2)
     process1.start()

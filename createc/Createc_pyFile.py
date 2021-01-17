@@ -26,21 +26,19 @@ with open(cgc_file, 'rt') as f:
 class GENERIC_FILE:
     """
     Generic file class, common for .dat, .vert files etc.
+
+    Parameters
+    ----------
+    file_path : str
+        Full file path
+
+    Returns
+    -------
+    generic_file : GENERIC_FILE
     """
 
     def __init__(self, file_path):
-        """
-        Initiator for Generic file class
 
-        Parameters
-        ----------
-        file_path : str
-            Full file path
-
-        Returns
-        -------
-        generic_file : GENERIC_FILE
-        """
         self._line_list = None
         self.fp = file_path
         self.meta = dict()
@@ -174,21 +172,18 @@ class VERT_SPEC(GENERIC_FILE):
     """
     Read the .vert file and generate useful and managable stuff
 
+    Parameters
+    ----------
+    file_path : str
+        Full file path
+
+    Returns
+    -------
+    vert_spec : VERT_SPEC
     """
 
     def __init__(self, file_path):
-        """
-        Initiator for VERT_SPEC file class
 
-        Parameters
-        ----------
-        file_path : str
-            Full file path
-
-        Returns
-        -------
-        vert_spec : VERT_SPEC
-        """
         super().__init__(file_path)
         with open(self.fp, 'r') as f:
             self._line_list = f.readlines()
@@ -217,33 +212,34 @@ class DAT_IMG:
     """
     Read .dat file and generate meta data and images as numpy arrays.
 
+    There are two options for input:
+
+    option 1: one arg, i.e. the full path to the .dat file
+
+    option 2: two named args
+
+    a. the binary content of the file together
+
+    b. the file_name as a string
+
+    Parameters
+    ----------
+    file_path : str
+        the full path to the .dat file
+    file_binary : bin
+        the binary content of the file together
+    file_name : str
+        the file_name as a string
+
+    Returns
+    -------
+    dat_img : DAT_IMG
+        dat_file_object with meta data and image numpy arrays.
+        Meta data is a dict, one can expand the dict at will.
+        Images are a list of numpy arrays.
     """
 
     def __init__(self, file_path=None, file_binary=None, file_name=None):
-        """
-        Initiator
-        input:
-        option 1: one arg, i.e. the full path to the .dat file
-        option 2: two named args
-        a. the binary content of the file together
-        b. the file_name as a string
-
-        Parameters
-        ----------
-        file_path : str
-            the full path to the .dat file
-        file_binary : bin
-            the binary content of the file together
-        file_name : str
-            the file_name as a string
-
-        Returns
-        -------
-        dat_img : DAT_IMG
-            dat_file_object with meta data and image numpy arrays.
-            Meta data is a dict, one can expand the dict at will.
-            Images are a list of numpy arrays.
-        """
 
         self.meta = dict()
         self.img_array_list = []
