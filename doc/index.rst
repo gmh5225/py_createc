@@ -10,7 +10,7 @@ Welcome to py_createc's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   modules
+   api
 
 
 Indices and tables
