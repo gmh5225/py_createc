@@ -12,7 +12,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath(r"C:\\Users\\xuc1\\OneDrive - Aalto University\\Program\\codes\\py_createc\\createc"))
+sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
@@ -35,8 +35,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon'
-
 ]
+
 # Generate automatic API documentation
 autosummary_generate = True
 autosummary_imported_members = True
