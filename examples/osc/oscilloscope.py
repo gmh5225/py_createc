@@ -153,7 +153,7 @@ if __name__ == '__main__':
     elif args.temperature:
         stm = CreatecWin32()
         producer_funcs = [partial(dp.createc_auxadc_6, stm=stm),  # new version STMAFM 4.3 provides direct read of temperature as string.
-                          partial(dp.createc_auxadc_6, stm=stm)]  # these two get the temperature as float number in Kelvin
+                          partial(dp.createc_auxadc_7, stm=stm)]  # these two get the temperature as float number in Kelvin
         y_labels = ['STM(K)', 'LHe(K)']
         logger_name = 'temperature'
     elif args.cpu:
