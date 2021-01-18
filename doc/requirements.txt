@@ -1,0 +1,3 @@
+sphinx
+sphinx_pdj_theme
+numpydoc

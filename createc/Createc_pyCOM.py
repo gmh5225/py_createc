@@ -19,7 +19,9 @@ with open(cgc_file, 'rt') as f:
 
 
 class CreatecWin32:
-    r""" A Createc wrapper class
+    """
+    The Createc wrapper class.
+
     The remote operation from http://spm-wiki.createc.de already provides lots of methods,
     this class is just a wrapper so many more custom methods can be added.
     """
