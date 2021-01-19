@@ -1,21 +1,59 @@
-.. py_createc documentation master file, created by
-   sphinx-quickstart on Mon Jan 18 00:12:43 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Py-Createc
+==========
 
-Welcome to py_createc's documentation!
-======================================
+Modules and example scripts to interface with the `Createc STM <https://www.createc.de/LT-STMAFM>`_.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+Installation
+------------
 
-   api
+Installation of the package can be done through `PIP <https://pip.pypa.io>`_:
+
+``pip install createc``
 
 
-Indices and tables
-==================
+Quickstart
+----------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+:py:class:`createc.CreatecWin32` is a wrapper class to interface with the Createc software.
+It provides access to all remote operations that can be found at the `stm-wiki <http://archive.today/I7Aw0>`_.
+In addition, there are several custom methods available, such as :py:meth:`createc.CreatecWin32.ramp_bias_mV` and :py:math`createc.CreatecWin32.ramp_current_pA`, etc.
+
+Here is an example that plays the testing beep sound on the STM:
+
+.. code-block:: python
+
+   import createc
+   stm = createc.CreatecWin32()
+   stm.client.stmbeep()
+
+Furthermore, several classes are available to to read ``.dat``, ``.vert`` files etc.
+For example, an image instance can be created by:
+
+.. code-block:: python
+
+   import createc
+   image_file = createc.DAT_IMG('path/to/filename.dat')
+
+
+More elaborate examples
+-----------------------
+
+The `examples folder <https://version.aalto.fi/gitlab/xuc1/py_createc/-/tree/master/examples>`_ contains useful scripts to communicate with the STM.
+These scripts show off the more advanced features of the Py-Createc package.
+
+
+API Documentation
+-----------------
+
+Finally, there is the comprehensive :ref:`API documentation`.
+
+
+Citation
+--------
+
+If you use Py-Createc in a research project, pleace cite the following paper:
+
+
+Author
+------
+Chen Xu <chen.xu@aalto.fi>

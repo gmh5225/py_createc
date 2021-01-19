@@ -1,10 +1,11 @@
-API Documentation
-======================
+.. _API documentation:
 
-Documentation 
+API Documentation
+=================
+
+.. automodule:: createc
 
 .. currentmodule:: createc
-
 .. autosummary::
     :toctree: modules
 
