@@ -6,11 +6,9 @@ Created on Thu May 16 17:07:44 2019
 """
 import numpy as np
 import time
-import win32com.client as win32
 from .utils.misc import XY2D
 import yaml
 import os
-from pywintypes import com_error
 
 this_dir = os.path.dirname(__file__)
 cgc_file = os.path.join(this_dir, 'Createc_global_const.yaml')
@@ -34,6 +32,9 @@ class CreatecWin32:
         -------
         CreatecWin32
         """
+        import win32com.client as win32
+        from pywintypes import com_error
+
         try:
             # print('Trying EnsureDispatch')
             self.client = win32.gencache.EnsureDispatch(
