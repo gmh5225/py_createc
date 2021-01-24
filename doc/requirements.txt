@@ -2,4 +2,4 @@ sphinx
 sphinx_pdj_theme
 numpy
 pandas
-
+pyyaml
