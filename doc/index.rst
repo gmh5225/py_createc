@@ -16,7 +16,7 @@ Quickstart
 
 :py:class:`createc.CreatecWin32` is a wrapper class to interface with the Createc software.
 It provides access to all remote operations that can be found at the `stm-wiki <http://archive.today/I7Aw0>`_.
-In addition, there are several custom methods available, such as :py:meth:`createc.CreatecWin32.ramp_bias_mV` and :py:meth`createc.CreatecWin32.ramp_current_pA`, etc.
+In addition, there are several custom methods available, such as :py:meth:`createc.CreatecWin32.ramp_bias_mV` and :py:meth:`createc.CreatecWin32.ramp_current_pA`, etc.
 
 Here is an example that plays the testing beep sound on the STM:
 
