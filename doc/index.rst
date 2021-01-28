@@ -38,7 +38,7 @@ For example, an image instance can be created by:
 More elaborate examples
 -----------------------
 
-The `examples folder <https://version.aalto.fi/gitlab/xuc1/py_createc/-/tree/master/examples>`_ contains useful scripts to communicate with the STM.
+The `examples folder <https://github.com/chenxu2394/py_createc/tree/main/examples>`_ contains useful scripts to communicate with the STM.
 These scripts show off the more advanced features of the Py-Createc package.
 
 
@@ -56,4 +56,4 @@ If you use Py-Createc in a research project, pleace cite the following paper:
 
 Author
 ------
-Chen Xu <chen.xu@aalto.fi>
+Chen Xu <cxu.self@gmail.com>
