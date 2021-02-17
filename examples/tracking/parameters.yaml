@@ -5,6 +5,7 @@ Total_steps: 21
 #bias range
 Bias_Range_mV: [0] #List every bias, needs at leat one element
 
+
 g_filename_len: 18 # The last 18 char is sth. like A191214.245959.dat
 
 
@@ -14,8 +15,8 @@ g_filename_len: 18 # The last 18 char is sth. like A191214.245959.dat
 g_reposition_delay: 5 #seconds before reposition for alignment to template
 
 #template file, const current scan
-template_file: '\Cu(111)\2020-05-15\A200519.100455.dat'
-template_folder: 'H:\Createc\STMDATA'
+template_file: ''
+template_folder: ''
 
 use_last_as_template: True
 

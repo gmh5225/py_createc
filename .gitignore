@@ -142,3 +142,13 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+
+
+ToDo
+tests/test_pyFile.ipynb
+/environment.yaml
+/doc/modules.rst
+/doc/createc.rst
+/doc/createc.utils.rst
+/cmd_logger.py
