@@ -1,9 +1,9 @@
 #const height scan, height range
-StartHeight: -2
-EndHeight:  0
+StartHeight: -1.5
+EndHeight:  0.5
 Total_steps: 21
 #bias range
-Bias_Range_mV: [0, 100, 200, 300, 400, 500] #List every bias, needs at leat one element
+Bias_Range_mV: [0] #List every bias, needs at leat one element
 
 g_filename_len: 18 # The last 18 char is sth. like A191214.245959.dat
 
@@ -22,7 +22,7 @@ use_last_as_template: True
 shift_reg_channel: [0, 1] # List of channel number for shift registration, i.e. alignment
 subpixel_reg: 1 # precision for alignment, use 1, 10 or 100, not in use
 
-deltaX_dac: 6 #pixel size in x
+deltaX_dac: 10 #pixel size in x
 Chmode:
     mode: 1 # 1 for const height, 0 for const current
     ddeltaX: 96 #scan speed
@@ -30,5 +30,5 @@ Chmode:
 
 Ccmode:
     mode: 0
-    ddeltaX: 20
+    ddeltaX: 24
     channels_code: 0x00000003
