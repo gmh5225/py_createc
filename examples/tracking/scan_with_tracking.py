@@ -58,13 +58,17 @@ def find_shift(img_src, img_des, img_previous, extra_sec, continuous_drift=True)
     shift_c = shift * dt2 / dt1
     return shift_c if continuous_drift else shift
 
+import os
+this_dir = os.path.dirname(__file__)
+yaml_logging = os.path.join(this_dir, 'logging_tracking.yaml')
+yaml_param = os.path.join(this_dir, 'parameters.yaml')
 
-with open('./logging_tracking.yaml', 'rt') as f:
+with open(yaml_logging, 'rt') as f:
     config = yaml.safe_load(f.read())
 logging.config.dictConfig(config)
 logger = logging.getLogger('main')
 
-with open('./parameters.yaml', 'rt') as f:
+with open(yaml_param, 'rt') as f:
     params = yaml.safe_load(f.read())
 
 stm = CreatecWin32()
