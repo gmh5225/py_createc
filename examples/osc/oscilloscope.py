@@ -142,6 +142,7 @@ if __name__ == '__main__':
     group.add_argument("-t", "--temperature", help="show temperatures", action="store_true")
     group.add_argument("-c", "--cpu", help="show cpu usage", action="store_true")
     group.add_argument("-a", "--adc", help="show ADC signals board 1..2 channel 0..5", action="store_true")
+    parser.add_argument("-p", "--port", help="specify a port", default=5001, type=int)
     args = parser.parse_args()
 
     if args.zi:
@@ -191,7 +192,7 @@ if __name__ == '__main__':
     print('Start logging thread')
 
     # Main thread for graphing
-    server = Server({'/': partial(make_document, log_q=logger_q, funcs=producer_funcs, labels=y_labels)}, port=5001)
+    server = Server({'/': partial(make_document, log_q=logger_q, funcs=producer_funcs, labels=y_labels)}, port=args.port)
     server.start()
     server.io_loop.add_callback(server.show, "/")
     try:
