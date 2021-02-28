@@ -42,6 +42,8 @@ def logger(buffer_q, labels, log_name, quit_sig, interval):
         For logger file name
     quit_sig : threading.Event
         Thead quit signal
+    interval : int
+        Log interval in seconds
     """
     import logging.config
     import logging
