@@ -151,4 +151,4 @@ tests/test_pyFile.ipynb
 /doc/modules.rst
 /doc/createc.rst
 /doc/createc.utils.rst
-/cmd_logger.py
+#/cmd_logger.py
