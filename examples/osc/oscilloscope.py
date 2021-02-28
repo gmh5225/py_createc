@@ -139,7 +139,8 @@ def make_document(doc, log_q, funcs, labels, scope_points):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='An oscilloscope, showing random signals if no args given')
+    parser = argparse.ArgumentParser(description='An oscilloscope, showing random signals if no argument is given.',
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-z", "-i", "--zi", help="show feedback Z and current", action="store_true")
