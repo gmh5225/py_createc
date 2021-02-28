@@ -6,7 +6,6 @@
      Child thread : Logger (consumer)
 """
 
-
 import createc.utils.data_producer as dp
 from createc.Createc_pyCOM import CreatecWin32
 from bokeh.server.server import Server
@@ -20,9 +19,9 @@ from threading import Thread, Event
 import queue
 import argparse
 
-
 # Scope_Points = 50000  # total points to show in each channel in the scope
 # Log_Avg_Len = 5  # Average through recent X points for logging
+Format_Specifier = '.2f'  # Format specifier for the values shown in the logger as well as in the scope annotation
 Stream_Interval = 0.2  # I/O data fetching interval in seconds (Stream_Interval <= Consumer_Timeout)
 Consumer_Timeout = None  # timeout for consumers in second, None for never timeout
 
@@ -51,7 +50,7 @@ def logger(buffer_q, labels, log_name, quit_sig, interval):
     this_dir = os.path.dirname(__file__)
     log_config = os.path.join(this_dir, 'logger.config')
     log_file = log_name + '.log'
-    logging.config.fileConfig(log_config, defaults={'logfilename': this_dir+'/'+log_file})
+    logging.config.fileConfig(log_config, defaults={'logfilename': this_dir + '/' + log_file})
     this_logger = logging.getLogger('this_logger')
 
     try:
@@ -62,7 +61,7 @@ def logger(buffer_q, labels, log_name, quit_sig, interval):
     prev = []
     for index, data in enumerate(data_pak):
         prev.append(data[0])  # if v2 does not work, it is b/c of this line cannot be fixed with only 1 queue
-        msg = f'{labels[index]}\t{data[0]:%Y-%m-%d %H:%M:%S}\t{data[1]:.3f}'
+        msg = f'{labels[index]}\t{data[0]:%Y-%m-%d %H:%M:%S}\t{data[1]:{Format_Specifier}}'
         this_logger.info(msg)
 
     while not quit_sig.is_set():
@@ -74,7 +73,7 @@ def logger(buffer_q, labels, log_name, quit_sig, interval):
         for index, data in enumerate(data_pak):
             delta = data[0] - prev[index]
             if delta.total_seconds() >= interval:
-                msg = f'{labels[index]}\t{data[0]:%Y-%m-%d %H:%M:%S}\t{data[1]:.3f}'
+                msg = f'{labels[index]}\t{data[0]:%Y-%m-%d %H:%M:%S}\t{data[1]:{Format_Specifier}}'
                 this_logger.info(msg)
                 prev[index] = data[0]
         time.sleep(Stream_Interval)  # try to be in sync with producer, but not necessary
@@ -110,7 +109,7 @@ def make_document(doc, log_q, funcs, labels, scope_points):
         log_q.put(data_pak)
         for index, data in enumerate(data_pak):
             sources[index].stream(dict(time=[data[0]], data=[data[1]]), scope_points)
-            annotations[index].text = f'{data[1]: .2f}'
+            annotations[index].text = f'{data[1]:{Format_Specifier}}'
 
     sources = [ColumnDataSource(dict(time=[], data=[])) for _ in range(len(labels))]
     figs = []
@@ -162,8 +161,10 @@ if __name__ == '__main__':
         logger_name = 'zi'
     elif args.temperature:
         stm = CreatecWin32()
-        producer_funcs = [partial(dp.createc_auxadc_6, stm=stm),  # new version STMAFM 4.3 provides direct read of temperature as string.
-                          partial(dp.createc_auxadc_7, stm=stm)]  # these two get the temperature as float number in Kelvin
+        producer_funcs = [partial(dp.createc_auxadc_6, stm=stm),
+                          # new version STMAFM 4.3 provides direct read of temperature as string.
+                          partial(dp.createc_auxadc_7,
+                                  stm=stm)]  # these two get the temperature as float number in Kelvin
         y_labels = ['STM(K)', 'LHe(K)']
         logger_name = 'temperature'
     elif args.cpu:
@@ -184,7 +185,7 @@ if __name__ == '__main__':
                           partial(dp.createc_adc, stm=stm, channel=3, board=2),
                           partial(dp.createc_adc, stm=stm, channel=4, board=2),
                           partial(dp.createc_adc, stm=stm, channel=5, board=2)]
-        y_labels = ['ADC'+str(i) for i in range(12)]
+        y_labels = ['ADC' + str(i) for i in range(12)]
         logger_name = 'ADC'
     else:
         producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
@@ -201,7 +202,8 @@ if __name__ == '__main__':
     print('Start logging thread')
 
     # Main thread for graphing
-    server = Server({'/': partial(make_document, log_q=logger_q, funcs=producer_funcs, labels=y_labels, scope_points=args.scope_points)}, port=args.port)
+    server = Server({'/': partial(make_document, log_q=logger_q, funcs=producer_funcs, labels=y_labels,
+                                  scope_points=args.scope_points)}, port=args.port)
     server.start()
     server.io_loop.add_callback(server.show, "/")
     try:
