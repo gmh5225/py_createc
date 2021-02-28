@@ -21,9 +21,8 @@ import queue
 import argparse
 
 
-Scope_Points = 50000  # total points to show in each channel in the scope
-Log_Avg_Len = 5  # Average through recent X points for logging
-Log_Interval = 60  # Logging every X seconds
+# Scope_Points = 50000  # total points to show in each channel in the scope
+# Log_Avg_Len = 5  # Average through recent X points for logging
 Stream_Interval = 0.2  # I/O data fetching interval in seconds (Stream_Interval <= Consumer_Timeout)
 Consumer_Timeout = None  # timeout for consumers in second, None for never timeout
 
@@ -81,7 +80,7 @@ def logger(buffer_q, labels, log_name, quit_sig, interval):
         time.sleep(Stream_Interval)  # try to be in sync with producer, but not necessary
 
 
-def make_document(doc, log_q, funcs, labels):
+def make_document(doc, log_q, funcs, labels, scope_points):
     """
     The document for bokeh server, it takes care of data producer in the update() function
 
@@ -95,6 +94,8 @@ def make_document(doc, log_q, funcs, labels):
         List of producer functions
     labels : list(str)
         List of osc labels
+    scope_points : int
+        Total points shown in a scope
 
     Returns
     -------
@@ -108,7 +109,7 @@ def make_document(doc, log_q, funcs, labels):
         data_pak = tuple((dt.datetime.now(), func()) for func in funcs)
         log_q.put(data_pak)
         for index, data in enumerate(data_pak):
-            sources[index].stream(dict(time=[data[0]], data=[data[1]]), Scope_Points)
+            sources[index].stream(dict(time=[data[0]], data=[data[1]]), scope_points)
             annotations[index].text = f'{data[1]: .2f}'
 
     sources = [ColumnDataSource(dict(time=[], data=[])) for _ in range(len(labels))]
@@ -148,6 +149,7 @@ if __name__ == '__main__':
 
     parser.add_argument("-p", "--port", help="specify a port", default=5001, type=int)
     parser.add_argument("-l", "--log_interval", help="log interval in seconds", default=60, type=int)
+    parser.add_argument("-s", "--scope_points", help="total points shown in a scope", default=50000, type=int)
 
     args = parser.parse_args()
 
@@ -198,7 +200,7 @@ if __name__ == '__main__':
     print('Start logging thread')
 
     # Main thread for graphing
-    server = Server({'/': partial(make_document, log_q=logger_q, funcs=producer_funcs, labels=y_labels)}, port=args.port)
+    server = Server({'/': partial(make_document, log_q=logger_q, funcs=producer_funcs, labels=y_labels, scope_points=args.scope_points)}, port=args.port)
     server.start()
     server.io_loop.add_callback(server.show, "/")
     try:
