@@ -28,7 +28,7 @@ Stream_Interval = 0.2  # I/O data fetching interval in seconds (Stream_Interval 
 Consumer_Timeout = None  # timeout for consumers in second, None for never timeout
 
 
-def logger(buffer_q, labels, log_name, quit_sig):
+def logger(buffer_q, labels, log_name, quit_sig, interval):
     """
     A logger function logging result to stdout and/or file
 
@@ -72,7 +72,7 @@ def logger(buffer_q, labels, log_name, quit_sig):
             return
         for index, data in enumerate(data_pak):
             delta = data[0] - prev[index]
-            if delta.total_seconds() >= Log_Interval:
+            if delta.total_seconds() >= interval:
                 msg = f'{labels[index]}\t{data[0]:%Y-%m-%d %H:%M:%S}\t{data[1]:.3f}'
                 this_logger.info(msg)
                 prev[index] = data[0]
@@ -137,12 +137,16 @@ def make_document(doc, log_q, funcs, labels):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='An oscilloscope, showing random signals if no args given')
+
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-z", "-i", "--zi", help="show feedback Z and current", action="store_true")
     group.add_argument("-t", "--temperature", help="show temperatures", action="store_true")
     group.add_argument("-c", "--cpu", help="show cpu usage", action="store_true")
     group.add_argument("-a", "--adc", help="show ADC signals board 1..2 channel 0..5", action="store_true")
+
     parser.add_argument("-p", "--port", help="specify a port", default=5001, type=int)
+    parser.add_argument("-l", "--log_interval", help="log interval in seconds", default=60, type=int)
+
     args = parser.parse_args()
 
     if args.zi:
@@ -187,7 +191,7 @@ if __name__ == '__main__':
     # Start the data producer thread and the logger thread
     quit_signal = Event()  # signal for terminating all threads
 
-    logging = Thread(target=logger, args=(logger_q, y_labels, logger_name, quit_signal))
+    logging = Thread(target=logger, args=(logger_q, y_labels, logger_name, quit_signal, args.log_interval))
     logging.start()
     print('Start logging thread')
 
