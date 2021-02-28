@@ -141,6 +141,42 @@ def make_document(doc, log_q, funcs, labels, scope_points, format_specifier):
     doc.add_periodic_callback(callback=update, period_milliseconds=Stream_Interval * 1000)
 
 
+def prep_p_dp(ser):
+    """
+
+    Parameters
+    ----------
+    ser : serial.Serial
+        Serial instance
+
+    Returns
+    -------
+    response : float
+        Pressure in mbar
+    """
+    ser.write('#RD\r'.encode())
+    response = ser.readline()
+    return float(response[2:-1])
+
+
+def loadlock_p_dp(ser):
+    """
+
+    Parameters
+    ----------
+    ser : serial.Serial
+        Serial instance
+
+    Returns
+    -------
+    response : float
+        Pressure in mbar
+    """
+    ser.write(b"RPV1\r")
+    response = ser.read(size=50).decode('ascii').split(',')
+    return float(response[1])
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='An oscilloscope, showing random signals if no argument is given.',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -150,8 +186,9 @@ if __name__ == '__main__':
     group.add_argument("-t", "--temperature", help="show temperatures", action="store_true")
     group.add_argument("-c", "--cpu", help="show cpu usage", action="store_true")
     group.add_argument("-a", "--adc", help="show ADC signals board 1..2 channel 0..5", action="store_true")
+    group.add_argument("-p", "--pressure", help="show pressure", action="store_true")
 
-    parser.add_argument("-p", "--port", help="specify a port", default=5001, type=int)
+    parser.add_argument("-o", "--port", help="specify a port", default=5001, type=int)
     parser.add_argument("-l", "--log_interval", help="log interval in seconds", default=60, type=int)
     parser.add_argument("-s", "--scope_points", help="total points shown in a scope", default=50000, type=int)
 
@@ -195,6 +232,15 @@ if __name__ == '__main__':
         y_labels = ['ADC' + str(i) for i in range(12)]
         logger_name = 'ADC'
         fs = '.2f'
+    elif args.pressure:
+        import serial
+        ser_prep_p = serial.Serial('COM4', timeout=0)
+        ser_loadlock_p = serial.Serial('COM6', timeout=0)
+        producer_funcs = [partial(prep_p_dp, ser=ser_prep_p),
+                          partial(loadlock_p_dp, ser=ser_loadlock_p)]
+        y_labels = ['Prep_P', 'Loadlock_P']
+        logger_name = 'pressure'
+        fs = '.2e'
     else:
         producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
         y_labels = ['Random1', 'Random2', 'Emitter']
@@ -221,4 +267,8 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         quit_signal.set()
         print('Keyboard interruption')
-    print('Done')
+    finally:
+        if ser_prep_p in locals() and ser_prep_p.isOpen():
+            ser_prep_p.close()
+        if ser_loadlock_p in locals() and ser_loadlock_p.isOpen():
+            ser_loadlock_p.close()
