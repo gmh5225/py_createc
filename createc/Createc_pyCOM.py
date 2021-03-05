@@ -63,6 +63,7 @@ class CreatecWin32:
         -------
         is_active : Boolean
         """
+        from pywintypes import com_error
         try:
             self.client.scanstatus
             return True
