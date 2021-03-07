@@ -268,7 +268,17 @@ if __name__ == '__main__':
         quit_signal.set()
         print('Keyboard interruption')
     finally:
-        if ser_prep_p in locals() and ser_prep_p.isOpen():
-            ser_prep_p.close()
-        if ser_loadlock_p in locals() and ser_loadlock_p.isOpen():
-            ser_loadlock_p.close()
+        try: 
+            ser_prep_p
+        except NameError:
+            pass
+        else:
+            if ser_prep_p.isOpen():
+                ser_prep_p.close()
+        try:
+            ser_loadlock_p
+        except NameError:
+            pass
+        else:
+            if ser_loadlock_p.isOpen():
+                ser_loadlock_p.close()           
