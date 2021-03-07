@@ -177,6 +177,24 @@ def loadlock_p_dp(ser):
     return float(response[1])
 
 
+def main_ion_p_dp(ser):
+    """
+
+    Parameters
+    ----------
+    ser : serial.Serial
+        Serial instance
+
+    Returns
+    -------
+    response : float
+        Pressure in mbar
+    """
+    ser.write(b'~ 05 0B 02 00\r')
+    response = ser.readline()
+    return float(response.split()[3])
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='An oscilloscope, showing random signals if no argument is given.',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -236,9 +254,11 @@ if __name__ == '__main__':
         import serial
         ser_prep_p = serial.Serial('COM4', timeout=0)
         ser_loadlock_p = serial.Serial('COM6', timeout=0)
+        ser_main_ion_p = serial.Serial('COM7', timeout=0)
         producer_funcs = [partial(prep_p_dp, ser=ser_prep_p),
-                          partial(loadlock_p_dp, ser=ser_loadlock_p)]
-        y_labels = ['Prep_P', 'Loadlock_P']
+                          partial(loadlock_p_dp, ser=ser_loadlock_p),
+                          partial(main_ion_p_dp, ser=ser_main_ion_p)]
+        y_labels = ['Prep_P', 'Loadlock_P', 'Main_Ion_P']
         logger_name = 'pressure'
         fs = '.2e'
     else:
@@ -267,6 +287,7 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         quit_signal.set()
         print('Keyboard interruption')
+"""
     finally:
         try: 
             ser_prep_p
@@ -275,10 +296,20 @@ if __name__ == '__main__':
         else:
             if ser_prep_p.isOpen():
                 ser_prep_p.close()
+                
         try:
             ser_loadlock_p
         except NameError:
             pass
         else:
             if ser_loadlock_p.isOpen():
-                ser_loadlock_p.close()           
+                ser_loadlock_p.close()
+                
+        try:
+            ser_main_ion_p
+        except NameError:
+            pass
+        else:
+            if ser_main_ion_p.isOpen():
+                ser_main_ion_p.close()
+"""
