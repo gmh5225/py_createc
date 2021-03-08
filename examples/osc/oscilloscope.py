@@ -81,7 +81,7 @@ def logger(buffer_q, labels, log_name, quit_sig, interval, format_specifier):
         time.sleep(Stream_Interval)  # try to be in sync with producer, but not necessary
 
 
-def make_document(doc, log_q, funcs, labels, scope_points, format_specifier):
+def make_document(doc, log_q, funcs, labels, scope_points, format_specifier, y_axis_type):
     """
     The document for bokeh server, it takes care of data producer in the update() function
 
@@ -128,6 +128,7 @@ def make_document(doc, log_q, funcs, labels, scope_points, format_specifier):
     )
     for i in range(len(labels)):
         figs.append(figure(x_axis_type='datetime',
+                           y_axis_type=y_axis_type,
                            y_axis_label=labels[i],
                            toolbar_location=None, active_drag=None, active_scroll=None, tools=[hover]))
         figs[i].line(x='time', y='data', source=sources[i], line_color='red')
@@ -211,7 +212,7 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--scope_points", help="total points shown in a scope", default=50000, type=int)
 
     args = parser.parse_args()
-
+    y_axis_type = 'linear'
     if args.zi:
         stm = CreatecWin32()
         producer_funcs = [partial(dp.createc_fbz, stm=stm),
@@ -261,6 +262,7 @@ if __name__ == '__main__':
         y_labels = ['Prep_P', 'Loadlock_P', 'Main_Ion_P']
         logger_name = 'pressure'
         fs = '.2e'
+        y_axis_type = 'log'
     else:
         producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
         y_labels = ['Random1', 'Random2', 'Emitter']
@@ -278,7 +280,8 @@ if __name__ == '__main__':
 
     # Main thread for graphing
     server = Server({'/': partial(make_document, log_q=logger_q, funcs=producer_funcs, labels=y_labels,
-                                  scope_points=args.scope_points, format_specifier=fs)},
+                                  scope_points=args.scope_points, format_specifier=fs,
+                                  y_axis_type=y_axis_type)},
                     port=args.port)
     server.start()
     server.io_loop.add_callback(server.show, "/")
