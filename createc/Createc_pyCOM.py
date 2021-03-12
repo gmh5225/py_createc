@@ -218,7 +218,7 @@ class CreatecWin32:
         """
         self.client.setxyoffpixel(dx, dy)
 
-    def pre_scan_01(self, chmode: int, rotation: float = None, ddeltaX: int = None,
+    def pre_scan_01(self, chmode: int = None, rotation: float = None, ddeltaX: int = None,
                     deltaX_dac: int = None, deltaY_dac: int = None, channels_code: int = None,
                     ch_zoff: float = None, ch_bias: float = None):
         """
