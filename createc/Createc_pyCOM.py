@@ -220,7 +220,8 @@ class CreatecWin32:
 
     def pre_scan_01(self, chmode: int = None, rotation: float = None, ddeltaX: int = None,
                     deltaX_dac: int = None, deltaY_dac: int = None, channels_code: int = None,
-                    ch_zoff: float = None, ch_bias: float = None):
+                    ch_zoff: float = None, ch_bias: float = None, bias: float = None,
+                    current: float = None):
         """
         Parameters configuration before scanning an image.
 
@@ -255,6 +256,8 @@ class CreatecWin32:
         if channels_code is not None: self.client.setparam('ChannelSelectVal', channels_code)
         if ch_zoff is not None: self.client.setchmodezoff(ch_zoff)
         if ch_bias is not None: self.client.setparam('CHModeBias[mV]', ch_bias)
+        if bias is not None: self.ramp_bias_mV(bias)
+        if current is not None: self.ramp_current_pA(current)
 
     def do_scan_01(self):
         """
