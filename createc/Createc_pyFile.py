@@ -291,6 +291,8 @@ class DAT_IMG:
         self.xPiezoConst = float(self.meta['Xpiezoconst'])  # Createc software error
         self.yPiezoConst = float(self.meta['YPiezoconst'])
         self.zPiezoConst = float(self.meta['ZPiezoconst'])
+        self.bias = float(self.meta['BiasVoltage / BiasVolt.[mV]'])
+        self.current = float(self.meta['FBLogIset'])
 
     def _read_binary(self):
         """
