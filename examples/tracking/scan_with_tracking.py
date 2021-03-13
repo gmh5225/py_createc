@@ -157,18 +157,19 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
         time.sleep(params['g_reposition_delay'])        
         """
 
-        logger.info('Pre const-current scan')
-        stm.pre_scan_01(chmode=0,  # pre_cc_scan is always in const mode
-                        deltaX_dac=params['deltaX_dac'],
-                        channels_code=params['Pre_cc_scan']['channels_code'])
-        time_to_wait = float(stm.client.getparam('Sec/Image:'))
-        stm.client.scanstart()
-        time.sleep(time_to_wait)
-        while stm.client.scanstatus:
-            time.sleep(5)
-        stm.client.quicksave()
-        logger.info('cc: ' + stm.client.savedatfilename[-params['g_filename_len']:])
-        img_previous = DAT_IMG(stm.client.savedatfilename)
+        if params['Pre_cc_scan']['in_use']:
+            logger.info('Pre const-current scan')
+            stm.pre_scan_01(chmode=0,  # pre_cc_scan is always in const mode
+                            deltaX_dac=params['deltaX_dac'],
+                            channels_code=params['Pre_cc_scan']['channels_code'])
+            time_to_wait = float(stm.client.getparam('Sec/Image:'))
+            stm.client.scanstart()
+            time.sleep(time_to_wait)
+            while stm.client.scanstatus:
+                time.sleep(5)
+            stm.client.quicksave()
+            logger.info('cc: ' + stm.client.savedatfilename[-params['g_filename_len']:])
+            img_previous = DAT_IMG(stm.client.savedatfilename)
 
         logger.info('AFM scan')
         stm.pre_scan_01(chmode=params['CH_AFM'],

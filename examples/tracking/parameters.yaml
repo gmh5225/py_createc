@@ -47,6 +47,7 @@ subpixel_reg: 1 # precision for alignment, use 1, 10 or 100, not in use
 
 deltaX_dac: 16 #pixel size in x
 Pre_cc_scan:
+    in_use: True
     ddeltaX: 24 #scan speed
     channels_code: 0x00000003
 AFM_scan:
