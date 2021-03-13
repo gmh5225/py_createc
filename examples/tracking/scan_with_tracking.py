@@ -89,10 +89,17 @@ logger.info('Start.' + '*' * 30)
 logger.info('template: ' + template[-params['g_filename_len']:])
 
 idx = 0
+# const height scan series
 Height_Range_Angstrom = np.linspace(params['StartHeight'], params['EndHeight'], params['Total_steps'])
-for ch_zoff in Height_Range_Angstrom:
+# const current scan series
+Bias_Range_mV = np.linspace(params['StartBias_mV'], params['EndBias_mV'], params['Total_steps'])
+Current_Range_pA = np.linspace(params['StartCurrent_pA'], params['EndCurrent_pA'], params['Total_steps'])
+
+for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Current_Range_pA):
     logger.info('-' * 10)
     logger.info('ch_zoff %.2f' % round(ch_zoff, 2))
+    logger.info('ci_bias %.2f' % round(ci_bias, 2))
+    logger.info('ci_current %.2f' % round(ci_current, 2))
 
     for ch_bias in params['Bias_Range_mV']:
         idx += 1
@@ -101,7 +108,11 @@ for ch_zoff in Height_Range_Angstrom:
         stm.pre_scan_01(chmode=img_des.chmode,
                         ddeltaX=img_des.ddeltaX,
                         deltaX_dac=img_des.deltaX_dac,
-                        channels_code=img_des.channels_code)
+                        channels_code=img_des.channels_code,
+                        ch_zoff=0,
+                        ch_bias=0,
+                        bias=img_des.bias,
+                        current=img_des.current)
         time_to_wait = float(stm.client.getparam('Sec/Image:'))
         stm.client.scanstart()
         time.sleep(time_to_wait)
@@ -153,12 +164,14 @@ for ch_zoff in Height_Range_Angstrom:
         logger.info('cc: ' + stm.client.savedatfilename[-params['g_filename_len']:])
         img_previous = DAT_IMG(stm.client.savedatfilename)
 
-        logger.info('const height mode scan')
+        logger.info('Scan for data collection')
         stm.pre_scan_01(chmode=params['Chmode']['mode'],
                         ddeltaX=params['Chmode']['ddeltaX'],
                         channels_code=params['Chmode']['channels_code'],
                         ch_zoff=ch_zoff,
-                        ch_bias=ch_bias)
+                        ch_bias=ch_bias,
+                        bias=ci_bias,
+                        current=ci_current)
         time_to_wait = float(stm.client.getparam('Sec/Image:'))
         stm.client.scanstart()
         time.sleep(time_to_wait)
@@ -171,7 +184,11 @@ logger.info('Final template scan')
 stm.pre_scan_01(chmode=img_des.chmode,
                 ddeltaX=img_des.ddeltaX,
                 deltaX_dac=img_des.deltaX_dac,
-                channels_code=img_des.channels_code)
+                channels_code=img_des.channels_code,
+                ch_zoff=0,
+                ch_bias=0,
+                bias=img_des.bias,
+                current=img_des.current)
 time_to_wait = float(stm.client.getparam('Sec/Image:'))
 stm.client.scanstart()
 time.sleep(time_to_wait)
