@@ -1,20 +1,20 @@
 # Do const current scans or const height scans
 # Option 1: do const current scans, then edit 'StartBias_mV', 'EndBias_mV', 'StartCurrent_pA', 'EndCurrent_pA'
 # Option 2: do const height scans, then edit 'StartHeight', 'EndHeight'
-# Total_steps is the total number of images to take,
+# Total_images is the total number of images to take,
 # The program will do a even division between 'Start' and 'End' values,
 # For example 
-# Total_steps = 5, StartBias_mV = 30, EndBias_mV = 10
+# Total_images = 5, StartBias_mV = 30, EndBias_mV = 10
 # The program will do [30, 25, 20, 15, 10] for data collection 
 
-CH_AFM : 1 # 1 For const height scans, 0 for const current scans
-Total_steps: 2 # total number of images to take
+CH_AFM : 0 # 1 For const height scans, 0 for const current scans
 
+Total_images: 2 # total number of images to take
 
 # Option 1
 # const current scan, bias in mV
-StartBias_mV: 100
-EndBias_mV: 100
+StartBias_mV: 60
+EndBias_mV: 50
 # const current scan, current in pA
 StartCurrent_pA: 100
 EndCurrent_pA: 100
@@ -46,12 +46,9 @@ shift_reg_channel: [0] # List of channel number for shift registration, i.e. ali
 subpixel_reg: 1 # precision for alignment, use 1, 10 or 100, not in use
 
 deltaX_dac: 16 #pixel size in x
-Chmode:
-    mode: 0 # 1 for const height, 0 for const current
-    ddeltaX: 128    #scan speed
-    channels_code: 0x0000001F
-
-Ccmode:
-    mode: 0
-    ddeltaX: 32
+Pre_cc_scan:
+    ddeltaX: 24 #scan speed
+    channels_code: 0x00000003
+AFM_scan:
+    ddeltaX: 96
     channels_code: 0x0000001F

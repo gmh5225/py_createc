@@ -58,7 +58,9 @@ def find_shift(img_src, img_des, img_previous, extra_sec, continuous_drift=True)
     shift_c = shift * dt2 / dt1
     return shift_c if continuous_drift else shift
 
+
 import os
+
 this_dir = os.path.dirname(__file__)
 yaml_logging = os.path.join(this_dir, 'logging_tracking.yaml')
 yaml_param = os.path.join(this_dir, 'parameters.yaml')
@@ -89,11 +91,15 @@ logger.info('Start.' + '*' * 30)
 logger.info('template: ' + template[-params['g_filename_len']:])
 
 idx = 0
-# const height scan series
-Height_Range_Angstrom = np.linspace(params['StartHeight'], params['EndHeight'], params['Total_steps'])
-# const current scan series
-Bias_Range_mV = np.linspace(params['StartBias_mV'], params['EndBias_mV'], params['Total_steps'])
-Current_Range_pA = np.linspace(params['StartCurrent_pA'], params['EndCurrent_pA'], params['Total_steps'])
+
+if params['CH_AFM'] == 0:  # const current scan series
+    Bias_Range_mV = np.linspace(params['StartBias_mV'], params['EndBias_mV'], params['Total_images'])
+    Current_Range_pA = np.linspace(params['StartCurrent_pA'], params['EndCurrent_pA'], params['Total_images'])
+    Height_Range_Angstrom = [0] * params['Total_images']
+else:  # const height scan series
+    Bias_Range_mV = [img_des.bias] * params['Total_images']
+    Current_Range_pA = [img_des.current] * params['Total_images']
+    Height_Range_Angstrom = np.linspace(params['StartHeight'], params['EndHeight'], params['Total_images'])
 
 for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Current_Range_pA):
     logger.info('-' * 10)
@@ -151,10 +157,10 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
         time.sleep(params['g_reposition_delay'])        
         """
 
-        logger.info('const current mode scan')
-        stm.pre_scan_01(chmode=params['Ccmode']['mode'],
+        logger.info('Pre const-current scan')
+        stm.pre_scan_01(chmode=0,  # pre_cc_scan is always in const mode
                         deltaX_dac=params['deltaX_dac'],
-                        channels_code=params['Ccmode']['channels_code'])
+                        channels_code=params['Pre_cc_scan']['channels_code'])
         time_to_wait = float(stm.client.getparam('Sec/Image:'))
         stm.client.scanstart()
         time.sleep(time_to_wait)
@@ -164,10 +170,10 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
         logger.info('cc: ' + stm.client.savedatfilename[-params['g_filename_len']:])
         img_previous = DAT_IMG(stm.client.savedatfilename)
 
-        logger.info('Scan for data collection')
-        stm.pre_scan_01(chmode=params['Chmode']['mode'],
-                        ddeltaX=params['Chmode']['ddeltaX'],
-                        channels_code=params['Chmode']['channels_code'],
+        logger.info('AFM scan')
+        stm.pre_scan_01(chmode=params['CH_AFM'],
+                        ddeltaX=params['AFM_scan']['ddeltaX'],
+                        channels_code=params['AFM_scan']['channels_code'],
                         ch_zoff=ch_zoff,
                         ch_bias=ch_bias,
                         bias=ci_bias,
