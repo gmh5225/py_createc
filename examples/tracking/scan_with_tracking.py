@@ -185,7 +185,7 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
         while stm.client.scanstatus:
             time.sleep(5)
         stm.client.quicksave()
-        logger.info('ch: ' + stm.client.savedatfilename[-params['g_filename_len']:])
+        logger.info('afm: ' + stm.client.savedatfilename[-params['g_filename_len']:])
 
 logger.info('Final template scan')
 stm.pre_scan_01(chmode=img_des.chmode,
