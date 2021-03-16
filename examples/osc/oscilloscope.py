@@ -6,8 +6,6 @@
      Child thread : Logger (consumer)
 """
 
-import createc.utils.data_producer as dp
-from createc.Createc_pyCOM import CreatecWin32
 from bokeh.server.server import Server
 from bokeh.models import ColumnDataSource, Label, HoverTool
 from bokeh.plotting import figure
@@ -144,60 +142,6 @@ def make_document(doc, log_q, funcs, labels, scope_points, format_specifier, y_a
     doc.add_periodic_callback(callback=update, period_milliseconds=interval)
 
 
-def prep_p_dp(ser):
-    """
-
-    Parameters
-    ----------
-    ser : serial.Serial
-        Serial instance
-
-    Returns
-    -------
-    response : float
-        Pressure in mbar
-    """
-    ser.write('#RD\r'.encode())
-    response = ser.readline()
-    return float(response[2:-1])
-
-
-def loadlock_p_dp(ser):
-    """
-
-    Parameters
-    ----------
-    ser : serial.Serial
-        Serial instance
-
-    Returns
-    -------
-    response : float
-        Pressure in mbar
-    """
-    ser.write(b"RPV1\r")
-    response = ser.read(size=50).decode('ascii').split(',')
-    return float(response[1])
-
-
-def main_ion_p_dp(ser):
-    """
-
-    Parameters
-    ----------
-    ser : serial.Serial
-        Serial instance
-
-    Returns
-    -------
-    response : float
-        Pressure in mbar
-    """
-    ser.write(b'~ 05 0B 02 00\r')
-    response = ser.readline()
-    return float(response.split()[3])
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='An oscilloscope, showing random signals if no argument is given.',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -217,6 +161,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     y_axis_type = 'linear'
     if args.zi:
+        import createc.utils.data_producer as dp
+        from createc.Createc_pyCOM import CreatecWin32
+
         stm = CreatecWin32()
         producer_funcs = [partial(dp.createc_fbz, stm=stm),
                           partial(dp.createc_adc, stm=stm, channel=0, kelvin=False, board=1)]
@@ -224,6 +171,9 @@ if __name__ == '__main__':
         logger_name = 'zi'
         fs = '.2f'
     elif args.temperature:
+        import createc.utils.data_producer as dp
+        from createc.Createc_pyCOM import CreatecWin32
+
         stm = CreatecWin32()
         producer_funcs = [partial(dp.createc_auxadc_6, stm=stm),
                           # new version STMAFM 4.3 provides direct read of temperature as string.
@@ -233,11 +183,16 @@ if __name__ == '__main__':
         logger_name = 'temperature'
         fs = '.2f'
     elif args.cpu:
+        import createc.utils.data_producer as dp
+
         producer_funcs = [dp.f_cpu]
         y_labels = ['CPU']
         logger_name = 'CPU'
         fs = '.2f'
     elif args.adc:
+        import createc.utils.data_producer as dp
+        from createc.Createc_pyCOM import CreatecWin32
+
         stm = CreatecWin32()
         producer_funcs = [partial(dp.createc_adc, stm=stm, channel=0, board=1),
                           partial(dp.createc_adc, stm=stm, channel=1, board=1),
@@ -255,7 +210,62 @@ if __name__ == '__main__':
         logger_name = 'ADC'
         fs = '.2f'
     elif args.pressure:
+        def prep_p_dp(ser):
+            """
+
+            Parameters
+            ----------
+            ser : serial.Serial
+                Serial instance
+
+            Returns
+            -------
+            response : float
+                Pressure in mbar
+            """
+            ser.write('#RD\r'.encode())
+            response = ser.readline()
+            return float(response[2:-1])
+
+
+        def loadlock_p_dp(ser):
+            """
+
+            Parameters
+            ----------
+            ser : serial.Serial
+                Serial instance
+
+            Returns
+            -------
+            response : float
+                Pressure in mbar
+            """
+            ser.write(b"RPV1\r")
+            response = ser.read(size=50).decode('ascii').split(',')
+            return float(response[1])
+
+
+        def main_ion_p_dp(ser):
+            """
+
+            Parameters
+            ----------
+            ser : serial.Serial
+                Serial instance
+
+            Returns
+            -------
+            response : float
+                Pressure in mbar
+            """
+            ser.write(b'~ 05 0B 02 00\r')
+            response = ser.readline()
+            return float(response.split()[3])
+
+
         import serial
+
         ser_prep_p = serial.Serial('COM4', timeout=0)
         ser_loadlock_p = serial.Serial('COM6', timeout=0)
         ser_main_ion_p = serial.Serial('COM7', timeout=0)
@@ -267,6 +277,8 @@ if __name__ == '__main__':
         fs = '.2e'
         y_axis_type = 'log'
     else:
+        import createc.utils.data_producer as dp
+
         producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
         y_labels = ['Random1', 'Random2', 'Emitter']
         logger_name = 'random'
@@ -277,7 +289,8 @@ if __name__ == '__main__':
     # Start the data producer thread and the logger thread
     quit_signal = Event()  # signal for terminating all threads
 
-    logging = Thread(target=logger, args=(logger_q, y_labels, logger_name, quit_signal, args.log_interval, fs, args.interval))
+    logging = Thread(target=logger,
+                     args=(logger_q, y_labels, logger_name, quit_signal, args.log_interval, fs, args.interval))
     logging.start()
     print('Start logging thread')
 
