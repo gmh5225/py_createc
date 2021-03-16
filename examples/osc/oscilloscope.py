@@ -160,6 +160,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     y_axis_type = 'linear'
+    fs = '.2f'
     if args.zi:
         import createc.utils.data_producer as dp
         from createc.Createc_pyCOM import CreatecWin32
@@ -169,7 +170,6 @@ if __name__ == '__main__':
                           partial(dp.createc_adc, stm=stm, channel=0, kelvin=False, board=1)]
         y_labels = ['Feedback Z', 'Current']
         logger_name = 'zi'
-        fs = '.2f'
     elif args.temperature:
         import createc.utils.data_producer as dp
         from createc.Createc_pyCOM import CreatecWin32
@@ -181,14 +181,12 @@ if __name__ == '__main__':
                                   stm=stm)]  # these two get the temperature as float number in Kelvin
         y_labels = ['STM(K)', 'LHe(K)']
         logger_name = 'temperature'
-        fs = '.2f'
     elif args.cpu:
         import createc.utils.data_producer as dp
 
         producer_funcs = [dp.f_cpu]
         y_labels = ['CPU']
         logger_name = 'CPU'
-        fs = '.2f'
     elif args.adc:
         import createc.utils.data_producer as dp
         from createc.Createc_pyCOM import CreatecWin32
@@ -208,7 +206,6 @@ if __name__ == '__main__':
                           partial(dp.createc_adc, stm=stm, channel=5, board=2)]
         y_labels = ['ADC' + str(i) for i in range(12)]
         logger_name = 'ADC'
-        fs = '.2f'
     elif args.pressure:
         def prep_p_dp(ser):
             """
@@ -282,7 +279,6 @@ if __name__ == '__main__':
         producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
         y_labels = ['Random1', 'Random2', 'Emitter']
         logger_name = 'random'
-        fs = '.2f'
 
     logger_q = queue.Queue()
 
