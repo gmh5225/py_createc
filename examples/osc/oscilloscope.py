@@ -22,11 +22,11 @@ import argparse
 # Scope_Points = 50000  # total points to show in each channel in the scope
 # Log_Avg_Len = 5  # Average through recent X points for logging
 # Format_Specifier = '.2f'  # Format specifier for the values shown in the logger as well as in the scope annotation
-Stream_Interval = 0.2  # I/O data fetching interval in seconds (Stream_Interval <= Consumer_Timeout)
+# Stream_Interval = 0.2  # I/O data fetching interval in seconds (Stream_Interval <= Consumer_Timeout)
 Consumer_Timeout = None  # timeout for consumers in second, None for never timeout
 
 
-def logger(buffer_q, labels, log_name, quit_sig, interval, format_specifier):
+def logger(buffer_q, labels, log_name, quit_sig, log_interval, format_specifier, interval):
     """
     A logger function logging result to stdout and/or file
 
@@ -39,11 +39,13 @@ def logger(buffer_q, labels, log_name, quit_sig, interval, format_specifier):
     log_name : str
         For logger file name
     quit_sig : threading.Event
-        Thead quit signal
-    interval : int
+        Thread quit signal
+    log_interval : int
         Log interval in seconds
     format_specifier : str
         Format specifier for the values shown in the logger
+    interval: int
+        Stream interval in milliseconds
     """
     import logging.config
     import logging
@@ -74,14 +76,14 @@ def logger(buffer_q, labels, log_name, quit_sig, interval, format_specifier):
             return
         for index, data in enumerate(data_pak):
             delta = data[0] - prev[index]
-            if delta.total_seconds() >= interval:
+            if delta.total_seconds() >= log_interval:
                 msg = f'{labels[index]}\t{data[0]:%Y-%m-%d %H:%M:%S}\t{data[1]:{format_specifier}}'
                 this_logger.info(msg)
                 prev[index] = data[0]
-        time.sleep(Stream_Interval)  # try to be in sync with producer, but not necessary
+        time.sleep(interval * 0.001)  # try to be in sync with producer, but not necessary
 
 
-def make_document(doc, log_q, funcs, labels, scope_points, format_specifier, y_axis_type):
+def make_document(doc, log_q, funcs, labels, scope_points, format_specifier, y_axis_type, interval):
     """
     The document for bokeh server, it takes care of data producer in the update() function
 
@@ -139,7 +141,7 @@ def make_document(doc, log_q, funcs, labels, scope_points, format_specifier, y_a
     doc.theme = 'dark_minimal'
     doc.title = "Oscilloscope"
     doc.add_root(column([fig for fig in figs], sizing_mode='stretch_both'))
-    doc.add_periodic_callback(callback=update, period_milliseconds=Stream_Interval * 1000)
+    doc.add_periodic_callback(callback=update, period_milliseconds=interval)
 
 
 def prep_p_dp(ser):
@@ -201,7 +203,7 @@ if __name__ == '__main__':
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("-z", "-i", "--zi", help="show feedback Z and current", action="store_true")
+    group.add_argument("-z", "--zi", help="show feedback Z and current", action="store_true")
     group.add_argument("-t", "--temperature", help="show temperatures", action="store_true")
     group.add_argument("-c", "--cpu", help="show cpu usage", action="store_true")
     group.add_argument("-a", "--adc", help="show ADC signals board 1..2 channel 0..5", action="store_true")
@@ -210,6 +212,7 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--port", help="specify a port", default=5001, type=int)
     parser.add_argument("-l", "--log_interval", help="log interval in seconds", default=60, type=int)
     parser.add_argument("-s", "--scope_points", help="total points shown in a scope", default=50000, type=int)
+    parser.add_argument("-i", "--interval", help="stream interval in milliseconds", default=500, type=int)
 
     args = parser.parse_args()
     y_axis_type = 'linear'
@@ -274,14 +277,14 @@ if __name__ == '__main__':
     # Start the data producer thread and the logger thread
     quit_signal = Event()  # signal for terminating all threads
 
-    logging = Thread(target=logger, args=(logger_q, y_labels, logger_name, quit_signal, args.log_interval, fs))
+    logging = Thread(target=logger, args=(logger_q, y_labels, logger_name, quit_signal, args.log_interval, fs, args.interval))
     logging.start()
     print('Start logging thread')
 
     # Main thread for graphing
     server = Server({'/': partial(make_document, log_q=logger_q, funcs=producer_funcs, labels=y_labels,
                                   scope_points=args.scope_points, format_specifier=fs,
-                                  y_axis_type=y_axis_type)},
+                                  y_axis_type=y_axis_type, interval=args.interval)},
                     port=args.port)
     server.start()
     server.io_loop.add_callback(server.show, "/")
