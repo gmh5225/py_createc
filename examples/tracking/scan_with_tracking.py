@@ -16,21 +16,11 @@ from skimage.filters import gaussian
 import numpy as np
 import time
 from createc.Createc_pyCOM import CreatecWin32
+from createc.utils.image_utils import level_correction
 import logging.config
 import yaml
 import sys
 import os
-
-def level_correction(Y):
-    m, n = Y.shape
-    assert m >= 2 and n >= 2
-    X1, X2 = np.mgrid[:m, :n]
-    X = np.hstack((np.reshape(X1, (m * n, 1)), np.reshape(X2, (m * n, 1))))
-    X = np.hstack((np.ones((m * n, 1)), X))
-    YY = np.reshape(Y, (m * n, 1))
-    theta = np.dot(np.dot(np.linalg.pinv(np.dot(X.transpose(), X)), X.transpose()), YY)
-    plane = np.reshape(np.dot(X, theta), (m, n))
-    return Y - plane
 
 
 def find_shift(img_src, img_des, img_previous, extra_sec, continuous_drift=True):
