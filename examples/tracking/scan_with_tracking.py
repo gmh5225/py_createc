@@ -16,11 +16,10 @@ from skimage.filters import gaussian
 import numpy as np
 import time
 from createc.Createc_pyCOM import CreatecWin32
-import logging
 import logging.config
 import yaml
 import sys
-
+import os
 
 def level_correction(Y):
     m, n = Y.shape
@@ -59,17 +58,12 @@ def find_shift(img_src, img_des, img_previous, extra_sec, continuous_drift=True)
     return shift_c if continuous_drift else shift
 
 
-import os
-
 this_dir = os.path.dirname(__file__)
-yaml_logging = os.path.join(this_dir, 'logging_tracking.yaml')
+log_config = os.path.join(this_dir, 'logging_tracking.config')
+logging.config.fileConfig(log_config, defaults={'logfilename': this_dir + '/' + 'tracking.log'})
+logger = logging.getLogger('this_logger')
+
 yaml_param = os.path.join(this_dir, 'parameters.yaml')
-
-with open(yaml_logging, 'rt') as f:
-    config = yaml.safe_load(f.read())
-logging.config.dictConfig(config)
-logger = logging.getLogger('main')
-
 with open(yaml_param, 'rt') as f:
     params = yaml.safe_load(f.read())
 
