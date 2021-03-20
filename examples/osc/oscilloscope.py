@@ -78,7 +78,7 @@ def logger(buffer_q, labels, log_name, quit_sig, log_interval, format_specifier,
                 msg = f'{labels[index]}\t{data[0]:%Y-%m-%d %H:%M:%S}\t{data[1]:{format_specifier}}'
                 this_logger.info(msg)
                 prev[index] = data[0]
-        time.sleep(interval * 0.001)  # try to be in sync with producer, but not necessary
+        #time.sleep(interval * 0.001)  # try to be in sync with producer, but not necessary
 
 
 def make_document(doc, log_q, funcs, labels, scope_points, format_specifier, y_axis_type, interval):
@@ -243,6 +243,24 @@ if __name__ == '__main__':
             return float(response[1])
 
 
+        def gasline_p_dp(ser):
+            """
+
+            Parameters
+            ----------
+            ser : serial.Serial
+                Serial instance
+
+            Returns
+            -------
+            response : float
+                Pressure in mbar
+            """
+            ser.write(b"RPV3\r")
+            response = ser.read(size=50).decode('ascii').split(',')
+            return float(response[1])
+            
+
         def main_ion_p_dp(ser):
             """
 
@@ -264,12 +282,16 @@ if __name__ == '__main__':
         import serial
 
         ser_prep_p = serial.Serial('COM4', timeout=0)
-        ser_loadlock_p = serial.Serial('COM6', timeout=0)
+        ser_vacom_p = serial.Serial('COM6', timeout=0)
         ser_main_ion_p = serial.Serial('COM7', timeout=0)
         producer_funcs = [partial(prep_p_dp, ser=ser_prep_p),
-                          partial(loadlock_p_dp, ser=ser_loadlock_p),
+                          partial(loadlock_p_dp, ser=ser_vacom_p),
+                          #partial(gasline_p_dp, ser=ser_vacom_p),
                           partial(main_ion_p_dp, ser=ser_main_ion_p)]
-        y_labels = ['Prep_P', 'Loadlock_P', 'Main_Ion_P']
+        y_labels = ['Prep_P', 
+                    'Loadlock_P', 
+                    #'Gasline_P', 
+                    'Main_Ion_P']
         logger_name = 'pressure'
         fs = '.2e'
         y_axis_type = 'log'
@@ -313,12 +335,12 @@ if __name__ == '__main__':
                 ser_prep_p.close()
                 
         try:
-            ser_loadlock_p
+            ser_vacom_p
         except NameError:
             pass
         else:
-            if ser_loadlock_p.isOpen():
-                ser_loadlock_p.close()
+            if ser_vacom_p.isOpen():
+                ser_vacom_p.close()
                 
         try:
             ser_main_ion_p
