@@ -50,7 +50,7 @@ def find_shift(img_src, img_des, img_previous, extra_sec, continuous_drift=True)
 
 this_dir = os.path.dirname(__file__)
 log_config = os.path.join(this_dir, 'logging_tracking.config')
-logging.config.fileConfig(log_config, defaults={'logfilename': this_dir + '/' + 'tracking.log'})
+logging.config.fileConfig(log_config, defaults={'logfilename': os.path.join(this_dir, 'tracking.log').replace('\\', '\\\\')})
 logger = logging.getLogger('this_logger')
 
 yaml_param = os.path.join(this_dir, 'parameters.yaml')
