@@ -25,7 +25,7 @@ def createc_fbz(stm):
         Createc instance
     Returns
     -------
-    value : str
+    value : float
 
     """
     # from createc.Createc_pyCOM import CreatecWin32
@@ -52,7 +52,7 @@ def createc_adc(stm, channel, board, kelvin=False):
         
     Returns
     -------
-    data : str
+    data : float
 
     """
     data = stm.client.getadcvalf(board, channel)
