@@ -6,7 +6,7 @@ Created on Thu Mar 28 18:48:48 2019
 
 Scan with tracking
 Autofilesave should be OFF
-
+Be careful about daylight saving time where the continuous shift-finding can fail.
 """
 from createc.Createc_pyFile import DAT_IMG
 # from skimage.feature import register_translation as rt
