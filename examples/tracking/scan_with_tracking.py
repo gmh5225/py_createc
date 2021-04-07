@@ -21,6 +21,7 @@ import logging.config
 import yaml
 import sys
 import os
+import datetime
 
 
 def find_shift(img_src, img_des, img_previous, extra_sec, continuous_drift=True):
@@ -50,7 +51,8 @@ def find_shift(img_src, img_des, img_previous, extra_sec, continuous_drift=True)
 
 this_dir = os.path.dirname(__file__)
 log_config = os.path.join(this_dir, 'logging_tracking.config')
-logging.config.fileConfig(log_config, defaults={'logfilename': os.path.join(this_dir, 'tracking.log').replace('\\', '\\\\')})
+log_fn = 'log_' + datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + '.log'
+logging.config.fileConfig(log_config, defaults={'logfilename': os.path.join(this_dir, 'logs', log_fn).replace('\\', '\\\\')})
 logger = logging.getLogger('this_logger')
 
 yaml_param = os.path.join(this_dir, 'parameters.yaml')
@@ -104,6 +106,7 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
                             bias=img_des.bias,
                             current=img_des.current)
         time_to_wait = float(stm.client.getparam('Sec/Image:'))
+        time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.client.getparam('Delay Y')))
         stm.client.scanstart()
         time.sleep(time_to_wait)
         while stm.client.scanstatus:
@@ -126,6 +129,7 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
         """
         import random
         time_to_wait = float(stm.client.getparam('Sec/Image:'))
+        time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.client.getparam('Delay Y')))
         stm.client.scanstart()
         time.sleep(time_to_wait)
         while stm.client.scanstatus:
@@ -147,6 +151,7 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
                                 deltaX_dac=params['deltaX_dac'],
                                 channels_code=params['Pre_cc_scan']['channels_code'])
             time_to_wait = float(stm.client.getparam('Sec/Image:'))
+            time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.client.getparam('Delay Y')))
             stm.client.scanstart()
             time.sleep(time_to_wait)
             while stm.client.scanstatus:
@@ -164,6 +169,7 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
                             bias=ci_bias,
                             current=ci_current)
         time_to_wait = float(stm.client.getparam('Sec/Image:'))
+        time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.client.getparam('Delay Y')))
         stm.client.scanstart()
         time.sleep(time_to_wait)
         while stm.client.scanstatus:
@@ -181,6 +187,7 @@ stm.pre_scan_config(chmode=img_des.chmode,
                 bias=img_des.bias,
                 current=img_des.current)
 time_to_wait = float(stm.client.getparam('Sec/Image:'))
+time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.client.getparam('Delay Y')))
 stm.client.scanstart()
 time.sleep(time_to_wait)
 while stm.client.scanstatus:
