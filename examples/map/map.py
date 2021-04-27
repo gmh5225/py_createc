@@ -192,7 +192,7 @@ def make_document(doc):
         plot_img()
         status_text.value = 'Channel changed'
 
-    def connnect_stm_callback(event):
+    def connect_stm_callback(event):
         """
         Callback to connect to the STM software
         """
@@ -265,7 +265,7 @@ def make_document(doc):
     
     # A button to (re)connect to the STM software
     connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success")
-    connect_stm_bn.on_click(connnect_stm_callback)
+    connect_stm_bn.on_click(connect_stm_callback)
 
     # show the status of the interface
     status_text = TextInput(title='', value='Ready', disabled=True)
