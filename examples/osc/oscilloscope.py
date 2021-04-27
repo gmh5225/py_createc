@@ -222,6 +222,8 @@ if __name__ == '__main__':
             """
             ser.write('#RD\r'.encode())
             response = ser.readline()
+            if len(response) == 0:
+                return 0
             return float(response[2:-1])
 
 
@@ -240,7 +242,10 @@ if __name__ == '__main__':
             """
             ser.write(b"RPV1\r")
             response = ser.read(size=50).decode('ascii').split(',')
-            return float(response[1])
+            try:
+                return float(response[1])
+            except IndexError:
+                return 0
 
 
         def gasline_p_dp(ser):
@@ -258,7 +263,10 @@ if __name__ == '__main__':
             """
             ser.write(b"RPV3\r")
             response = ser.read(size=50).decode('ascii').split(',')
-            return float(response[1])
+            try:
+                return float(response[1])
+            except IndexError:
+                return 0
             
 
         def main_ion_p_dp(ser):
