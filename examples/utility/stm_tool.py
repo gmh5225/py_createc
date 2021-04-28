@@ -1,17 +1,17 @@
 from bokeh.io import output_file, curdoc, show
-from bokeh.models import FileInput, ColumnDataSource, CustomJSHover
+from bokeh.models import FileInput, ColumnDataSource, CustomJSHover, Paragraph
 from bokeh.plotting import figure
 from bokeh.layouts import column, row
 from bokeh.server.server import Server
 from bokeh.models.tools import PanTool, BoxZoomTool, WheelZoomTool, \
 UndoTool, RedoTool, ResetTool, SaveTool, HoverTool
 from bokeh.palettes import Greys256
-from bokeh.models import Button, HoverTool, TapTool, TextInput, CustomJS, Select
+from bokeh.models import Button, HoverTool, TapTool, TextInput, CustomJS, Select, Slider
 from bokeh.events import Tap, DoubleTap
+from bokeh.models.formatters import FuncTickFormatter
 
 import base64
 from collections import deque, namedtuple
-import matplotlib.pyplot as plt
 import tornado.web
 import numpy as np
 import os
@@ -143,6 +143,7 @@ def make_document(doc):
             temp_file_name = f'image{filename}_{channel}.png'
             path = os.path.join(os.path.dirname(__file__), 'temp', temp_file_name)
 
+            import matplotlib.pyplot as plt
             plt.imsave(path, img, cmap='gray')
             p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='center',
                                      w=file.size.x, h=file.size.y,
@@ -192,7 +193,7 @@ def make_document(doc):
         plot_img()
         status_text.value = 'Channel changed'
 
-    def connnect_stm_callback(event):
+    def connect_stm_callback(event):
         """
         Callback to connect to the STM software
         """
@@ -202,6 +203,47 @@ def make_document(doc):
         show_stm_area_bn.disabled=False
         status_text.value = 'STM connected'
 
+    def ramping_bias_callback(event):
+        """
+        Callback for ramping bias
+        """
+        if stm is None or not stm.is_active():
+            status_text.value = 'No STM is connected'
+            return
+        status_text.value = 'Ramping bias'
+        try:
+            bias_target = float(bias_mV_input.value_input)
+        except ValueError:
+            status_text.value = 'Invalid bias'
+            return
+        try:
+            steps = int(steps_bias_ramping.value_input)
+        except ValueError:
+            status_text.value = 'Invalid steps'
+            return
+        stm.ramp_bias_mV(bias_target, steps)
+        status_text.value = 'Ramping bias done'
+
+    def ramping_current_callback(event):
+        """
+        Callback for ramping current
+        """
+        if stm is None or not stm.is_active():
+            status_text.value = 'No STM is connected'
+            return
+        status_text.value = 'Ramping current'
+        try:
+            current_target = float(current_pA_input.value_input)
+        except ValueError:
+            status_text.value = 'Invalid current'
+            return
+        try:
+            steps = int(steps_current_ramping.value_input)
+        except ValueError:
+            status_text.value = 'Invalid steps'
+            return
+        stm.ramp_current_pA(current_target, steps)
+        status_text.value = 'Ramping current done'
 
     """
     Main body below
@@ -264,16 +306,62 @@ def make_document(doc):
     ch_select.on_change('value', channel_selection_callback)
 
     # A button to (re)connect to the STM software
-    connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success")
-    connect_stm_bn.on_click(connnect_stm_callback)
+    connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success",
+                            sizing_mode='stretch_width',
+                            min_width=100)
+    connect_stm_bn.on_click(connect_stm_callback)
 
     # show the status of the interface
-    status_text = TextInput(title='', value='Ready', disabled=True)
+    status_text = TextInput(title='', value='Ready', disabled=True,
+                            sizing_mode='stretch_width',
+                            min_width=100)
+
+    # input for bias value in mV
+    bias_mV_input = TextInput(title='', value_input='10', value='10')
+    bias_unit = Paragraph(text='mV', align='center')
+    bias_title = Paragraph(text='Bias', align='center')
+
+    # steps for ramping bias
+    steps_bias_ramping = TextInput(title='', value_input='100', value='100')
+    steps_bias_title = Paragraph(text='steps', align='center')
+
+    # button for ramping bias
+    ramping_bias_bn = Button(label="Ramping Bias", button_type="success")
+    ramping_bias_bn.on_click(ramping_bias_callback)
+
+    # slider not in use
+    slider_bias = Slider(start=-2, end=4, value=0, step=0.01,
+                         show_value=False,
+                         format=FuncTickFormatter(code="return Math.pow(10, tick).toFixed(2)"))
+
+    # input for current value in pA
+    current_pA_input = TextInput(title='', value='10', value_input='10')
+    current_unit = Paragraph(text='pA', align='center')
+    current_title = Paragraph(text='Current', align='center')
+
+    # steps for ramping bias
+    steps_current_ramping = TextInput(title='', value_input='100', value='100')
+    steps_current_title = Paragraph(text='steps', align='center')
+
+    # button for ramping bias
+    ramping_current_bn = Button(label="Ramping Current", button_type="success")
+    ramping_current_bn.on_click(ramping_current_callback)
+
     # layout includes the map and the controls below
     controls_1 = row([file_input, ch_select, textxy_show], sizing_mode='stretch_width')
     controls_2 = row([textxy_hover, clear_marks_bn, status_text], sizing_mode='stretch_width')
     controls_3 = row([connect_stm_bn, show_stm_area_bn, send_xy_bn], sizing_mode='stretch_width')
-    doc.add_root(column([p, controls_1, controls_2, controls_3], sizing_mode='stretch_both'))
+    controls_a = column([status_text, connect_stm_bn], sizing_mode='stretch_both')
+    controls_b = row([bias_title, bias_mV_input, bias_unit,
+                      steps_bias_ramping, steps_bias_title,
+                      ramping_bias_bn],
+                     sizing_mode='stretch_width')
+    controls_b1 = row([slider_bias], sizing_mode='stretch_width')
+    controls_c = row([current_title, current_pA_input, current_unit,
+                      steps_current_ramping, steps_current_title,
+                      ramping_current_bn],
+                     sizing_mode='stretch_width')
+    doc.add_root(column([controls_a, controls_b, controls_c], sizing_mode='stretch_both'))
 
 
 path_que = deque()
@@ -282,7 +370,7 @@ extra_patterns = [(r"/(image(.*))", tornado.web.StaticFileHandler,
                   {"path": os.path.join(os.path.dirname(__file__), 'temp')}),
                   (r"/(favicon.ico)", tornado.web.StaticFileHandler,
                   {"path": os.path.join(os.path.dirname(__file__), 'temp')})]
-server = Server(apps, extra_patterns=extra_patterns)
+server = Server(apps, extra_patterns=extra_patterns, port=5987)
 server.start()
 server.io_loop.add_callback(server.show, "/")
 try:
