@@ -4,10 +4,12 @@ from bokeh.models import Button, TextInput, Slider
 from bokeh.models.formatters import FuncTickFormatter
 
 from createc.Createc_pyCOM import CreatecWin32
-
+import logging.config
+import logging
+import os
+import datetime
 
 def make_document(doc):
-
     def connect_stm_callback(event):
         """
         Callback to connect to the STM software
@@ -15,6 +17,8 @@ def make_document(doc):
         nonlocal stm
         stm = CreatecWin32()
         status_text.value = 'STM connected'
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Connect STM'
+        this_logger.info(msg)
 
     def ramping_bias_callback(event):
         """
@@ -35,6 +39,9 @@ def make_document(doc):
             status_text.value = 'Invalid steps'
             return
         stm.ramp_bias_mV(bias_target, steps)
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        msg = msg + f' Ramp bias to {bias_target} mV with steps speed {steps}'
+        this_logger.info(msg)
         status_text.value = 'Ramping bias done'
 
     def ramping_current_callback(event):
@@ -56,6 +63,9 @@ def make_document(doc):
             status_text.value = 'Invalid steps'
             return
         stm.ramp_current_pA(current_target, steps)
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        msg = msg + f' Ramp current to {current_target} pA with steps speed {steps}'
+        this_logger.info(msg)
         status_text.value = 'Ramping current done'
 
     """
@@ -120,6 +130,12 @@ def make_document(doc):
 
     doc.add_root(column([controls_a, controls_b, controls_c], sizing_mode='stretch_both'))
 
+
+this_dir = os.path.dirname(__file__)
+log_config = os.path.join(this_dir, 'logger.config')
+log_file = 'stm_tool.log'
+logging.config.fileConfig(log_config, defaults={'logfilename': this_dir + '/' + log_file})
+this_logger = logging.getLogger('this_logger')
 
 apps = {'/': make_document}
 server = Server(apps, port=5987)
