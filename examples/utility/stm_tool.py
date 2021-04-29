@@ -9,7 +9,12 @@ import logging
 import os
 import datetime
 
+
 def make_document(doc):
+    """
+    The make doc func for bokeh
+
+    """
     def connect_stm_callback(event):
         """
         Callback to connect to the STM software
