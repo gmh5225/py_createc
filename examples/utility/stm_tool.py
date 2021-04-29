@@ -139,7 +139,8 @@ def make_document(doc):
 this_dir = os.path.dirname(__file__)
 log_config = os.path.join(this_dir, 'logger.config')
 log_file = 'stm_tool.log'
-logging.config.fileConfig(log_config, defaults={'logfilename': this_dir + '/' + log_file})
+#logging.config.fileConfig(log_config, defaults={'logfilename': this_dir + '\/' + log_file})
+logging.config.fileConfig(log_config, defaults={'logfilename': os.path.join(this_dir, log_file).replace('\\', '\\\\')})
 this_logger = logging.getLogger('this_logger')
 
 apps = {'/': make_document}
