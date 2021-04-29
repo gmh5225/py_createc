@@ -4,7 +4,7 @@ from bokeh.plotting import figure
 from bokeh.layouts import column, row
 from bokeh.server.server import Server
 from bokeh.models.tools import PanTool, BoxZoomTool, WheelZoomTool, \
-UndoTool, RedoTool, ResetTool, SaveTool, HoverTool
+    UndoTool, RedoTool, ResetTool, SaveTool, HoverTool
 from bokeh.palettes import Greys256
 from bokeh.models import Button, HoverTool, TapTool, TextInput, CustomJS, Select, Slider
 from bokeh.events import Tap, DoubleTap
@@ -21,15 +21,14 @@ from createc.Createc_pyCOM import CreatecWin32
 from createc.utils.misc import XY2D, point_rot2D_y_inv
 from createc.utils.image_utils import level_correction
 
-
-SCAN_BOUNDARY_X = 3000 # scanner range in angstrom
+SCAN_BOUNDARY_X = 3000  # scanner range in angstrom
 SCAN_BOUNDARY_Y = 3000
-NUM_SIGMA = 3 # remove any outlier pixels of an image beyond a defined several sigmas
-MAX_CH = 8 # maxium channel number, temp variable
+NUM_SIGMA = 3  # remove any outlier pixels of an image beyond a defined several sigmas
+MAX_CH = 8  # maxium channel number, temp variable
 FILE_TUPLE = namedtuple('FILE_TUPLE', ['file', 'filename'])
 
-def make_document(doc):
 
+def make_document(doc):
     def show_area_callback(event):
         """
         Show current STM scan area
@@ -119,57 +118,57 @@ def make_document(doc):
 
         channel = int(ch_select.value[-1])
         if channel >= file.channels:
-            channel = file.channels-1
+            channel = file.channels - 1
             ch_select.value = f'{ch_select.value[:-1]}{channel}'
 
         img = file.imgs[channel]
         # img = level_correction(file.imgs[channel])
 
         # remove any outlier
-        threshold = np.mean(img)+NUM_SIGMA*np.std(img)
-        img[img>threshold] = threshold
-        threshold = np.mean(img)-NUM_SIGMA*np.std(img)
-        img[img<threshold] = threshold
+        threshold = np.mean(img) + NUM_SIGMA * np.std(img)
+        img[img > threshold] = threshold
+        threshold = np.mean(img) - NUM_SIGMA * np.std(img)
+        img[img < threshold] = threshold
 
-        temp = file.nom_size.y-file.size.y if file.scan_ymode == 2 else 0
+        temp = file.nom_size.y - file.size.y if file.scan_ymode == 2 else 0
         anchor = XY2D(x=file.offset.x,
-                      y=(file.offset.y+temp+file.size.y/2))
+                      y=(file.offset.y + temp + file.size.y / 2))
 
         anchor = point_rot2D_y_inv(anchor, XY2D(x=file.offset.x, y=file.offset.y),
-                             np.deg2rad(file.rotation))
+                                   np.deg2rad(file.rotation))
         # print('offset:', file.offset)
         # print('angle:', file.rotation)
-        if int(file.rotation*100) not in [0, 9000, -9000, 18000, -18000]:
+        if int(file.rotation * 100) not in [0, 9000, -9000, 18000, -18000]:
             temp_file_name = f'image{filename}_{channel}.png'
             path = os.path.join(os.path.dirname(__file__), 'temp', temp_file_name)
 
             import matplotlib.pyplot as plt
             plt.imsave(path, img, cmap='gray')
             p.image_url([temp_file_name], x=anchor.x, y=anchor.y, anchor='center',
-                                     w=file.size.x, h=file.size.y,
-                                     angle=file.rotation,
-                                     angle_units='deg',
-                                     name = filename)
+                        w=file.size.x, h=file.size.y,
+                        angle=file.rotation,
+                        angle_units='deg',
+                        name=filename)
             path_que.append(path)
             return None
 
-        elif int(file.rotation*100) == 0:
-            anchor = XY2D(x=anchor.x-file.size.x/2, y=anchor.y+file.size.y/2)
+        elif int(file.rotation * 100) == 0:
+            anchor = XY2D(x=anchor.x - file.size.x / 2, y=anchor.y + file.size.y / 2)
             width = file.size.x
             height = file.size.y
-        elif int(file.rotation*100) == 9000:
-            img = img.swapaxes(-2,-1)[...,::-1,:]
-            anchor = XY2D(x=anchor.x-file.size.y/2, y=anchor.y+file.size.x/2)
+        elif int(file.rotation * 100) == 9000:
+            img = img.swapaxes(-2, -1)[..., ::-1, :]
+            anchor = XY2D(x=anchor.x - file.size.y / 2, y=anchor.y + file.size.x / 2)
             width = file.size.y
             height = file.size.x
-        elif int(file.rotation*100) == -9000:
-            img = img.swapaxes(-2,-1)[...,::-1]
-            anchor = XY2D(x=anchor.x-file.size.y/2, y=anchor.y+file.size.x/2)
+        elif int(file.rotation * 100) == -9000:
+            img = img.swapaxes(-2, -1)[..., ::-1]
+            anchor = XY2D(x=anchor.x - file.size.y / 2, y=anchor.y + file.size.x / 2)
             width = file.size.y
             height = file.size.x
         else:
-            img = img[...,::-1,::-1]
-            anchor = XY2D(x=anchor.x-file.size.x/2, y=anchor.y+file.size.y/2)
+            img = img[..., ::-1, ::-1]
+            anchor = XY2D(x=anchor.x - file.size.x / 2, y=anchor.y + file.size.y / 2)
             width = file.size.x
             height = file.size.y
         p.image(image=[np.flipud(img)], x=anchor.x, y=anchor.y,
@@ -199,8 +198,8 @@ def make_document(doc):
         """
         nonlocal stm
         stm = CreatecWin32()
-        send_xy_bn.disabled=False
-        show_stm_area_bn.disabled=False
+        send_xy_bn.disabled = False
+        show_stm_area_bn.disabled = False
         status_text.value = 'STM connected'
 
     def ramping_bias_callback(event):
@@ -308,25 +307,28 @@ def make_document(doc):
     # A button to (re)connect to the STM software
     connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success",
                             sizing_mode='stretch_width',
-                            min_width=100)
+                            min_width=10, default_size=2)
     connect_stm_bn.on_click(connect_stm_callback)
 
     # show the status of the interface
     status_text = TextInput(title='', value='Ready', disabled=True,
                             sizing_mode='stretch_width',
-                            min_width=100)
+                            min_width=10, default_size=2)
 
     # input for bias value in mV
-    bias_mV_input = TextInput(title='', value_input='10', value='10')
+    bias_mV_input = TextInput(title='Bias (mV)', value_input='10', value='10',
+                              min_width=50)
     bias_unit = Paragraph(text='mV', align='center')
     bias_title = Paragraph(text='Bias', align='center')
 
     # steps for ramping bias
-    steps_bias_ramping = TextInput(title='', value_input='100', value='100')
+    steps_bias_ramping = TextInput(title='Steps', value_input='100', value='100',
+                                   min_width=50)
     steps_bias_title = Paragraph(text='steps', align='center')
 
     # button for ramping bias
-    ramping_bias_bn = Button(label="Ramping Bias", button_type="success")
+    ramping_bias_bn = Button(label="Ramping Bias", button_type="success",
+                             min_width=10, default_size=2)
     ramping_bias_bn.on_click(ramping_bias_callback)
 
     # slider not in use
@@ -335,16 +337,19 @@ def make_document(doc):
                          format=FuncTickFormatter(code="return Math.pow(10, tick).toFixed(2)"))
 
     # input for current value in pA
-    current_pA_input = TextInput(title='', value='10', value_input='10')
+    current_pA_input = TextInput(title='Current (pA)', value='10', value_input='10',
+                                 min_width=50)
     current_unit = Paragraph(text='pA', align='center')
     current_title = Paragraph(text='Current', align='center')
 
     # steps for ramping bias
-    steps_current_ramping = TextInput(title='', value_input='100', value='100')
+    steps_current_ramping = TextInput(title='Steps', value_input='100', value='100',
+                                      min_width=50)
     steps_current_title = Paragraph(text='steps', align='center')
 
     # button for ramping bias
-    ramping_current_bn = Button(label="Ramping Current", button_type="success")
+    ramping_current_bn = Button(label="Ramping Current", button_type="success",
+                                min_width=10, default_size=2)
     ramping_current_bn.on_click(ramping_current_callback)
 
     # layout includes the map and the controls below
@@ -352,24 +357,27 @@ def make_document(doc):
     controls_2 = row([textxy_hover, clear_marks_bn, status_text], sizing_mode='stretch_width')
     controls_3 = row([connect_stm_bn, show_stm_area_bn, send_xy_bn], sizing_mode='stretch_width')
     controls_a = column([status_text, connect_stm_bn], sizing_mode='stretch_both')
-    controls_b = row([bias_title, bias_mV_input, bias_unit,
-                      steps_bias_ramping, steps_bias_title,
-                      ramping_bias_bn],
-                     sizing_mode='stretch_width')
+    controls_b = column([row([bias_mV_input,
+                              steps_bias_ramping],
+                             sizing_mode='stretch_width'),
+                         ramping_bias_bn],
+                        sizing_mode='stretch_width')
     controls_b1 = row([slider_bias], sizing_mode='stretch_width')
-    controls_c = row([current_title, current_pA_input, current_unit,
-                      steps_current_ramping, steps_current_title,
-                      ramping_current_bn],
-                     sizing_mode='stretch_width')
+    controls_c = column([row([current_pA_input,
+                              steps_current_ramping],
+                             sizing_mode='stretch_width'),
+                         ramping_current_bn],
+                        sizing_mode='stretch_width')
+
     doc.add_root(column([controls_a, controls_b, controls_c], sizing_mode='stretch_both'))
 
 
 path_que = deque()
 apps = {'/': make_document}
 extra_patterns = [(r"/(image(.*))", tornado.web.StaticFileHandler,
-                  {"path": os.path.join(os.path.dirname(__file__), 'temp')}),
+                   {"path": os.path.join(os.path.dirname(__file__), 'temp')}),
                   (r"/(favicon.ico)", tornado.web.StaticFileHandler,
-                  {"path": os.path.join(os.path.dirname(__file__), 'temp')})]
+                   {"path": os.path.join(os.path.dirname(__file__), 'temp')})]
 server = Server(apps, extra_patterns=extra_patterns, port=5987)
 server.start()
 server.io_loop.add_callback(server.show, "/")
