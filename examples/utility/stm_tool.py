@@ -15,15 +15,21 @@ def make_document(doc):
     The make doc func for bokeh
 
     """
+
     def connect_stm_callback(event):
         """
         Callback to connect to the STM software
         """
-        nonlocal stm
-        stm = CreatecWin32()
-        status_text.value = 'STM connected'
-        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Connect STM'
-        this_logger.info(msg)
+        status_text.value = 'Connecting to STM'
+
+        def process():
+            nonlocal stm
+            stm = CreatecWin32()
+            status_text.value = 'STM connected'
+            msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Connect STM'
+            this_logger.info(msg)
+
+        doc.add_next_tick_callback(process)
 
     def ramping_bias_callback(event):
         """
@@ -33,21 +39,25 @@ def make_document(doc):
             status_text.value = 'No STM is connected'
             return
         status_text.value = 'Ramping bias'
-        try:
-            bias_target = float(bias_mV_input.value_input)
-        except ValueError:
-            status_text.value = 'Invalid bias'
-            return
-        try:
-            steps = int(steps_bias_ramping.value_input)
-        except ValueError:
-            status_text.value = 'Invalid steps'
-            return
-        stm.ramp_bias_mV(bias_target, steps)
-        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        msg = msg + f' Ramp bias to {bias_target} mV with steps speed {steps}'
-        this_logger.info(msg)
-        status_text.value = 'Ramping bias done'
+
+        def process():
+            try:
+                bias_target = float(bias_mV_input.value_input)
+            except ValueError:
+                status_text.value = 'Invalid bias'
+                return
+            try:
+                steps = int(steps_bias_ramping.value_input)
+            except ValueError:
+                status_text.value = 'Invalid steps'
+                return
+            stm.ramp_bias_mV(bias_target, steps)
+            msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            msg = msg + f' Ramp bias to {bias_target} mV with steps speed {steps}'
+            this_logger.info(msg)
+            status_text.value = 'Ramping bias done'
+
+        doc.add_next_tick_callback(process)
 
     def ramping_current_callback(event):
         """
@@ -57,21 +67,25 @@ def make_document(doc):
             status_text.value = 'No STM is connected'
             return
         status_text.value = 'Ramping current'
-        try:
-            current_target = float(current_pA_input.value_input)
-        except ValueError:
-            status_text.value = 'Invalid current'
-            return
-        try:
-            steps = int(steps_current_ramping.value_input)
-        except ValueError:
-            status_text.value = 'Invalid steps'
-            return
-        stm.ramp_current_pA(current_target, steps)
-        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        msg = msg + f' Ramp current to {current_target} pA with steps speed {steps}'
-        this_logger.info(msg)
-        status_text.value = 'Ramping current done'
+
+        def process():
+            try:
+                current_target = float(current_pA_input.value_input)
+            except ValueError:
+                status_text.value = 'Invalid current'
+                return
+            try:
+                steps = int(steps_current_ramping.value_input)
+            except ValueError:
+                status_text.value = 'Invalid steps'
+                return
+            stm.ramp_current_pA(current_target, steps)
+            msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            msg = msg + f' Ramp current to {current_target} pA with steps speed {steps}'
+            this_logger.info(msg)
+            status_text.value = 'Ramping current done'
+
+        doc.add_next_tick_callback(process)
 
     """
     Main body below
@@ -139,7 +153,7 @@ def make_document(doc):
 this_dir = os.path.dirname(__file__)
 log_config = os.path.join(this_dir, 'logger.config')
 log_file = 'stm_tool.log'
-#logging.config.fileConfig(log_config, defaults={'logfilename': this_dir + '\/' + log_file})
+# logging.config.fileConfig(log_config, defaults={'logfilename': this_dir + '\/' + log_file})
 logging.config.fileConfig(log_config, defaults={'logfilename': os.path.join(this_dir, log_file).replace('\\', '\\\\')})
 this_logger = logging.getLogger('this_logger')
 
