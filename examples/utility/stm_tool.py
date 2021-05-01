@@ -31,61 +31,73 @@ def make_document(doc):
 
         doc.add_next_tick_callback(process)
 
-    def ramping_bias_callback(event):
-        """
-        Callback for ramping bias
-        """
+    def process_bias():
+        try:
+            bias_target = float(bias_mV_input.value_input)
+        except ValueError:
+            status_text.value = 'Invalid bias'
+            return
+        try:
+            steps = int(steps_bias_ramping.value_input)
+        except ValueError:
+            status_text.value = 'Invalid steps'
+            return
+        stm.ramp_bias_mV(bias_target, steps)
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        msg = msg + f' Ramp bias to {bias_target} mV with steps speed {steps}'
+        this_logger.info(msg)
+        status_text.value = 'Ramping bias done'
+
+    def preprocess_bias():
         if stm is None or not stm.is_active():
             status_text.value = 'No STM is connected'
             return
         status_text.value = 'Ramping bias'
 
-        def process():
-            try:
-                bias_target = float(bias_mV_input.value_input)
-            except ValueError:
-                status_text.value = 'Invalid bias'
-                return
-            try:
-                steps = int(steps_bias_ramping.value_input)
-            except ValueError:
-                status_text.value = 'Invalid steps'
-                return
-            stm.ramp_bias_mV(bias_target, steps)
-            msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            msg = msg + f' Ramp bias to {bias_target} mV with steps speed {steps}'
-            this_logger.info(msg)
-            status_text.value = 'Ramping bias done'
-
-        doc.add_next_tick_callback(process)
-
-    def ramping_current_callback(event):
+    def ramping_bias_cb_bn(event):
         """
-        Callback for ramping current
+        Callback for ramping bias
         """
+        preprocess_bias()
+        doc.add_next_tick_callback(process_bias)
+
+    def ramping_bias_cb_ti(attr, old, new):
+        preprocess_bias()
+        doc.add_next_tick_callback(process_bias)
+
+    def process_current():
+        try:
+            current_target = float(current_pA_input.value_input)
+        except ValueError:
+            status_text.value = 'Invalid current'
+            return
+        try:
+            steps = int(steps_current_ramping.value_input)
+        except ValueError:
+            status_text.value = 'Invalid steps'
+            return
+        stm.ramp_current_pA(current_target, steps)
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        msg = msg + f' Ramp current to {current_target} pA with steps speed {steps}'
+        this_logger.info(msg)
+        status_text.value = 'Ramping current done'
+
+    def preprocess_current():
         if stm is None or not stm.is_active():
             status_text.value = 'No STM is connected'
             return
         status_text.value = 'Ramping current'
 
-        def process():
-            try:
-                current_target = float(current_pA_input.value_input)
-            except ValueError:
-                status_text.value = 'Invalid current'
-                return
-            try:
-                steps = int(steps_current_ramping.value_input)
-            except ValueError:
-                status_text.value = 'Invalid steps'
-                return
-            stm.ramp_current_pA(current_target, steps)
-            msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            msg = msg + f' Ramp current to {current_target} pA with steps speed {steps}'
-            this_logger.info(msg)
-            status_text.value = 'Ramping current done'
+    def ramping_current_cb_bn(event):
+        """
+        Callback for ramping current
+        """
+        preprocess_current()
+        doc.add_next_tick_callback(process_current)
 
-        doc.add_next_tick_callback(process)
+    def ramping_current_cb_ti(attr, old, new):
+        preprocess_current()
+        doc.add_next_tick_callback(process_current)
 
     """
     Main body below
@@ -104,17 +116,16 @@ def make_document(doc):
                             min_width=10, default_size=2)
 
     # input for bias value in mV
-    bias_mV_input = TextInput(title='Bias (mV)', value_input='10', value='10',
-                              min_width=50)
+    bias_mV_input = TextInput(title='Bias (mV)', value_input='10', value='10', min_width=50)
+    bias_mV_input.on_change('value', ramping_bias_cb_ti)
 
     # steps for ramping bias
-    steps_bias_ramping = TextInput(title='Steps', value_input='100', value='100',
-                                   min_width=50)
+    steps_bias_ramping = TextInput(title='Steps', value_input='100', value='100', min_width=50)
 
     # button for ramping bias
     ramping_bias_bn = Button(label="Ramp Bias", button_type="success",
                              min_width=10, default_size=2)
-    ramping_bias_bn.on_click(ramping_bias_callback)
+    ramping_bias_bn.on_click(ramping_bias_cb_bn)
 
     # slider not in use
     slider_bias = Slider(start=-2, end=4, value=0, step=0.01,
@@ -122,17 +133,16 @@ def make_document(doc):
                          format=FuncTickFormatter(code="return Math.pow(10, tick).toFixed(2)"))
 
     # input for current value in pA
-    current_pA_input = TextInput(title='Current (pA)', value='10', value_input='10',
-                                 min_width=50)
+    current_pA_input = TextInput(title='Current (pA)', value='10', value_input='10', min_width=50)
+    current_pA_input.on_change('value', ramping_current_cb_ti)
 
     # steps for ramping bias
-    steps_current_ramping = TextInput(title='Steps', value_input='100', value='100',
-                                      min_width=50)
+    steps_current_ramping = TextInput(title='Steps', value_input='100', value='100', min_width=50)
 
     # button for ramping bias
     ramping_current_bn = Button(label="Ramp Current", button_type="success",
                                 min_width=10, default_size=2)
-    ramping_current_bn.on_click(ramping_current_callback)
+    ramping_current_bn.on_click(ramping_current_cb_bn)
 
     # layout includes the map and the controls below
     controls_a = column([status_text, connect_stm_bn], sizing_mode='stretch_both')
