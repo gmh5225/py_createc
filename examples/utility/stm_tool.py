@@ -21,11 +21,13 @@ def make_document(doc):
         Callback to connect to the STM software
         """
         status_text.value = 'Connecting to STM'
+        connect_stm_bn.disabled = True
 
         def process():
             nonlocal stm
             stm = CreatecWin32()
             status_text.value = 'STM connected'
+            connect_stm_bn.disabled = False
             msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Connect STM'
             this_logger.info(msg)
 
@@ -36,23 +38,27 @@ def make_document(doc):
             bias_target = float(bias_mV_input.value_input)
         except ValueError:
             status_text.value = 'Invalid bias'
+            ramping_bias_bn.disabled = False
             return
         try:
             steps = int(steps_bias_ramping.value_input)
         except ValueError:
             status_text.value = 'Invalid steps'
+            ramping_bias_bn.disabled = False
             return
         stm.ramp_bias_mV(bias_target, steps)
         msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         msg = msg + f' Ramp bias to {bias_target} mV with steps speed {steps}'
         this_logger.info(msg)
         status_text.value = 'Ramping bias done'
+        ramping_bias_bn.disabled = False
 
     def preprocess_bias():
         if stm is None or not stm.is_active():
             status_text.value = 'No STM is connected'
             return
         status_text.value = 'Ramping bias'
+        ramping_bias_bn.disabled = True
 
     def ramping_bias_cb_bn(event):
         """
@@ -70,23 +76,27 @@ def make_document(doc):
             current_target = float(current_pA_input.value_input)
         except ValueError:
             status_text.value = 'Invalid current'
+            ramping_current_bn.disabled = False
             return
         try:
             steps = int(steps_current_ramping.value_input)
         except ValueError:
             status_text.value = 'Invalid steps'
+            ramping_current_bn.disabled = False
             return
         stm.ramp_current_pA(current_target, steps)
         msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         msg = msg + f' Ramp current to {current_target} pA with steps speed {steps}'
         this_logger.info(msg)
         status_text.value = 'Ramping current done'
+        ramping_current_bn.disabled = False
 
     def preprocess_current():
         if stm is None or not stm.is_active():
             status_text.value = 'No STM is connected'
             return
         status_text.value = 'Ramping current'
+        ramping_current_bn.disabled = True
 
     def ramping_current_cb_bn(event):
         """
