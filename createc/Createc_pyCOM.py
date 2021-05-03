@@ -342,3 +342,14 @@ class CreatecWin32:
         y_offset = -y_offset * cgc['g_XY_volt'] * self.yPiezoConst / 2 ** cgc['g_XY_bits']
 
         return XY2D(y=y_offset, x=x_offset)
+
+    @property
+    def preampgain(self):
+        """
+        Pre amplifier gain
+
+        Returns
+        -------
+        gain : int
+        """
+        return int(self.client.getparam('GainPre 10^'))
