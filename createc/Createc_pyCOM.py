@@ -108,7 +108,7 @@ class CreatecWin32:
             target bias in mV
         speed : int
             speed is actually steps, it can be any integer larger than 0.
-            1 means directly stepping to the final bias, it is default to 100.
+            1 means directly stepping to the final value, it is default to 100.
 
         Returns
         -------
@@ -144,7 +144,7 @@ class CreatecWin32:
             end_current in pA
         speed : int
             speed is actually steps, it can be any integer larger than 0.
-            1 means directly stepping to the final bias, it is default to 100.
+            1 means directly stepping to the final value, it is default to 100.
 
         Returns
         -------
