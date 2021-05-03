@@ -204,7 +204,7 @@ class VERT_SPEC(GENERIC_FILE):
                                 usecols=range(len(self.spec_headers)))
 
 
-class DAT_IMG_v2:
+class DAT_IMG_v2(GENERIC_FILE):
     pass
 
 
