@@ -55,3 +55,4 @@ g_file_spec_headers:
 # scanner movement in XY range
 g_XY_bits: 20 # 20 bits
 g_XY_volt: 200 # 200 volts
+g_preamp_gain: 9 # default gain
