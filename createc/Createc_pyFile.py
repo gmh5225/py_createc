@@ -27,21 +27,13 @@ class GENERIC_FILE:
     """
     Generic file class, common for .dat, .vert files etc.
 
-    Parameters
-    ----------
-    file_path : str
-        Full file path
-
     Returns
     -------
     generic_file : GENERIC_FILE
     """
 
-    def __init__(self, file_path):
-
-        self._line_list = None
-        self.fp = file_path
-        self.meta = dict()
+    def __init__(self):
+        pass
 
     def _read_binary(self):
         """
@@ -49,57 +41,66 @@ class GENERIC_FILE:
 
         Returns
         -------
-        _binary : bin
-            a binary stream of the entire file
+        _meta_binary : bin
+            meta data in binary
+        _data_binary : bin
+            data in binary
+
         """
+
         with open(self.fp, 'rb') as f:
             _binary = f.read()
-            return _binary
 
-    def _bin2meta_dict(self, start=0, end=cgc['g_file_meta_binary_len']):
+        return _binary[:cgc['g_file_data_bin_offset']], _binary[cgc['g_file_data_bin_offset']:]
+
+    def _bin2meta_dict(self):
         """
-        Convert meta binary to meta info using ansi encoding, filling out the _meta dictionary
+        Convert meta binary to meta info using ansi encoding, filling out the meta dictionary
         Here ansi means Windows-1252 extended ascii code page CP-1252
-        prerequisite: _binary stream
 
-        Parameters
-        ----------
-        start : int
-            Start position
-        end : int
-            End position
         Returns
         -------
         None : None
-
         """
-        meta_list = self._binary[start:end].decode('cp1252').split('\n')
+
+        meta_list = self._meta_binary.decode('cp1252', errors='ignore').split('\n')
+        self.meta['file_version'] = meta_list[0]
         for line in meta_list:
             temp = line.split('=')
             if len(temp) == 2:
-                self.meta[temp[0]] = temp[1][:-1]
+                keywords = temp[0].split('/')
+                keywords = [kw.strip().lower() for kw in keywords]
+                for kw in keywords:
+                    self.meta[kw] = temp[1][:-1]
 
     def _extracted_meta(self):
         """
-        Assign meta data to easily readable properties
+        Assign meta data to easily readable properties.
         One can expand these at will, one may use the method meta_key() to see what keys are available
 
         Returns
         -------
         None : None
-            it just populates all the self.properties
+            It just populates all the self.properties
         """
         self.file_version = self.meta['file_version']
         self.file_version = ''.join(e for e in self.file_version if e.isalnum())
-        self.xPixel = int(self.meta['Num.X / Num.X'])
-        self.yPixel = int(self.meta['Num.Y / Num.Y'])
-        self.channels = int(self.meta['Channels / Channels'])
-        self.ch_zoff = float(self.meta['CHModeZoff / CHModeZoff'])
-        self.chmode = int(self.meta['CHMode / CHMode'])
-        self.rotation = float(self.meta['Rotation / Rotation'])
-        self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
-        self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
-        self.channels_code = self.meta['Channelselectval / Channelselectval']
+        self.xPixel = int(self.meta['num.x'])
+        self.yPixel = int(self.meta['num.y'])
+        self.channels = int(self.meta['channels'])
+        self.ch_zoff = float(self.meta['chmodezoff'])
+        self.ch_bias = float(self.meta['chmodebias[mv]'])
+        self.chmode = int(self.meta['chmode'])
+        self.rotation = float(self.meta['rotation'])
+        self.ddeltaX = int(self.meta['dx_div_ddelta-x'])
+        self.deltaX_dac = int(self.meta['delta x'])
+        self.channels_code = self.meta['channelselectval']
+        self.scan_ymode = int(self.meta['scanymode'])
+        self.xPiezoConst = float(self.meta['xpiezoconst'])
+        self.yPiezoConst = float(self.meta['ypiezoconst'])
+        self.zPiezoConst = float(self.meta['zpiezoconst'])
+        self.bias = float(self.meta['biasvoltage'])
+        self.current = float(self.meta['fblogiset'])
 
     def _file2meta_dict(self):
         """
@@ -133,7 +134,7 @@ class GENERIC_FILE:
             if len(temp) == 2:
                 self.meta[temp[0]] = temp[1]
 
-    def _spec_meta(self, pos: int, index_header: str, vz_header: str, spec_headers: str):
+    def _spec_meta(self, spec_meta: str, index_header: str, vz_header: str, spec_headers: str):
         """
         Extract the spec meta data from the file, it includes Number of spec pts, X_position, Y_position and Channel code.
 
@@ -153,7 +154,7 @@ class GENERIC_FILE:
         None : None
             It populates: self.spec_total_pt, self.spec_pos_x, self.spec_pos_y, self.spec_channel_code, self.spec_headers
         """
-        result = re.findall(r'(\d+)', self._line_list[pos])
+        result = re.findall(r'(\d+)', spec_meta)
         self.spec_total_pt = int(result[0])
         self.spec_pos_x = int(result[1])
         self.spec_pos_y = int(result[2])
@@ -161,7 +162,7 @@ class GENERIC_FILE:
         try:
             self.spec_out_channel_count = 'v' + result[6]
         except IndexError:
-            self.spec_out_channel_count = 'v2' # dummy
+            self.spec_out_channel_count = 'v2'  # dummy
         self._filter = [b == '1' for b in bin(self.spec_channel_code)[2:].rjust(len(cgc[spec_headers]))[::-1]]
         self.spec_headers = cgc[index_header] + \
                             cgc[vz_header][self.file_version][self.spec_out_channel_count] + \
@@ -182,21 +183,31 @@ class VERT_SPEC(GENERIC_FILE):
     vert_spec : VERT_SPEC
     """
 
-    def __init__(self, file_path):
+    def __init__(self, file_path=None, file_binary=None, file_name=None):
 
-        super().__init__(file_path)
-        with open(self.fp, 'r', encoding='cp1252', errors='ignore') as f:
-            self._line_list = f.readlines()
+        self.meta = dict()
 
-        super()._line_list2meta_dict(start=0, end=cgc['g_file_meta_total_lines'])
-        super()._extracted_meta()
+        if file_path is not None:
+            self.fp = file_path
+            _, self.fn = os.path.split(self.fp)
+            self._meta_binary, self._data_binary = self._read_binary()
+        else:
+            self.fn = file_name
+            self._meta_binary = file_binary[:int(cgc['g_file_meta_binary_len'])]
+            self._data_binary = file_binary[int(cgc['g_file_data_bin_offset']):]
 
-        super()._spec_meta(pos=cgc['g_file_spec_meta_line'][self.file_version],
+        self._bin2meta_dict()
+        self._extracted_meta()
+
+        spec_data = self._data_binary.decode('cp1252', errors='ignore')
+        _, spec_meta, spec_f_obj = spec_data.split('\n', maxsplit=2)
+
+        super()._spec_meta(spec_meta=spec_meta,
                            index_header='g_file_spec_index_header',
                            vz_header='g_file_spec_vz_header',
                            spec_headers='g_file_spec_headers')
-        f_obj = io.StringIO('\n'.join(self._line_list[cgc['g_file_spec_skip_rows'][self.file_version]:]))
-        self.spec = pd.read_csv(filepath_or_buffer=f_obj, sep=cgc['g_file_spec_delimiter'],
+        # f_obj = io.StringIO('\n'.join(self._line_list[cgc['g_file_spec_skip_rows'][self.file_version]:]))
+        self.spec = pd.read_csv(filepath_or_buffer=io.StringIO(spec_f_obj), sep=cgc['g_file_spec_delimiter'],
                                 header=None,
                                 names=self.spec_headers,
                                 index_col=cgc['g_file_spec_index_header'],
