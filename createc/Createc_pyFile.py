@@ -185,7 +185,7 @@ class VERT_SPEC(GENERIC_FILE):
     def __init__(self, file_path):
 
         super().__init__(file_path)
-        with open(self.fp, 'r') as f:
+        with open(self.fp, 'r', encoding='cp1252', errors='ignore') as f:
             self._line_list = f.readlines()
 
         super()._line_list2meta_dict(start=0, end=cgc['g_file_meta_total_lines'])
