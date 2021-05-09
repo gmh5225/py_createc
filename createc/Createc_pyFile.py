@@ -277,22 +277,22 @@ class DAT_IMG:
         """
         self.file_version = self.meta['file_version']
         self.file_version = ''.join(e for e in self.file_version if e.isalnum())
-        self.xPixel = int(self.meta['Num.X / Num.X'])
-        self.yPixel = int(self.meta['Num.Y / Num.Y'])
-        self.channels = int(self.meta['Channels / Channels'])
-        self.ch_zoff = float(self.meta['CHModeZoff / CHModeZoff'])
-        self.ch_bias = float(self.meta['CHModeBias[mV] / CHModeBias[mV]'])
-        self.chmode = int(self.meta['CHMode / CHMode'])
-        self.rotation = float(self.meta['Rotation / Rotation'])
-        self.ddeltaX = int(self.meta['DX_DIV_DDelta-X / DX/DDeltaX'])
-        self.deltaX_dac = int(self.meta['Delta X / Delta X [Dac]'])
-        self.channels_code = self.meta['Channelselectval / Channelselectval']
-        self.scan_ymode = int(self.meta['ScanYMode / ScanYMode'])
-        self.xPiezoConst = float(self.meta['Xpiezoconst'])  # Createc software error
-        self.yPiezoConst = float(self.meta['YPiezoconst'])
-        self.zPiezoConst = float(self.meta['ZPiezoconst'])
-        self.bias = float(self.meta['BiasVoltage / BiasVolt.[mV]'])
-        self.current = float(self.meta['FBLogIset'])
+        self.xPixel = int(self.meta['num.x'])
+        self.yPixel = int(self.meta['num.y'])
+        self.channels = int(self.meta['channels'])
+        self.ch_zoff = float(self.meta['chmodezoff'])
+        self.ch_bias = float(self.meta['chmodebias[mv]'])
+        self.chmode = int(self.meta['chmode'])
+        self.rotation = float(self.meta['rotation'])
+        self.ddeltaX = int(self.meta['dx_div_ddelta-x'])
+        self.deltaX_dac = int(self.meta['delta x'])
+        self.channels_code = self.meta['channelselectval']
+        self.scan_ymode = int(self.meta['scanymode'])
+        self.xPiezoConst = float(self.meta['xpiezoconst'])
+        self.yPiezoConst = float(self.meta['ypiezoconst'])
+        self.zPiezoConst = float(self.meta['zpiezoconst'])
+        self.bias = float(self.meta['biasvoltage'])
+        self.current = float(self.meta['fblogiset'])
 
     def _read_binary(self):
         """
@@ -328,7 +328,10 @@ class DAT_IMG:
         for line in meta_list:
             temp = line.split('=')
             if len(temp) == 2:
-                self.meta[temp[0]] = temp[1][:-1]
+                keywords = temp[0].split('/')
+                keywords = [kw.strip().lower() for kw in keywords]
+                for kw in keywords:
+                    self.meta[kw] = temp[1][:-1]
 
     def _read_img(self):
         """
