@@ -180,102 +180,7 @@ class GENERIC_FILE:
                             cgc[vz_header][self.file_version][self.spec_out_channel_count] + \
                             list(compress(cgc[spec_headers][self.file_version], self._filter))
 
-
-class VERT_SPEC(GENERIC_FILE):
-    """
-    Read the .vert file and generate useful and managable stuff
-
-    Parameters
-    ----------
-    file_path : str
-        Full file path
-
-    Returns
-    -------
-    vert_spec : VERT_SPEC
-    """
-
-    def __init__(self, file_path=None, file_binary=None, file_name=None):
-        super().__init__(file_path, file_binary, file_name)
-
-        spec_data = self._data_binary.decode('cp1252', errors='ignore')
-        _, spec_meta, spec_f_obj = spec_data.split('\n', maxsplit=2)
-
-        super()._spec_meta(spec_meta=spec_meta,
-                           index_header='g_file_spec_index_header',
-                           vz_header='g_file_spec_vz_header',
-                           spec_headers='g_file_spec_headers')
-        # f_obj = io.StringIO('\n'.join(self._line_list[cgc['g_file_spec_skip_rows'][self.file_version]:]))
-        self.spec = pd.read_csv(filepath_or_buffer=io.StringIO(spec_f_obj), sep=cgc['g_file_spec_delimiter'],
-                                header=None,
-                                names=self.spec_headers,
-                                index_col=cgc['g_file_spec_index_header'],
-                                engine='python',
-                                usecols=range(len(self.spec_headers)))
-
-
-class DAT_IMG(GENERIC_FILE):
-    """
-    Read .dat file and generate meta data and images as numpy arrays.
-
-    There are two options for input:
-
-    option 1: one arg, i.e. the full path to the .dat file
-
-    option 2: two named args
-
-    a. the binary content of the file together
-
-    b. the file_name as a string
-
-    Parameters
-    ----------
-    file_path : str
-        the full path to the .dat file
-    file_binary : bin
-        the binary content of the file together
-    file_name : str
-        the file_name as a string
-
-    Returns
-    -------
-    dat_img : DAT_IMG
-        dat_file_object with meta data and image numpy arrays.
-        Meta data is a dict, one can expand the dict at will.
-        Images are a list of numpy arrays.
-    """
-
-    def __init__(self, file_path=None, file_binary=None, file_name=None):
-
-        super().__init__(file_path, file_binary, file_name)
-        self.img_array_list = []
-        self._read_img()
-
-        # imgs are numpy arrays, with rows with only zeros cropped off
-        self.imgs = [self._crop_img(arr) for arr in self.img_array_list]
-        # assert(len(set(img.shape for img in self.imgs)) <= 1)
-        # Pixels = namedtuple('Pixels', ['y', 'x'])
-        self.img_pixels = XY2D(y=self.imgs[0].shape[0],
-                               x=self.imgs[0].shape[1])  # size in (y, x)
-
-    def _read_img(self):
-        """
-        Convert img binary to numpy array's, filling out the img_array_list.
-        The image was compressed using zlib. So here they are decompressed.
-        prerequisite: self.xPixel, self.yPixel, self.channels
-
-        Returns
-        -------
-        None : None
-        """
-
-        decompressed_data = zlib.decompress(self._data_binary)
-        img_array = np.frombuffer(decompressed_data, np.dtype(cgc['g_file_dat_img_pixel_data_npdtype']))
-        img_array = np.reshape(img_array[1: self.xPixel * self.yPixel * self.channels + 1],
-                               (self.channels * self.yPixel, self.xPixel))
-        for i in range(self.channels):
-            self.img_array_list.append(img_array[self.yPixel * i:self.yPixel * (i + 1)])
-
+    @staticmethod
     def meta_keys(self):
         """
         Print all available keys in meta
@@ -286,23 +191,6 @@ class DAT_IMG(GENERIC_FILE):
         """
 
         return [k for k in self.meta]
-
-    @staticmethod
-    def _crop_img(arr):
-        """
-        Crop an image, by removing all rows which contain only zeros.
-
-        Parameters
-        ----------
-        arr : numpy array
-            Individual image
-
-        Returns
-        -------
-        arr : numpy array
-            Cropped image
-        """
-        return arr[~np.all(arr == 0, axis=1)]
 
     @property
     def offset(self):
@@ -376,3 +264,115 @@ class DAT_IMG(GENERIC_FILE):
         timestamp : datetime.timestamp
         """
         return self.datetime.timestamp()
+
+
+class VERT_SPEC(GENERIC_FILE):
+    """
+    Read the .vert file and generate useful and managable stuff
+
+    Parameters
+    ----------
+    file_path : str
+        Full file path
+
+    Returns
+    -------
+    vert_spec : VERT_SPEC
+    """
+
+    def __init__(self, file_path=None, file_binary=None, file_name=None):
+        super().__init__(file_path, file_binary, file_name)
+
+        spec_data = self._data_binary.decode('cp1252', errors='ignore')
+        _, spec_meta, spec_f_obj = spec_data.split('\n', maxsplit=2)
+
+        super()._spec_meta(spec_meta=spec_meta,
+                           index_header='g_file_spec_index_header',
+                           vz_header='g_file_spec_vz_header',
+                           spec_headers='g_file_spec_headers')
+        # f_obj = io.StringIO('\n'.join(self._line_list[cgc['g_file_spec_skip_rows'][self.file_version]:]))
+        self.spec = pd.read_csv(filepath_or_buffer=io.StringIO(spec_f_obj), sep=cgc['g_file_spec_delimiter'],
+                                header=None,
+                                names=self.spec_headers,
+                                index_col=cgc['g_file_spec_index_header'],
+                                engine='python',
+                                usecols=range(len(self.spec_headers)))
+
+
+class DAT_IMG(GENERIC_FILE):
+    """
+    Read .dat file and generate meta data and images as numpy arrays.
+
+    There are two options for input:
+
+    option 1: one arg, i.e. the full path to the .dat file
+
+    option 2: two named args
+
+    a. the binary content of the file together
+
+    b. the file_name as a string
+
+    Parameters
+    ----------
+    file_path : str
+        the full path to the .dat file
+    file_binary : bin
+        the binary content of the file together
+    file_name : str
+        the file_name as a string
+
+    Returns
+    -------
+    dat_img : DAT_IMG
+        dat_file_object with meta data and image numpy arrays.
+        Meta data is a dict, one can expand the dict at will.
+        Images are a list of numpy arrays.
+    """
+
+    def __init__(self, file_path=None, file_binary=None, file_name=None):
+        super().__init__(file_path, file_binary, file_name)
+        self.img_array_list = []
+        self._read_img()
+
+        # imgs are numpy arrays, with rows with only zeros cropped off
+        self.imgs = [self._crop_img(arr) for arr in self.img_array_list]
+        # assert(len(set(img.shape for img in self.imgs)) <= 1)
+        # Pixels = namedtuple('Pixels', ['y', 'x'])
+        self.img_pixels = XY2D(y=self.imgs[0].shape[0],
+                               x=self.imgs[0].shape[1])  # size in (y, x)
+
+    def _read_img(self):
+        """
+        Convert img binary to numpy array's, filling out the img_array_list.
+        The image was compressed using zlib. So here they are decompressed.
+        prerequisite: self.xPixel, self.yPixel, self.channels
+
+        Returns
+        -------
+        None : None
+        """
+
+        decompressed_data = zlib.decompress(self._data_binary)
+        img_array = np.frombuffer(decompressed_data, np.dtype(cgc['g_file_dat_img_pixel_data_npdtype']))
+        img_array = np.reshape(img_array[1: self.xPixel * self.yPixel * self.channels + 1],
+                               (self.channels * self.yPixel, self.xPixel))
+        for i in range(self.channels):
+            self.img_array_list.append(img_array[self.yPixel * i:self.yPixel * (i + 1)])
+
+    @staticmethod
+    def _crop_img(arr):
+        """
+        Crop an image, by removing all rows which contain only zeros.
+
+        Parameters
+        ----------
+        arr : numpy array
+            Individual image
+
+        Returns
+        -------
+        arr : numpy array
+            Cropped image
+        """
+        return arr[~np.all(arr == 0, axis=1)]
