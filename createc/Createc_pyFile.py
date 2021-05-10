@@ -114,38 +114,6 @@ class GENERIC_FILE:
         self.bias = float(self.meta['biasvoltage'])
         self.current = float(self.meta['fblogiset'])
 
-    def _file2meta_dict(self):
-        """
-        Not in use
-        Open .dat file with asci encoding, read meta data directly from .dat file, fill out the meta_dict  
-
-        Returns
-        -------
-        None : None
-        """
-        with open(self.fp, 'r') as f:
-            for i in range(cgc['g_file_meta_total_lines']):
-                temp = f.readline().split('=')
-                if len(temp) == 2:
-                    self.meta[temp[0]] = temp[1][:-1]
-
-    def _line_list2meta_dict(self, start, end):
-        """
-        Fill the self.meta dict from the line list.
-        prerequisite: self._line_list
-
-        Returns
-        -------
-        None : None
-            It just fills out the self.dict.
-        """
-
-        self.meta['file_version'] = self._line_list[0]
-        for l in self._line_list[start:end]:
-            temp = l.split('\n')[0].split('=')
-            if len(temp) == 2:
-                self.meta[temp[0]] = temp[1]
-
     def _spec_meta(self, spec_meta: str, index_header: str, vz_header: str, spec_headers: str):
         """
         Extract the spec meta data from the file, it includes Number of spec pts, X_position, Y_position and Channel code.
