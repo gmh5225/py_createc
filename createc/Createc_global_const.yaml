@@ -21,18 +21,10 @@
 
 # .dat file
 g_file_data_bin_offset: 16384 # which is 128 * 128
-g_file_meta_binary_len: 12369 # useful readable meta info bytes
-g_file_meta_total_lines: 572 # total meta lines, same for .vert and .lat files
 g_file_dat_img_pixel_data_npdtype: '<f4' #little endian 32-bit float for .dat file
 g_file_year_pre: 2000 # filename, data taken are in year range 2000~2099
 
 #.vert & .lat file
-g_file_spec_meta_line: # spectrum meta position line
-  ParVERT30: 575
-  ParVERT32: 617
-g_file_spec_skip_rows: # spectrum start line number
-  ParVERT30: 576
-  ParVERT32: 618
 g_file_spec_delimiter: '\t' # delimiter between numbers in file
 g_file_spec_index_header: ['idx'] # spec file index column header
 g_file_spec_vz_header:
