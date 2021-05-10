@@ -32,8 +32,20 @@ class GENERIC_FILE:
     generic_file : GENERIC_FILE
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, file_path=None, file_binary=None, file_name=None):
+        self.meta = dict()
+
+        if file_path is not None:
+            self.fp = file_path
+            _, self.fn = os.path.split(self.fp)
+            self._meta_binary, self._data_binary = self._read_binary()
+        else:
+            self.fn = file_name
+            self._meta_binary = file_binary[:int(cgc['g_file_meta_binary_len'])]
+            self._data_binary = file_binary[int(cgc['g_file_data_bin_offset']):]
+
+        self._bin2meta_dict()
+        self._extracted_meta()
 
     def _read_binary(self):
         """
@@ -184,20 +196,7 @@ class VERT_SPEC(GENERIC_FILE):
     """
 
     def __init__(self, file_path=None, file_binary=None, file_name=None):
-
-        self.meta = dict()
-
-        if file_path is not None:
-            self.fp = file_path
-            _, self.fn = os.path.split(self.fp)
-            self._meta_binary, self._data_binary = self._read_binary()
-        else:
-            self.fn = file_name
-            self._meta_binary = file_binary[:int(cgc['g_file_meta_binary_len'])]
-            self._data_binary = file_binary[int(cgc['g_file_data_bin_offset']):]
-
-        self._bin2meta_dict()
-        self._extracted_meta()
+        super().__init__(file_path, file_binary, file_name)
 
         spec_data = self._data_binary.decode('cp1252', errors='ignore')
         _, spec_meta, spec_f_obj = spec_data.split('\n', maxsplit=2)
@@ -215,11 +214,7 @@ class VERT_SPEC(GENERIC_FILE):
                                 usecols=range(len(self.spec_headers)))
 
 
-class DAT_IMG_v2(GENERIC_FILE):
-    pass
-
-
-class DAT_IMG:
+class DAT_IMG(GENERIC_FILE):
     """
     Read .dat file and generate meta data and images as numpy arrays.
 
@@ -252,21 +247,8 @@ class DAT_IMG:
 
     def __init__(self, file_path=None, file_binary=None, file_name=None):
 
-        self.meta = dict()
+        super().__init__(file_path, file_binary, file_name)
         self.img_array_list = []
-
-        if file_path is not None:
-            self.fp = file_path
-            _, self.fn = os.path.split(self.fp)
-            self._meta_binary, self._data_binary = self._read_binary()
-        else:
-            self.fn = file_name
-            self._meta_binary = file_binary[:int(cgc['g_file_meta_binary_len'])]
-            self._data_binary = file_binary[int(cgc['g_file_data_bin_offset']):]
-
-        self._bin2meta_dict()
-        self._extracted_meta()
-
         self._read_img()
 
         # imgs are numpy arrays, with rows with only zeros cropped off
@@ -275,74 +257,6 @@ class DAT_IMG:
         # Pixels = namedtuple('Pixels', ['y', 'x'])
         self.img_pixels = XY2D(y=self.imgs[0].shape[0],
                                x=self.imgs[0].shape[1])  # size in (y, x)
-
-    def _extracted_meta(self):
-        """
-        Assign meta data to easily readable properties.
-        One can expand these at will, one may use the method meta_key() to see what keys are available
-
-        Returns
-        -------
-        None : None
-            It just populates all the self.properties
-        """
-        self.file_version = self.meta['file_version']
-        self.file_version = ''.join(e for e in self.file_version if e.isalnum())
-        self.xPixel = int(self.meta['num.x'])
-        self.yPixel = int(self.meta['num.y'])
-        self.channels = int(self.meta['channels'])
-        self.ch_zoff = float(self.meta['chmodezoff'])
-        self.ch_bias = float(self.meta['chmodebias[mv]'])
-        self.chmode = int(self.meta['chmode'])
-        self.rotation = float(self.meta['rotation'])
-        self.ddeltaX = int(self.meta['dx_div_ddelta-x'])
-        self.deltaX_dac = int(self.meta['delta x'])
-        self.channels_code = self.meta['channelselectval']
-        self.scan_ymode = int(self.meta['scanymode'])
-        self.xPiezoConst = float(self.meta['xpiezoconst'])
-        self.yPiezoConst = float(self.meta['ypiezoconst'])
-        self.zPiezoConst = float(self.meta['zpiezoconst'])
-        self.bias = float(self.meta['biasvoltage'])
-        self.current = float(self.meta['fblogiset'])
-
-    def _read_binary(self):
-        """
-        Open .dat file in raw binary format
-
-        Returns
-        -------
-        _meta_binary : bin
-            meta data in binary
-        _data_binary : bin
-            data in binary
-
-        """
-
-        with open(self.fp, 'rb') as f:
-            _meta_binary = f.read(int(cgc['g_file_meta_binary_len']))
-            f.seek(int(cgc['g_file_data_bin_offset']))
-            _data_binary = f.read()
-            return _meta_binary, _data_binary
-
-    def _bin2meta_dict(self):
-        """
-        Convert meta binary to meta info using ansi encoding, filling out the meta dictionary
-        Here ansi means Windows-1252 extended ascii code page CP-1252
-
-        Returns
-        -------
-        None : None
-        """
-
-        meta_list = self._meta_binary.decode('cp1252', errors='ignore').split('\n')
-        self.meta['file_version'] = meta_list[0]
-        for line in meta_list:
-            temp = line.split('=')
-            if len(temp) == 2:
-                keywords = temp[0].split('/')
-                keywords = [kw.strip().lower() for kw in keywords]
-                for kw in keywords:
-                    self.meta[kw] = temp[1][:-1]
 
     def _read_img(self):
         """
@@ -373,41 +287,6 @@ class DAT_IMG:
 
         return [k for k in self.meta]
 
-    def _file2meta_dict(self):
-        """
-        Not in use
-        Open .dat file with asci encoding, read meta data directly from .dat file, fill out the meta_dict  
-
-        Returns
-        -------
-        None : None
-        """
-        with open(self.fp, 'r') as f:
-            for i in range(cgc['g_file_meta_total_lines']):
-                temp = f.readline().split('=')
-                if len(temp) == 2:
-                    self.meta[temp[0]] = temp[1][:-1]
-
-    def _file2img_arrays(self):
-        """
-        Not in use
-        Open .dat file in raw binary format, start from a global constant g_file_data_bin_offset = 16384
-        fill out the img_array_list with images in the format of numpy array's
-        prerequisite: self.xPixel, self.yPixel, self.channels
-
-        Returns
-        -------
-        None : None
-        """
-        with open(self.fp, 'rb') as f:
-            f.seek(cgc['g_file_data_bin_offset'])
-            decompressed_data = zlib.decompress(f.read())
-            img_array = np.fromstring(decompressed_data, np.dtype(cgc['g_file_dat_img_pixel_data_npdtype']))
-            img_array = np.reshape(img_array[1: self.xPixel * self.yPixel * self.channels + 1],
-                                   (self.channels * self.yPixel, self.xPixel))
-            for i in range(self.channels):
-                self.img_array_list.append(img_array[self.yPixel * i:self.yPixel * (i + 1)])
-
     @staticmethod
     def _crop_img(arr):
         """
@@ -434,17 +313,16 @@ class DAT_IMG:
         -------
         offset : XY2D
         """
-        x_offset = np.float(self.meta['Scanrotoffx / OffsetX'])
-        y_offset = np.float(self.meta['Scanrotoffy / OffsetY'])
+        x_offset = np.float(self.meta['scanrotoffx'])
+        y_offset = np.float(self.meta['scanrotoffy'])
 
-        # x_piezo_const = np.float(self.meta['Xpiezoconst'])
-        # y_piezo_const = np.float(self.meta['YPiezoconst'])
+        # x_piezo_const = np.float(self.meta['xpiezoconst'])
+        # y_piezo_const = np.float(self.meta['ypiezoconst'])
 
         x_offset = -x_offset * cgc['g_XY_volt'] * self.xPiezoConst / 2 ** cgc['g_XY_bits']
         y_offset = -y_offset * cgc['g_XY_volt'] * self.yPiezoConst / 2 ** cgc['g_XY_bits']
 
-        # Offset = namedtuple('Offset', ['y', 'x'])
-        return XY2D(y=y_offset, x=x_offset)
+        # Offset = namedtuple('Offset', ['y', 'x'])  return XY2D(y=y_offset, x=x_offset)
 
     @property
     def size(self):
@@ -455,8 +333,8 @@ class DAT_IMG:
         -------
         size : XY2D
         """
-        x = float(self.meta['Length x[A]']) * self.img_pixels.x / self.xPixel
-        y = float(self.meta['Length y[A]']) * self.img_pixels.y / self.yPixel
+        x = float(self.meta['length x[a]']) * self.img_pixels.x / self.xPixel
+        y = float(self.meta['length y[a]']) * self.img_pixels.y / self.yPixel
         # Size = namedtuple('Size', ['y', 'x'])
         return XY2D(y=y, x=x)
 
@@ -470,8 +348,8 @@ class DAT_IMG:
         nom_size : XY2D
         """
         # Size = namedtuple('Size', ['y', 'x'])
-        return XY2D(y=float(self.meta['Length y[A]']),
-                    x=float(self.meta['Length x[A]']))
+        return XY2D(y=float(self.meta['length y[a]']),
+                    x=float(self.meta['length x[a]']))
 
     @property
     def datetime(self):
