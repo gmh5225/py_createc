@@ -180,7 +180,6 @@ class GENERIC_FILE:
                             cgc[vz_header][self.file_version][self.spec_out_channel_count] + \
                             list(compress(cgc[spec_headers][self.file_version], self._filter))
 
-    @staticmethod
     def meta_keys(self):
         """
         Print all available keys in meta
