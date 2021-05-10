@@ -80,7 +80,7 @@ class GENERIC_FILE:
         for line in meta_list:
             temp = line.split('=')
             if len(temp) == 2:
-                keywords = temp[0].split('/')
+                keywords = temp[0].split(' / ')
                 keywords = [kw.strip().lower() for kw in keywords]
                 for kw in keywords:
                     self.meta[kw] = temp[1][:-1]
