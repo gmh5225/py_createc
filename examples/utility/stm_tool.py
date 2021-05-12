@@ -1,6 +1,6 @@
 from bokeh.layouts import column, row
 from bokeh.server.server import Server
-from bokeh.models import Button, TextInput, Slider
+from bokeh.models import Button, TextInput, Slider, Select
 from bokeh.models.formatters import FuncTickFormatter
 
 from createc.Createc_pyCOM import CreatecWin32
@@ -109,6 +109,15 @@ def make_document(doc):
         preprocess_current()
         doc.add_next_tick_callback(process_current)
 
+    def img_size_select_cb(attr, old, new):
+        if stm is None or not stm.is_active():
+            status_text.value = 'No STM is connected'
+            return
+        stm.client.setparam('Delta X [Dac]', int(img_size_select.value))
+        status_text.value = 'Image size changed'
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + img_size_select.value
+        this_logger.info(msg)
+
     """
     Main body below
     """
@@ -154,6 +163,10 @@ def make_document(doc):
                                 min_width=10, default_size=2)
     ramping_current_bn.on_click(ramping_current_cb_bn)
 
+    # image size selection
+    img_size_select = Select(title="Image Size(bits)", value="20", options=[str(i) for i in range(1, 65)])
+    img_size_select.on_change('value', img_size_select_cb)
+
     # layout includes the map and the controls below
     controls_a = column([status_text, connect_stm_bn], sizing_mode='stretch_both')
     controls_b = column([row([bias_mV_input,
@@ -167,7 +180,7 @@ def make_document(doc):
                          ramping_current_bn],
                         sizing_mode='stretch_width')
 
-    doc.add_root(column([controls_a, controls_b, controls_c], sizing_mode='stretch_both'))
+    doc.add_root(column([controls_a, controls_b, controls_c, img_size_select], sizing_mode='stretch_width'))
 
 
 this_dir = os.path.dirname(__file__)
