@@ -182,7 +182,8 @@ class CreatecWin32:
         -------
         current : str
         """
-        return self.client.getparam('FBLogIset')
+        current = float(self.client.getparam('FBLogIset')) * 10 ** (cgc['g_preamp_gain'] - self.preampgain)
+        return f'{current:.2f}'
 
     @property
     def bias_mV(self):
