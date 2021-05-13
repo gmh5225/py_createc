@@ -139,7 +139,7 @@ def make_document(doc):
     bias_mV_input.on_change('value', ramping_bias_cb_ti)
 
     # steps for ramping bias
-    steps_bias_ramping = TextInput(title='Steps', value_input='100', value='100', min_width=50)
+    steps_bias_ramping = TextInput(title='Steps', value_input='40', value='40', min_width=50)
 
     # button for ramping bias
     ramping_bias_bn = Button(label="Ramp Bias", button_type="success",
@@ -156,7 +156,7 @@ def make_document(doc):
     current_pA_input.on_change('value', ramping_current_cb_ti)
 
     # steps for ramping bias
-    steps_current_ramping = TextInput(title='Steps', value_input='100', value='100', min_width=50)
+    steps_current_ramping = TextInput(title='Steps', value_input='40', value='40', min_width=50)
 
     # button for ramping bias
     ramping_current_bn = Button(label="Ramp Current", button_type="success",
