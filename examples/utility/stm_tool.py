@@ -166,8 +166,8 @@ def make_document(doc):
     # image size selection
     size_range = [str(i) for i in range(1, 64)]
     size_range = size_range + [str(2**i) for i in range(6, 13)]
-    size_range = size_range[::-1]
-    img_size_select = Select(title="Image Size(bits)", value="128", options=size_range)
+    size_range = ['3985'] + size_range[::-1]
+    img_size_select = Select(title="Image Size (bits)", value="128", options=size_range)
     img_size_select.on_change('value', img_size_select_cb)
 
     # layout includes the map and the controls below
