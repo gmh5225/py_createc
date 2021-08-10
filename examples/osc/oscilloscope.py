@@ -154,7 +154,7 @@ if __name__ == '__main__':
     group.add_argument("-p", "--pressure", help="show pressure", action="store_true")
 
     parser.add_argument("-o", "--port", help="specify a port", default=5001, type=int)
-    parser.add_argument("-l", "--log_interval", help="log interval in seconds", default=60, type=int)
+    parser.add_argument("-l", "--log_interval", help="log interval in seconds", default=5, type=int)
     parser.add_argument("-s", "--scope_points", help="total points shown in a scope", default=50000, type=int)
     parser.add_argument("-i", "--interval", help="stream interval in milliseconds", default=500, type=int)
 
