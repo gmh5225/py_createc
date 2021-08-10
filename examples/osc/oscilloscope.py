@@ -292,14 +292,16 @@ if __name__ == '__main__':
         ser_prep_p = serial.Serial('COM4', timeout=0)
         ser_vacom_p = serial.Serial('COM6', timeout=0)
         ser_main_ion_p = serial.Serial('COM7', timeout=0)
-        producer_funcs = [partial(prep_p_dp, ser=ser_prep_p),
-                          partial(loadlock_p_dp, ser=ser_vacom_p),
-                          #partial(gasline_p_dp, ser=ser_vacom_p),
-                          partial(main_ion_p_dp, ser=ser_main_ion_p)]
-        y_labels = ['Prep_P', 
-                    'Loadlock_P', 
+        producer_funcs = [partial(main_ion_p_dp, ser=ser_main_ion_p),
+                          partial(prep_p_dp, ser=ser_prep_p),
+                          partial(loadlock_p_dp, ser=ser_vacom_p)
+                          #partial(gasline_p_dp, ser=ser_vacom_p)
+                          ]
+        y_labels = ['Main_Ion_P',
+                    'Prep_P', 
+                    'Loadlock_P' 
                     #'Gasline_P', 
-                    'Main_Ion_P']
+                    ]
         logger_name = 'pressure'
         fs = '.2e'
         y_axis_type = 'log'
