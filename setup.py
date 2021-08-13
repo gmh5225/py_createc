@@ -2,16 +2,16 @@ import setuptools
 
 #with open("README.md", "r", encoding="utf-8") as fh:
 #    long_description = fh.read()
-long_description = ''
+long_description = 'https://py-createc.readthedocs.io/en/latest/'
 
 setuptools.setup(
     name="createc",
     author="Chen Xu",
-    author_email="chen.xu@aalto.fi",
-    description="A python interface with Createc scanning probe microscope",
+    author_email="cxu.self@gmail.com",
+    description="A python interface with the Createc scanning probe microscope",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://version.aalto.fi/gitlab/xuc1/py_createc",
+    url="https://py-createc.readthedocs.io/en/latest/",
     packages=setuptools.find_packages(exclude=['examples']),
     package_data={
         'createc': ['*.yaml'],        
