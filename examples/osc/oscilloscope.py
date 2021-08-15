@@ -51,8 +51,8 @@ def logger(buffer_q, labels, log_name, quit_sig, log_interval, format_specifier,
 
     this_dir = os.path.dirname(__file__)
     log_config = os.path.join(this_dir, 'logger.config')
-    log_file = log_name + '.log'
-    logging.config.fileConfig(log_config, defaults={'logfilename': this_dir + '/' + log_file})
+    log_file = this_dir + '/' + log_name + '.log'
+    logging.config.fileConfig(log_config, defaults={'logfilename': log_file.replace("\\", "/")})
     this_logger = logging.getLogger('this_logger')
 
     try:
