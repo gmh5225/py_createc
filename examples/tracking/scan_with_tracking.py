@@ -79,13 +79,14 @@ logger.info('template: ' + template[-params['g_filename_len']:])
 idx = 0
 
 if params['Const_Height'] == 0:  # const current scan series
-    Bias_Range_mV = np.linspace(params['StartBias_mV'], params['EndBias_mV'], params['Total_images'])
-    Current_Range_pA = np.linspace(params['StartCurrent_pA'], params['EndCurrent_pA'], params['Total_images'])
-    Height_Range_Angstrom = [0] * params['Total_images']
+    Bias_Range_mV = np.linspace(params['StartBias_mV'], params['EndBias_mV'], params['Total_'])
+    Current_Range_pA = np.linspace(params['StartCurrent_pA'], params['EndCurrent_pA'], params['Total_'])
+    Height_Range_Angstrom = [0] * params['Total_']
 else:  # const height scan series
-    Bias_Range_mV = [img_des.bias] * params['Total_images']
-    Current_Range_pA = [img_des.current] * params['Total_images']
-    Height_Range_Angstrom = np.linspace(params['StartHeight'], params['EndHeight'], params['Total_images'])
+    Bias_Range_mV = [img_des.bias] * params['Total_']
+    Current_Range_pA = [img_des.current] * params['Total_']
+    Height_Range_Angstrom = np.linspace(params['StartHeight'], params['EndHeight'], params['Total_'])
+    Bias_Range_mV = np.linspace(params['StartBias'], params['EndBias'], params['TotalBias'])
 
 for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Current_Range_pA):
     logger.info('-' * 10)
@@ -93,7 +94,7 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
     logger.info('ci_bias %.2f' % round(ci_bias, 2))
     logger.info('ci_current %.2f' % round(ci_current, 2))
 
-    for ch_bias in params['Bias_Range_mV']:
+    for ch_bias in Bias_Range_mV:
         idx += 1
         logger.info('ch_bias %.2f' % round(ch_bias, 2))
         logger.info('scan for alignment to template')

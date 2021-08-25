@@ -1,32 +1,33 @@
 # Do const current scans or const height scans
 # Option 1: do const current scans, then edit 'StartBias_mV', 'EndBias_mV', 'StartCurrent_pA', 'EndCurrent_pA'
 # Option 2: do const height scans, then edit 'StartHeight', 'EndHeight'
-# Total_images is the total number of images to take,
+# Total_ is the total number of images to take,
 # The program will do a even division between 'Start' and 'End' values,
 # For example 
-# Total_images = 5, StartBias_mV = 30, EndBias_mV = 10
+# Total_ = 5, StartBias_mV = 30, EndBias_mV = 10
 # The program will do [30, 25, 20, 15, 10] for data collection 
 
 Const_Height: 1 # 1 For const height scans, 0 for const current scans
 
-Total_images: 11 # total number of images to take
+Total_: 21 # total number of heights (for const height imaging) or total number of images (for const current imaging)
 
 # Option 1
 # const current scan, bias in mV
-StartBias_mV: 9
-EndBias_mV: 6
+StartBias_mV: 50
+EndBias_mV: 50
 # const current scan, current in pA
-StartCurrent_pA: 100
-EndCurrent_pA: 100
+StartCurrent_pA: 50
+EndCurrent_pA: 50
 
 
 # Option 2
 # const height scan, height range in Angstrom
-StartHeight: 0.0
-EndHeight:  0.0
+StartHeight: -2.0
+EndHeight:  -0.0
 # bias range for const height scan
-Bias_Range_mV: [0, -100, -200, -300, -400, -500, -600, -700, -800, -900, -1000] #List every bias, needs at leat one element
-
+StartBias: -200
+EndBias: 500
+TotalBias: 36
 
 g_filename_len: 18 # The last 18 char is sth. like A191214.245959.dat
 
@@ -45,11 +46,11 @@ use_last_as_template: True
 shift_reg_channel: [0] # List of channel number for shift registration, i.e. alignment
 subpixel_reg: 1 # precision for alignment, use 1, 10 or 100, not in use
 
-deltaX_dac: 8 #pixel size in x
+deltaX_dac: 5 #pixel size in x
 Pre_cc_scan:
-    in_use: False
-    ddeltaX: 32 #scan speed
+    in_use: True
+    ddeltaX: 20 #scan speed
     channels_code: 0x00000003
 Data_scan:
-    ddeltaX: 128
-    channels_code: 0x00000063
+    ddeltaX: 64
+    channels_code: 0x0000001E
