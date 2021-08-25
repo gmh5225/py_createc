@@ -177,7 +177,8 @@ class GENERIC_FILE:
         x_offset = -x_offset * cgc['g_XY_volt'] * self.xPiezoConst / 2 ** cgc['g_XY_bits']
         y_offset = -y_offset * cgc['g_XY_volt'] * self.yPiezoConst / 2 ** cgc['g_XY_bits']
 
-        # Offset = namedtuple('Offset', ['y', 'x'])  return XY2D(y=y_offset, x=x_offset)
+        # Offset = namedtuple('Offset', ['y', 'x'])
+        return XY2D(y=y_offset, x=x_offset)
 
     @property
     def size(self):
