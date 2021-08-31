@@ -112,7 +112,7 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
         time.sleep(time_to_wait)
         while stm.client.scanstatus:
             time.sleep(5)
-        stm.client.quicksave()
+        stm.client.filesave(stm.client.savedatfilename)
         cc_file_4align = stm.client.savedatfilename
         logger.info('cc_file_4align: ' + cc_file_4align[-params['g_filename_len']:])
 
@@ -135,7 +135,7 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
         time.sleep(time_to_wait)
         while stm.client.scanstatus:
             time.sleep(5)
-        stm.client.quicksave()
+        stm.client.filesave(stm.client.savedatfilename)
         cc_file_after_align = stm.client.savedatfilename
         logger.info('cc_file_after_align: '+ cc_file_after_align[-params['g_filename_len']:])
         
@@ -157,7 +157,7 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
             time.sleep(time_to_wait)
             while stm.client.scanstatus:
                 time.sleep(5)
-            stm.client.quicksave()
+            stm.client.filesave(stm.client.savedatfilename)
             logger.info('cc: ' + stm.client.savedatfilename[-params['g_filename_len']:])
             img_previous = DAT_IMG(stm.client.savedatfilename)
 
@@ -175,7 +175,7 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
         time.sleep(time_to_wait)
         while stm.client.scanstatus:
             time.sleep(5)
-        stm.client.quicksave()
+        stm.client.filesave(stm.client.savedatfilename)
         logger.info('data: ' + stm.client.savedatfilename[-params['g_filename_len']:])
 
 logger.info('Final template scan')
@@ -193,6 +193,6 @@ stm.client.scanstart()
 time.sleep(time_to_wait)
 while stm.client.scanstatus:
     time.sleep(5)
-stm.client.quicksave()
+stm.client.filesave(stm.client.savedatfilename)
 logger.info(stm.client.savedatfilename[-params['g_filename_len']:])
 logger.info('Done.')
