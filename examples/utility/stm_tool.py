@@ -118,6 +118,14 @@ def make_document(doc):
         msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + img_size_select.value
         this_logger.info(msg)
 
+    def img_speed_select_cb(attr, old, new):
+        if stm is None or not stm.is_active():
+            status_text.value = 'No STM is connected'
+            return
+        stm.client.setparam('DX/DDeltaX', int(img_speed_select.value))
+        status_text.value = 'Image speed changed'
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image speed changed to ' + img_speed_select.value
+        this_logger.info(msg)
     """
     Main body below
     """
@@ -170,6 +178,13 @@ def make_document(doc):
     img_size_select = Select(title="Image Size (bits)", value="128", options=size_range)
     img_size_select.on_change('value', img_size_select_cb)
 
+    # image speed selection
+    speed_range = [str(i) for i in range(1, 64)]
+    speed_range = speed_range + [str(2**i) for i in range(6, 13)]
+    speed_range = speed_range[::-1]
+    img_speed_select = Select(title="Image Speed (bits)", value="128", options=speed_range)
+    img_speed_select.on_change('value', img_speed_select_cb)
+
     # layout includes the map and the controls below
     controls_a = column([status_text, connect_stm_bn], sizing_mode='stretch_both')
     controls_b = column([row([bias_mV_input,
@@ -183,7 +198,7 @@ def make_document(doc):
                          ramping_current_bn],
                         sizing_mode='stretch_width')
 
-    doc.add_root(column([controls_a, controls_b, controls_c, img_size_select], sizing_mode='stretch_width'))
+    doc.add_root(column([controls_a, controls_b, controls_c, img_size_select, img_speed_select], sizing_mode='stretch_width'))
 
 
 this_dir = os.path.dirname(__file__)
