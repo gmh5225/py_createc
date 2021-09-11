@@ -118,14 +118,44 @@ def make_document(doc):
         msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + img_size_select.value
         this_logger.info(msg)
 
+    def img_size_increases1_cb(event):
+        if stm is None or not stm.is_active():
+            status_text.value = 'No STM is connected'
+            return
+        old_size = stm.imgX_size_bits
+        new_size = old_size + 1
+        stm.set_imgX_size_bits(new_size)
+        status_text.value = 'Image size changed'
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + str(stm.imgX_size_bits)
+        this_logger.info(msg)
+
+    def img_size_decreases1_cb(event):
+        if stm is None or not stm.is_active():
+            status_text.value = 'No STM is connected'
+            return
+        old_size = stm.imgX_size_bits
+        new_size = old_size - 1
+        stm.set_imgX_size_bits(new_size)
+        status_text.value = 'Image size changed'
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + str(stm.imgX_size_bits)
+        this_logger.info(msg)
+
+    def img_size_times2_cb(event):
+        pass
+
+    def img_size_divides2_cb(event):
+        pass
+
     def img_speed_select_cb(attr, old, new):
         if stm is None or not stm.is_active():
             status_text.value = 'No STM is connected'
             return
         stm.client.setparam('DX/DDeltaX', int(img_speed_select.value))
         status_text.value = 'Image speed changed'
-        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image speed changed to ' + img_speed_select.value
+        msg = datetime.datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S") + ' Image speed changed to ' + img_speed_select.value
         this_logger.info(msg)
+
     """
     Main body below
     """
@@ -173,14 +203,19 @@ def make_document(doc):
 
     # image size selection
     size_range = [str(i) for i in range(1, 64)]
-    size_range = size_range + [str(2**i) for i in range(6, 13)]
+    size_range = size_range + [str(2 ** i) for i in range(6, 13)]
     size_range = ['3985'] + size_range[::-1]
     img_size_select = Select(title="Image Size (bits)", value="128", options=size_range)
     img_size_select.on_change('value', img_size_select_cb)
 
+    img_size_increases1_bn = Button(label="+1", button_type="success")
+    img_size_increases1_bn.on_click(img_size_increases1_cb)
+    img_size_decreases1_bn = Button(label="-1", button_type="success")
+    img_size_decreases1_bn.on_click(img_size_decreases1_cb)
+
     # image speed selection
     speed_range = [str(i) for i in range(1, 64)]
-    speed_range = speed_range + [str(2**i) for i in range(6, 13)]
+    speed_range = speed_range + [str(2 ** i) for i in range(6, 13)]
     speed_range = speed_range[::-1]
     img_speed_select = Select(title="Image Speed (bits)", value="128", options=speed_range)
     img_speed_select.on_change('value', img_speed_select_cb)
@@ -197,8 +232,11 @@ def make_document(doc):
                              sizing_mode='stretch_width'),
                          ramping_current_bn],
                         sizing_mode='stretch_width')
-
-    doc.add_root(column([controls_a, controls_b, controls_c, img_size_select, img_speed_select], sizing_mode='stretch_width'))
+    controls_d = row([img_size_decreases1_bn,
+                      img_size_increases1_bn],
+                     sizing_mode='stretch_width')
+    doc.add_root(column([controls_a, controls_b, controls_c, img_size_select, controls_d, img_speed_select],
+                        sizing_mode='stretch_width'))
 
 
 this_dir = os.path.dirname(__file__)
