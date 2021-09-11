@@ -215,7 +215,7 @@ def make_document(doc):
 
     # image speed selection
     speed_range = [str(i) for i in range(1, 64)]
-    speed_range = speed_range + [str(2 ** i) for i in range(6, 13)]
+    speed_range = speed_range + [str(2 ** i) for i in range(6, 14)]
     speed_range = speed_range[::-1]
     img_speed_select = Select(title="Image Speed (bits)", value="128", options=speed_range)
     img_speed_select.on_change('value', img_speed_select_cb)
