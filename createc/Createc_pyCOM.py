@@ -211,9 +211,9 @@ class CreatecWin32:
         self.client.setxyoffpixel(dx, dy)
 
     def pre_scan_config(self, chmode: int = None, rotation: float = None, ddeltaX: int = None,
-                    deltaX_dac: int = None, deltaY_dac: int = None, channels_code: int = None,
-                    ch_zoff: float = None, ch_bias: float = None, bias: float = None,
-                    current: float = None):
+                        deltaX_dac: int = None, deltaY_dac: int = None, channels_code: int = None,
+                        ch_zoff: float = None, ch_bias: float = None, bias: float = None,
+                        current: float = None):
         """
         Parameters configuration before scanning an image.
 
@@ -345,3 +345,30 @@ class CreatecWin32:
         gain : int
         """
         return int(self.client.getparam('GainPre 10^'))
+
+    def set_imgX_size_bits(self, bits) -> None:
+        """
+        Set image X size in bits
+
+        Parameters
+        ----------
+        bits : int
+            integer bits
+        """
+        if bits < 1:
+            bits = 1
+        elif bits > cgc['g_max_size_bits']:
+            bits = cgc['g_max_size_bits']
+        self.client.setparam('Delta X [Dac]', bits)
+
+    @property
+    def imgX_size_bits(self) -> int:
+        """
+        Image X size in bits
+
+        Returns
+        -------
+        bits : int
+            integer bits
+        """
+        return int(self.client.getparam('Delta X [Dac]'))

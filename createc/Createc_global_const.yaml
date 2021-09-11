@@ -48,3 +48,5 @@ g_file_spec_headers:
 g_XY_bits: 20 # 20 bits
 g_XY_volt: 200 # 200 volts
 g_preamp_gain: 9 # default gain
+
+g_max_size_bits: 4096
