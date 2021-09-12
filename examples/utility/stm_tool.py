@@ -8,6 +8,7 @@ import logging.config
 import logging
 import os
 import datetime
+from functools import partial
 
 
 def make_document(doc):
@@ -28,6 +29,8 @@ def make_document(doc):
             stm = CreatecWin32()
             status_text.value = 'STM connected'
             connect_stm_bn.disabled = False
+            img_size_text.value = str(stm.imgX_size_bits)
+
             msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Connect STM'
             this_logger.info(msg)
 
@@ -118,33 +121,28 @@ def make_document(doc):
         msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + img_size_select.value
         this_logger.info(msg)
 
-    def img_size_increases1_cb(event):
+    def img_size_change_cb(event, op):
         if stm is None or not stm.is_active():
             status_text.value = 'No STM is connected'
             return
         old_size = stm.imgX_size_bits
-        new_size = old_size + 1
+        if op == 'plus1':
+            new_size = old_size + 1
+        elif op == 'minus1':
+            new_size = old_size - 1
+        elif op == 'times2':
+            new_size = old_size * 2
+        elif op == 'divides2':
+            new_size = old_size / 2
+        else:
+            raise ValueError('operation is not supported')
+
         stm.set_imgX_size_bits(new_size)
+        new_size = stm.imgX_size_bits
         status_text.value = 'Image size changed'
-        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + str(stm.imgX_size_bits)
+        img_size_text.value = str(new_size)
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + str(new_size)
         this_logger.info(msg)
-
-    def img_size_decreases1_cb(event):
-        if stm is None or not stm.is_active():
-            status_text.value = 'No STM is connected'
-            return
-        old_size = stm.imgX_size_bits
-        new_size = old_size - 1
-        stm.set_imgX_size_bits(new_size)
-        status_text.value = 'Image size changed'
-        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + str(stm.imgX_size_bits)
-        this_logger.info(msg)
-
-    def img_size_times2_cb(event):
-        pass
-
-    def img_size_divides2_cb(event):
-        pass
 
     def img_speed_select_cb(attr, old, new):
         if stm is None or not stm.is_active():
@@ -155,6 +153,9 @@ def make_document(doc):
         msg = datetime.datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S") + ' Image speed changed to ' + img_speed_select.value
         this_logger.info(msg)
+
+    def img_speed_change_cb(event, op):
+        pass
 
     """
     Main body below
@@ -208,10 +209,19 @@ def make_document(doc):
     img_size_select = Select(title="Image Size (bits)", value="128", options=size_range)
     img_size_select.on_change('value', img_size_select_cb)
 
+    # show the image size in bits
+    img_size_text = TextInput(title='Image Size (bits)', value='', disabled=True,
+                              sizing_mode='stretch_width',
+                              min_width=10, default_size=2)
+
     img_size_increases1_bn = Button(label="+1", button_type="success")
-    img_size_increases1_bn.on_click(img_size_increases1_cb)
+    img_size_increases1_bn.on_click(partial(img_size_change_cb, op='plus1'))
     img_size_decreases1_bn = Button(label="-1", button_type="success")
-    img_size_decreases1_bn.on_click(img_size_decreases1_cb)
+    img_size_decreases1_bn.on_click(partial(img_size_change_cb, op='minus1'))
+    img_size_times2_bn = Button(label="x2", button_type="success")
+    img_size_times2_bn.on_click(partial(img_size_change_cb, op='times2'))
+    img_size_divides2_bn = Button(label="/2", button_type="success")
+    img_size_divides2_bn.on_click(partial(img_size_change_cb, op='divides2'))
 
     # image speed selection
     speed_range = [str(i) for i in range(1, 64)]
@@ -232,10 +242,13 @@ def make_document(doc):
                              sizing_mode='stretch_width'),
                          ramping_current_bn],
                         sizing_mode='stretch_width')
-    controls_d = row([img_size_decreases1_bn,
-                      img_size_increases1_bn],
+    controls_d = row([img_size_divides2_bn,
+                      img_size_decreases1_bn,
+                      img_size_increases1_bn,
+                      img_size_times2_bn],
                      sizing_mode='stretch_width')
-    doc.add_root(column([controls_a, controls_b, controls_c, img_size_select, controls_d, img_speed_select],
+    doc.add_root(column([controls_a, controls_b, controls_c,
+                         img_size_text, controls_d, img_speed_select],
                         sizing_mode='stretch_width'))
 
 
