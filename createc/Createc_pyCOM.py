@@ -375,13 +375,27 @@ class CreatecWin32:
         self.client.setparam('Delta X [Dac]', bits)
 
     @property
-    def imgX_size_bits(self) -> int:
+    def img_dDeltaX_bits(self) -> int:
         """
-        Image X size in bits
+        Image dDeltaX in bits
 
         Returns
         -------
         bits : int
             integer bits
         """
-        return int(self.client.getparam('Delta X [Dac]'))
+        return int(self.client.getparam('DX/DDeltaX'))
+
+    @img_dDeltaX_bits.setter
+    def img_dDeltaX_bits(self, bits) -> None:
+        """
+        Set image dDeltaX in bits
+
+        Parameters
+        ----------
+        bits : int
+            integer bits
+        """
+        if bits < 1:
+            bits = 1
+        self.client.setparam('DX/DDeltaX', bits)
