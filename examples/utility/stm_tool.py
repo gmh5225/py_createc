@@ -30,7 +30,7 @@ def make_document(doc):
             status_text.value = 'STM connected'
             connect_stm_bn.disabled = False
             img_size_text.value = str(stm.imgX_size_bits)
-
+            img_duration_text.value = str(stm.img_dDeltaX_bits)
             msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Connect STM'
             this_logger.info(msg)
 
@@ -154,8 +154,28 @@ def make_document(doc):
             "%Y-%m-%d %H:%M:%S") + ' Image speed changed to ' + img_speed_select.value
         this_logger.info(msg)
 
-    def img_speed_change_cb(event, op):
-        pass
+    def img_duration_change_cb(event, op):
+        if stm is None or not stm.is_active():
+            status_text.value = 'No STM is connected'
+            return
+        old_duration = stm.img_dDeltaX_bits
+        if op == 'plus1':
+            new_duration = old_duration + 1
+        elif op == 'minus1':
+            new_duration = old_duration - 1
+        elif op == 'times2':
+            new_duration = old_duration * 2
+        elif op == 'divides2':
+            new_duration = old_duration / 2
+        else:
+            raise ValueError('operation is not supported')
+
+        stm.img_dDeltaX_bits = new_duration
+        new_duration = stm.img_dDeltaX_bits
+        status_text.value = 'Image duration changed'
+        img_duration_text.value = str(new_duration)
+        msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image duration changed to ' + str(new_duration)
+        this_logger.info(msg)
 
     """
     Main body below
@@ -230,6 +250,20 @@ def make_document(doc):
     img_speed_select = Select(title="Image Speed (bits)", value="128", options=speed_range)
     img_speed_select.on_change('value', img_speed_select_cb)
 
+    # show the image duration in bits
+    img_duration_text = TextInput(title='Image Duration (bits)', value='', disabled=True,
+                                  sizing_mode='stretch_width',
+                                  min_width=10, default_size=2)
+
+    img_duration_increases1_bn = Button(label="+1", button_type="success")
+    img_duration_increases1_bn.on_click(partial(img_duration_change_cb, op='plus1'))
+    img_duration_decreases1_bn = Button(label="-1", button_type="success")
+    img_duration_decreases1_bn.on_click(partial(img_duration_change_cb, op='minus1'))
+    img_duration_times2_bn = Button(label="x2", button_type="success")
+    img_duration_times2_bn.on_click(partial(img_duration_change_cb, op='times2'))
+    img_duration_divides2_bn = Button(label="/2", button_type="success")
+    img_duration_divides2_bn.on_click(partial(img_duration_change_cb, op='divides2'))
+
     # layout includes the map and the controls below
     controls_a = column([status_text, connect_stm_bn], sizing_mode='stretch_both')
     controls_b = column([row([bias_mV_input,
@@ -247,8 +281,13 @@ def make_document(doc):
                       img_size_increases1_bn,
                       img_size_times2_bn],
                      sizing_mode='stretch_width')
+    controls_e = row([img_duration_divides2_bn,
+                      img_duration_decreases1_bn,
+                      img_duration_increases1_bn,
+                      img_duration_times2_bn],
+                     sizing_mode='stretch_width')
     doc.add_root(column([controls_a, controls_b, controls_c,
-                         img_size_text, controls_d, img_speed_select],
+                         img_size_text, controls_d, img_duration_text, controls_e],
                         sizing_mode='stretch_width'))
 
 
