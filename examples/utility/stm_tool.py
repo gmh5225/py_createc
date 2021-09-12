@@ -137,7 +137,7 @@ def make_document(doc):
         else:
             raise ValueError('operation is not supported')
 
-        stm.set_imgX_size_bits(new_size)
+        stm.imgX_size_bits = new_size
         new_size = stm.imgX_size_bits
         status_text.value = 'Image size changed'
         img_size_text.value = str(new_size)
