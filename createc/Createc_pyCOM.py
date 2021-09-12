@@ -346,7 +346,20 @@ class CreatecWin32:
         """
         return int(self.client.getparam('GainPre 10^'))
 
-    def set_imgX_size_bits(self, bits) -> None:
+    @property
+    def imgX_size_bits(self) -> int:
+        """
+        Image X size in bits
+
+        Returns
+        -------
+        bits : int
+            integer bits
+        """
+        return int(self.client.getparam('Delta X [Dac]'))
+
+    @imgX_size_bits.setter
+    def imgX_size_bits(self, bits) -> None:
         """
         Set image X size in bits
 
