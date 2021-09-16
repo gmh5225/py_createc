@@ -195,7 +195,7 @@ def make_document(doc):
 
     # input for bias value in mV
     bias_mV_input = TextInput(title='Bias (mV)', value_input='10', value='10', min_width=50)
-    bias_mV_input.on_change('value', ramping_bias_cb_ti)
+    # bias_mV_input.on_change('value', ramping_bias_cb_ti)
 
     # steps for ramping bias
     steps_bias_ramping = TextInput(title='Steps', value_input='40', value='40', min_width=50)
@@ -212,7 +212,7 @@ def make_document(doc):
 
     # input for current value in pA
     current_pA_input = TextInput(title='Current (pA)', value='10', value_input='10', min_width=50)
-    current_pA_input.on_change('value', ramping_current_cb_ti)
+    # current_pA_input.on_change('value', ramping_current_cb_ti)
 
     # steps for ramping bias
     steps_current_ramping = TextInput(title='Steps', value_input='40', value='40', min_width=50)
