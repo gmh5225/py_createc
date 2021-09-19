@@ -29,9 +29,13 @@ def make_document(doc):
             stm = CreatecWin32()
             status_text.value = 'STM connected'
             connect_stm_bn.disabled = False
+            bias_mV_input.value = stm.bias_mV
+            current_pA_input.value = stm.current_pA
             img_size_text.value = str(stm.imgX_size_bits)
+            img_real_size.value = str(stm.nom_size.x)
             img_duration_text.value = str(stm.img_dDeltaX_bits)
-            msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Connect STM'
+            img_real_duration.value = str(datetime.timedelta(seconds=stm.duration))
+            msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Connect to STM'
             this_logger.info(msg)
 
         doc.add_next_tick_callback(process)
@@ -141,6 +145,7 @@ def make_document(doc):
         new_size = stm.imgX_size_bits
         status_text.value = 'Image size changed'
         img_size_text.value = str(new_size)
+        img_real_size.value = str(stm.nom_size.x)
         msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + str(new_size)
         this_logger.info(msg)
 
@@ -174,6 +179,7 @@ def make_document(doc):
         new_duration = stm.img_dDeltaX_bits
         status_text.value = 'Image duration changed'
         img_duration_text.value = str(new_duration)
+        img_real_duration.value = str(datetime.timedelta(seconds=stm.duration))
         msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image duration changed to ' + str(new_duration)
         this_logger.info(msg)
 
@@ -183,7 +189,7 @@ def make_document(doc):
     stm = None
 
     # A button to (re)connect to the STM software
-    connect_stm_bn = Button(label="(Re)Connect to STM", button_type="success",
+    connect_stm_bn = Button(label="(Re)Connect to STM / Refresh", button_type="success",
                             sizing_mode='stretch_width',
                             min_width=10, default_size=2)
     connect_stm_bn.on_click(connect_stm_callback)
@@ -234,6 +240,10 @@ def make_document(doc):
                               sizing_mode='stretch_width',
                               min_width=10, default_size=2)
 
+    img_real_size = TextInput(title='Angstrom', value='', disabled=True,
+                              sizing_mode='stretch_width',
+                              min_width=10, default_size=2)
+
     img_size_increases1_bn = Button(label="+1", button_type="success")
     img_size_increases1_bn.on_click(partial(img_size_change_cb, op='plus1'))
     img_size_decreases1_bn = Button(label="-1", button_type="success")
@@ -252,6 +262,10 @@ def make_document(doc):
 
     # show the image duration in bits
     img_duration_text = TextInput(title='Image Duration (bits)', value='', disabled=True,
+                                  sizing_mode='stretch_width',
+                                  min_width=10, default_size=2)
+
+    img_real_duration = TextInput(title='Time (h:m:s)', value='', disabled=True,
                                   sizing_mode='stretch_width',
                                   min_width=10, default_size=2)
 
@@ -276,18 +290,24 @@ def make_document(doc):
                              sizing_mode='stretch_width'),
                          ramping_current_bn],
                         sizing_mode='stretch_width')
-    controls_d = row([img_size_divides2_bn,
+    controls_d = row([img_size_text,
+                      img_real_size],
+                     sizing_mode='stretch_width')
+    controls_e = row([img_size_divides2_bn,
                       img_size_decreases1_bn,
                       img_size_increases1_bn,
                       img_size_times2_bn],
                      sizing_mode='stretch_width')
-    controls_e = row([img_duration_divides2_bn,
+    controls_f = row([img_duration_text,
+                      img_real_duration],
+                     sizing_mode='stretch_width')
+    controls_g = row([img_duration_divides2_bn,
                       img_duration_decreases1_bn,
                       img_duration_increases1_bn,
                       img_duration_times2_bn],
                      sizing_mode='stretch_width')
     doc.add_root(column([controls_a, controls_b, controls_c,
-                         img_size_text, controls_d, img_duration_text, controls_e],
+                         controls_d, controls_e, controls_f, controls_g],
                         sizing_mode='stretch_width'))
 
 
