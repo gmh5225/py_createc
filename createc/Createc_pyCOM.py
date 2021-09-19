@@ -399,3 +399,15 @@ class CreatecWin32:
         if bits < 1:
             bits = 1
         self.client.setparam('DX/DDeltaX', bits)
+
+    @property
+    def duration(self) -> int:
+        """
+        Duration of a scan in seconds
+        Returns
+        -------
+        time_to_wait : int
+        """
+        time_to_wait = float(self.client.getparam('Sec/Image:'))
+        time_to_wait = time_to_wait / 2 * (1 + 1 / float(self.client.getparam('Delay Y')))
+        return int(time_to_wait)
