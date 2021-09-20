@@ -261,7 +261,7 @@ def make_document(doc):
     img_speed_select.on_change('value', img_speed_select_cb)
 
     # show the image duration in bits
-    img_duration_text = TextInput(title='Image Duration (bits)', value='', disabled=True,
+    img_duration_text = TextInput(title='Duration (bits)', value='', disabled=True,
                                   sizing_mode='stretch_width',
                                   min_width=10, default_size=2)
 
