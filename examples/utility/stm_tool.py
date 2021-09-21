@@ -42,13 +42,13 @@ def make_document(doc):
 
     def process_bias():
         try:
-            bias_target = float(bias_mV_input.value_input)
+            bias_target = float(bias_mV_input.value)
         except ValueError:
             status_text.value = 'Invalid bias'
             ramping_bias_bn.disabled = False
             return
         try:
-            steps = int(steps_bias_ramping.value_input)
+            steps = int(steps_bias_ramping.value)
         except ValueError:
             status_text.value = 'Invalid steps'
             ramping_bias_bn.disabled = False
@@ -80,13 +80,13 @@ def make_document(doc):
 
     def process_current():
         try:
-            current_target = float(current_pA_input.value_input)
+            current_target = float(current_pA_input.value)
         except ValueError:
             status_text.value = 'Invalid current'
             ramping_current_bn.disabled = False
             return
         try:
-            steps = int(steps_current_ramping.value_input)
+            steps = int(steps_current_ramping.value)
         except ValueError:
             status_text.value = 'Invalid steps'
             ramping_current_bn.disabled = False
