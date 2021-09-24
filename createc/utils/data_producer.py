@@ -159,6 +159,17 @@ def f_random_tuple2():
     return np.random.rand(), np.random.rand()
 
 
+def f_random_tuple1():
+    """
+    A function to return a tuple of ome random float
+
+    Returns
+    -------
+    value : tuple
+    """
+    return np.random.rand(),
+
+
 def f_sinewave():
     """
     Testing func returning a sinewave stream based on current time.
