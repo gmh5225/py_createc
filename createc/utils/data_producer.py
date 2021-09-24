@@ -161,7 +161,7 @@ def f_random_tuple2():
 
 def f_random_tuple1():
     """
-    A function to return a tuple of ome random float
+    A function to return a tuple of one random float
 
     Returns
     -------
