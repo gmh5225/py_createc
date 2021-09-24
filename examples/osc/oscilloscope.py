@@ -109,6 +109,9 @@ def make_document(doc, log_q, funcs, labels, scope_points, format_specifier, y_a
         """
         The data producer and updater for bokeh server
         """
+        data_list = []
+        for func in funcs:
+
         data_pak = tuple((dt.datetime.now(), func()) for func in funcs)
         log_q.put(data_pak)
         for index, data in enumerate(data_pak):
@@ -308,8 +311,8 @@ if __name__ == '__main__':
     else:
         import createc.utils.data_producer as dp
 
-        producer_funcs = [dp.f_random, dp.f_random2, dp.f_emitter]
-        y_labels = ['Random1', 'Random2', 'Emitter']
+        producer_funcs = [dp.f_random_tuple1, dp.f_random_tuple2]
+        y_labels = ['Random1', 'Random2-1', 'Random2-2']
         logger_name = 'random'
 
     logger_q = queue.Queue()
