@@ -52,14 +52,14 @@ def createc_adc(stm, channel, board, kelvin=False):
         
     Returns
     -------
-    data : float
+    data : tuple
 
     """
     data = stm.client.getadcvalf(board, channel)
     if kelvin:
         import createc.utils.DT670
         data = createc.utils.DT670.Volt2Kelvin(data)
-    return data
+    return data,
 
 
 def createc_auxadc_6(stm):
