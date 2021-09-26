@@ -73,10 +73,10 @@ def createc_auxadc_6(stm):
 
     Returns
     -------
-    temperature : float
+    temperature : tuple
     """
     stm.client.setparam('MEMO_STMAFM', '')  # dummy function to 'manually' update the temperature reading
-    return float(stm.client.getparam('T_AUXADC6[K]'))
+    return float(stm.client.getparam('T_AUXADC6[K]')),
 
 
 def createc_auxadc_7(stm):
@@ -90,10 +90,10 @@ def createc_auxadc_7(stm):
 
     Returns
     -------
-    temperature : float
+    temperature : tuple
     """
     stm.client.setparam('MEMO_STMAFM', '')  # dummy function to 'manually' update the temperature reading
-    return float(stm.client.getparam('T_AUXADC7[K]'))
+    return float(stm.client.getparam('T_AUXADC7[K]')),
 
 
 def f_cpu():
