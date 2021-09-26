@@ -228,7 +228,7 @@ if __name__ == '__main__':
             response = ser.readline()
             if len(response) == 0:
                 return 0
-            return float(response[2:-1])
+            return float(response[2:-1]),
 
 
         def loadlock_p_dp(ser):
@@ -247,9 +247,9 @@ if __name__ == '__main__':
             ser.write(b"RPV1\r")
             response = ser.read(size=50).decode('ascii').split(',')
             try:
-                return float(response[1])
+                return float(response[1]),
             except IndexError:
-                return 0
+                return 0,
 
 
         def gasline_p_dp(ser):
@@ -268,9 +268,9 @@ if __name__ == '__main__':
             ser.write(b"RPV3\r")
             response = ser.read(size=50).decode('ascii').split(',')
             try:
-                return float(response[1])
+                return float(response[1]),
             except IndexError:
-                return 0
+                return 0,
             
 
         def main_ion_p_dp(ser):
@@ -288,7 +288,7 @@ if __name__ == '__main__':
             """
             ser.write(b'~ 05 0B 02 00\r')
             response = ser.readline()
-            return float(response.split()[3])
+            return float(response.split()[3]),
 
 
         import serial
