@@ -111,8 +111,9 @@ def make_document(doc, log_q, funcs, labels, scope_points, format_specifier, y_a
         """
         data_list = []
         for func in funcs:
+            data_list += [(dt.datetime.now(), res) for res in func()]
 
-        data_pak = tuple((dt.datetime.now(), func()) for func in funcs)
+        data_pak = tuple(data_list)
         log_q.put(data_pak)
         for index, data in enumerate(data_pak):
             sources[index].stream(dict(time=[data[0]], data=[data[1]]), scope_points)
