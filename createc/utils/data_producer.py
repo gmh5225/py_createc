@@ -102,10 +102,10 @@ def f_cpu():
 
     Returns
     -------
-    cpu : float
+    cpu : tuple
     """
     import psutil
-    return psutil.cpu_percent(percpu=False)
+    return psutil.cpu_percent(percpu=False),
 
 
 def f_ram():
