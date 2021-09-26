@@ -25,12 +25,12 @@ def createc_fbz(stm):
         Createc instance
     Returns
     -------
-    value : float
+    value : tuple
 
     """
     # from createc.Createc_pyCOM import CreatecWin32
     # stm = CreatecWin32()
-    return stm.client.getdacvalfb()
+    return stm.client.getdacvalfb(),
 
 
 def createc_adc(stm, channel, board, kelvin=False):
