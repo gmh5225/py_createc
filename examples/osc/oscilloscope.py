@@ -273,6 +273,28 @@ if __name__ == '__main__':
                 return 0,
             
 
+        def vacom_p_dp(ser):
+            """
+
+            Parameters
+            ----------
+            ser : serial.Serial
+                Serial instance
+
+            Returns
+            -------
+            response : tuple
+                Pressures in mbar
+            """
+            ser.write(b"RPV3\r")
+            try:
+                p = ser.read(size=100).decode('cp1252', errors='ignore').split(',')
+            except IndexError:
+                p = ['000', '000']
+            ser.write(b"RPV3\r")
+            ser.write(b"RPV1\r")
+            return float(p[-1][:-1].strip()), float(p[1][:-1].strip())
+
         def main_ion_p_dp(ser):
             """
 
@@ -298,13 +320,12 @@ if __name__ == '__main__':
         ser_main_ion_p = serial.Serial('COM7', timeout=0)
         producer_funcs = [partial(main_ion_p_dp, ser=ser_main_ion_p),
                           partial(prep_p_dp, ser=ser_prep_p),
-                          partial(loadlock_p_dp, ser=ser_vacom_p)
-                          #partial(gasline_p_dp, ser=ser_vacom_p)
+                          partial(vacom_p_dp, ser=ser_vacom_p)
                           ]
         y_labels = ['Main_Ion_P',
                     'Prep_P', 
-                    'Loadlock_P' 
-                    #'Gasline_P', 
+                    'Loadlock_P',
+                    'Gasline_P'
                     ]
         logger_name = 'pressure'
         fs = '.2e'
