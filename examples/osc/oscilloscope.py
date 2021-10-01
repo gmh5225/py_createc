@@ -288,12 +288,12 @@ if __name__ == '__main__':
             """
             ser.write(b"RPV3\r")
             try:
-                p = ser.read(size=100).decode('cp1252', errors='ignore').split(',')
+                p = ser.read(size=100).decode('cp1252', errors='ignore').strip().split('0,')
             except IndexError:
                 p = ['000', '000']
             ser.write(b"RPV3\r")
             ser.write(b"RPV1\r")
-            return float(p[-1][:-1].strip()), float(p[1][:-1].strip())
+            return float(p[-1].strip()), float(p[1].strip())
 
         def main_ion_p_dp(ser):
             """
