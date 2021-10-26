@@ -320,8 +320,12 @@ class DAT_IMG(GENERIC_FILE):
         -------
         None : None
         """
-
-        decompressed_data = zlib.decompress(self._data_binary)
+        try:
+            # if it is compressed data, then decompress it
+            decompressed_data = zlib.decompress(self._data_binary)
+        except zlib.error:
+            # else if it is not compressed, then do nothing
+            decompressed_data = self._data_binary
         img_array = np.frombuffer(decompressed_data, np.dtype(cgc['g_file_dat_img_pixel_data_npdtype']))
         img_array = np.reshape(img_array[1: self.xPixel * self.yPixel * self.channels + 1],
                                (self.channels * self.yPixel, self.xPixel))
