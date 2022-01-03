@@ -45,6 +45,21 @@ class CreatecWin32:
         # self.yPiezoConst = float(self.client.getparam('YPiezoconst'))
         # self.zPiezoConst = float(self.client.getparam('ZPiezoconst'))
 
+    def __getattr__(self, name):
+        """
+        Redirect method/property to COM object if it is not defined in the class
+
+        Parameters
+        ----------
+        name: str
+            method/property name
+
+        Returns
+        -------
+        None
+        """
+        return getattr(self.client, name)
+
     def is_active(self):
         """
         To check if the STM software is still listening to python
