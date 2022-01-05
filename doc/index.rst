@@ -24,7 +24,7 @@ Here is an example that plays the testing beep sound on the STM:
 
    import createc
    stm = createc.CreatecWin32()
-   stm.client.stmbeep()
+   stm.stmbeep()
 
 Furthermore, several classes are available to to read ``.dat``, ``.vert`` files etc.
 For example, an image instance can be created by:

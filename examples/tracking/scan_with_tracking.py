@@ -106,14 +106,14 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
                             ch_bias=0,
                             bias=img_des.bias,
                             current=img_des.current)
-        time_to_wait = float(stm.client.getparam('Sec/Image:'))
-        time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.client.getparam('Delay Y')))
-        stm.client.scanstart()
+        time_to_wait = float(stm.getparam('Sec/Image:'))
+        time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.getparam('Delay Y')))
+        stm.scanstart()
         time.sleep(time_to_wait)
-        while stm.client.scanstatus:
+        while stm.scanstatus:
             time.sleep(5)
-        stm.client.filesave(stm.client.savedatfilename)
-        cc_file_4align = stm.client.savedatfilename
+        stm.filesave(stm.savedatfilename)
+        cc_file_4align = stm.savedatfilename
         logger.info('cc_file_4align: ' + cc_file_4align[-params['g_filename_len']:])
 
         logger.info('Align to template')
@@ -129,14 +129,14 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
         # for testing shift registration
         """
         import random
-        time_to_wait = float(stm.client.getparam('Sec/Image:'))
-        time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.client.getparam('Delay Y')))
-        stm.client.scanstart()
+        time_to_wait = float(stm.getparam('Sec/Image:'))
+        time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.getparam('Delay Y')))
+        stm.scanstart()
         time.sleep(time_to_wait)
-        while stm.client.scanstatus:
+        while stm.scanstatus:
             time.sleep(5)
-        stm.client.filesave(stm.client.savedatfilename)
-        cc_file_after_align = stm.client.savedatfilename
+        stm.filesave(stm.savedatfilename)
+        cc_file_after_align = stm.savedatfilename
         logger.info('cc_file_after_align: '+ cc_file_after_align[-params['g_filename_len']:])
         
         logger.info('Mock drifting')
@@ -151,15 +151,15 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
             stm.pre_scan_config(chmode=0,  # pre_cc_scan is always in const mode
                                 deltaX_dac=params['deltaX_dac'],
                                 channels_code=params['Pre_cc_scan']['channels_code'])
-            time_to_wait = float(stm.client.getparam('Sec/Image:'))
-            time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.client.getparam('Delay Y')))
-            stm.client.scanstart()
+            time_to_wait = float(stm.getparam('Sec/Image:'))
+            time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.getparam('Delay Y')))
+            stm.scanstart()
             time.sleep(time_to_wait)
-            while stm.client.scanstatus:
+            while stm.scanstatus:
                 time.sleep(5)
-            stm.client.filesave(stm.client.savedatfilename)
-            logger.info('cc: ' + stm.client.savedatfilename[-params['g_filename_len']:])
-            img_previous = DAT_IMG(stm.client.savedatfilename)
+            stm.filesave(stm.savedatfilename)
+            logger.info('cc: ' + stm.savedatfilename[-params['g_filename_len']:])
+            img_previous = DAT_IMG(stm.savedatfilename)
 
         logger.info('Data scan')
         stm.pre_scan_config(chmode=params['Const_Height'],
@@ -169,14 +169,14 @@ for ch_zoff, ci_bias, ci_current in zip(Height_Range_Angstrom, Bias_Range_mV, Cu
                             ch_bias=ch_bias,
                             bias=ci_bias,
                             current=ci_current)
-        time_to_wait = float(stm.client.getparam('Sec/Image:'))
-        time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.client.getparam('Delay Y')))
-        stm.client.scanstart()
+        time_to_wait = float(stm.getparam('Sec/Image:'))
+        time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.getparam('Delay Y')))
+        stm.scanstart()
         time.sleep(time_to_wait)
-        while stm.client.scanstatus:
+        while stm.scanstatus:
             time.sleep(5)
-        stm.client.filesave(stm.client.savedatfilename)
-        logger.info('data: ' + stm.client.savedatfilename[-params['g_filename_len']:])
+        stm.filesave(stm.savedatfilename)
+        logger.info('data: ' + stm.savedatfilename[-params['g_filename_len']:])
 
 logger.info('Final template scan')
 stm.pre_scan_config(chmode=img_des.chmode,
@@ -187,12 +187,12 @@ stm.pre_scan_config(chmode=img_des.chmode,
                 ch_bias=0,
                 bias=img_des.bias,
                 current=img_des.current)
-time_to_wait = float(stm.client.getparam('Sec/Image:'))
-time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.client.getparam('Delay Y')))
-stm.client.scanstart()
+time_to_wait = float(stm.getparam('Sec/Image:'))
+time_to_wait = time_to_wait / 2 * (1 + 1 / float(stm.getparam('Delay Y')))
+stm.scanstart()
 time.sleep(time_to_wait)
-while stm.client.scanstatus:
+while stm.scanstatus:
     time.sleep(5)
-stm.client.filesave(stm.client.savedatfilename)
-logger.info(stm.client.savedatfilename[-params['g_filename_len']:])
+stm.filesave(stm.savedatfilename)
+logger.info(stm.savedatfilename[-params['g_filename_len']:])
 logger.info('Done.')

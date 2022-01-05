@@ -30,7 +30,7 @@ def createc_fbz(stm):
     """
     # from createc.Createc_pyCOM import CreatecWin32
     # stm = CreatecWin32()
-    return stm.client.getdacvalfb(),
+    return stm.getdacvalfb(),
 
 
 def createc_adc(stm, channel, board, kelvin=False):
@@ -55,7 +55,7 @@ def createc_adc(stm, channel, board, kelvin=False):
     data : tuple
 
     """
-    data = stm.client.getadcvalf(board, channel)
+    data = stm.getadcvalf(board, channel)
     if kelvin:
         import createc.utils.DT670
         data = createc.utils.DT670.Volt2Kelvin(data)
@@ -75,8 +75,8 @@ def createc_auxadc_6(stm):
     -------
     temperature : tuple
     """
-    stm.client.setparam('MEMO_STMAFM', '')  # dummy function to 'manually' update the temperature reading
-    return float(stm.client.getparam('T_AUXADC6[K]')),
+    stm.setparam('MEMO_STMAFM', '')  # dummy function to 'manually' update the temperature reading
+    return float(stm.getparam('T_AUXADC6[K]')),
 
 
 def createc_auxadc_7(stm):
@@ -92,8 +92,8 @@ def createc_auxadc_7(stm):
     -------
     temperature : tuple
     """
-    stm.client.setparam('MEMO_STMAFM', '')  # dummy function to 'manually' update the temperature reading
-    return float(stm.client.getparam('T_AUXADC7[K]')),
+    stm.setparam('MEMO_STMAFM', '')  # dummy function to 'manually' update the temperature reading
+    return float(stm.getparam('T_AUXADC7[K]')),
 
 
 def f_cpu():
@@ -267,7 +267,7 @@ def createc_ADC1_T():
     import DT670
     stm = cp.CreatecWin32()
     while True:
-        ADC1 = stm.client.getadcvalf(1, 1)
+        ADC1 = stm.getadcvalf(1, 1)
         yield (datetime.datetime.now(), DT670.Volt2Kelvin(ADC1))
 
 
@@ -284,7 +284,7 @@ def createc_ADC2_T():
     import DT670
     stm = cp.CreatecWin32()
     while True:
-        ADC2 = stm.client.getadcvalf(1, 2)
+        ADC2 = stm.getadcvalf(1, 2)
         yield (datetime.datetime.now(), DT670.Volt2Kelvin(ADC2))
 
 

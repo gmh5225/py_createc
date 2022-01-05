@@ -103,8 +103,8 @@ def make_document(doc):
         x_volt = float(x) / stm.xPiezoConst
         y_volt = float(y) / stm.yPiezoConst
 
-        stm.client.setxyoffvolt(x_volt, y_volt)
-        stm.client.setparam('RotCMode', 0)
+        stm.setxyoffvolt(x_volt, y_volt)
+        stm.setparam('RotCMode', 0)
         status_text.value = 'XY coordinate sent'
 
     def plot_img():

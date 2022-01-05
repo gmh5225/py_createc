@@ -120,7 +120,7 @@ def make_document(doc):
         if stm is None or not stm.is_active():
             status_text.value = 'No STM is connected'
             return
-        stm.client.setparam('Delta X [Dac]', int(img_size_select.value))
+        stm.setparam('Delta X [Dac]', int(img_size_select.value))
         status_text.value = 'Image size changed'
         msg = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' Image size changed to ' + img_size_select.value
         this_logger.info(msg)
@@ -153,7 +153,7 @@ def make_document(doc):
         if stm is None or not stm.is_active():
             status_text.value = 'No STM is connected'
             return
-        stm.client.setparam('DX/DDeltaX', int(img_speed_select.value))
+        stm.setparam('DX/DDeltaX', int(img_speed_select.value))
         status_text.value = 'Image speed changed'
         msg = datetime.datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S") + ' Image speed changed to ' + img_speed_select.value
