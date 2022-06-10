@@ -349,26 +349,34 @@ class DAT_IMG(GENERIC_FILE):
         """
         return arr[~np.all(arr == 0, axis=1)]
 
-class GRID_SPEC(GENERIC_FILE):
-    def __init__(self, file_path=None, file_binary=None, file_name=None):
-        if file_path is not None:
-            self.fp = file_path
-            _, self.fn = os.path.split(self.fp)
-        self.DAT_IMG = DAT_IMG(file_path + ".dat")
 
-        f = open(file_path, "rb")
-        a = np.fromfile(f, dtype=np.uint32,count=256)
-        f.close
-        f = open(file_path, "rb")
-        b = np.fromfile(f, dtype=np.float32,count=256)
-        f.close
+class GRID_SPEC:
+    """
+    Read .gridspec file
+
+    Parameters
+    ----------
+    file_path : str
+        The file path to the .specgrid file
+    """
+    def __init__(self, file_path):
+
+        self.fp = file_path
+        _, self.fn = os.path.split(self.fp)
+        # self.DAT_IMG = DAT_IMG(file_path + ".dat")
+
+        with open(file_path, "rb") as file:
+            b = np.fromfile(file, dtype=np.float32)
+
+        a = b[:256].view(np.uint32)
+
         self.version = a[0]
         self.nx = a[1]
         self.ny = a[2]
         self.dx = a[3]
         self.dy = a[4]
         self.specxgrid = a[5]
-        self.specygrid= a [6]
+        self.specygrid = a[6]
         self.vertpoints = a[7]
         self.vertmandelay = a[8]
         self.vertmangain = a[9]
@@ -392,19 +400,21 @@ class GRID_SPEC(GENERIC_FILE):
         self.specgridcenterx = a[27]
         self.specgridcentery = a[28]
 
-        self.count3 = self.vertpoints*3
+        self.count3 = self.vertpoints * 3
 
-        self.specvz = np.fromfile(f, dtype=np.float32,count=self.count3)
-        self.specvz3 = self.specvz.reshape(self.vertpoints,3)
-        self.data = np.fromfile(f, dtype=np.float32)
+        self.specvz = b[256: 256 + self.count3]
+        self.specvz3 = self.specvz.reshape(self.vertpoints, 3)
+        self.data = b[256 + self.count3:]
 
         try:
-            self.a, self.b = int(self.nx/self.specgriddx), int(self.ny/self.specgriddy)
-            self.specdata = self.data.reshape(self.a,self.b,len(self.specvz3),int(len(self.data)/self.a/self.b/len(self.specvz3)))
-        except:
+            self.a, self.b = int(self.nx / self.specgriddx), int(self.ny / self.specgriddy)
+            self.specdata = self.data.reshape(self.a, self.b, len(self.specvz3),
+                                              int(len(self.data) / self.a / self.b / len(self.specvz3)))
+        except ValueError:
             self.a, self.b = self.xend, self.yend
-            self.specdata = self.data.reshape(self.a,self.b,len(self.specvz3),int(len(self.data)/self.a/self.b/len(self.specvz3)))
+            self.specdata = self.data.reshape(self.a, self.b, len(self.specvz3),
+                                              int(len(self.data) / self.a / self.b / len(self.specvz3)))
 
-        self.cube_array = self.specdata[:,:,:,1].T
+        self.cube_array = self.specdata[:, :, :, 1].T
 
         _, self.xpix, self.ypix = self.cube_array.shape
