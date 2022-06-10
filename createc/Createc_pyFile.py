@@ -348,3 +348,73 @@ class DAT_IMG(GENERIC_FILE):
             Cropped image
         """
         return arr[~np.all(arr == 0, axis=1)]
+
+
+class GRID_SPEC:
+    """
+    Read .gridspec file
+
+    Parameters
+    ----------
+    file_path : str
+        The file path to the .specgrid file
+    """
+    def __init__(self, file_path):
+
+        self.fp = file_path
+        _, self.fn = os.path.split(self.fp)
+        # self.DAT_IMG = DAT_IMG(file_path + ".dat")
+
+        with open(file_path, "rb") as file:
+            b = np.fromfile(file, dtype=np.float32)
+
+        a = b[:256].view(np.uint32)
+
+        self.version = a[0]
+        self.nx = a[1]
+        self.ny = a[2]
+        self.dx = a[3]
+        self.dy = a[4]
+        self.specxgrid = a[5]
+        self.specygrid = a[6]
+        self.vertpoints = a[7]
+        self.vertmandelay = a[8]
+        self.vertmangain = a[9]
+        self.biasvoltage = b[10]
+        self.tunnelcurrent = b[11]
+        self.imagedatasize = a[12]
+        self.specgriddatasize = a[13]
+        self.specgridchan = a[14]
+        self.specgridchannelselectval = a[15]
+        self.specgriddatasize64 = np.int64(a[17])
+        self.specgriddatasize64 = (self.specgriddatasize64 << 32) + a[16]
+        self.xstart = a[18]
+        self.xend = a[19]
+        self.ystart = a[20]
+        self.yend = a[21]
+        self.specgridchannelselectval2 = a[22]
+        self.specgridnx = a[23]
+        self.specgridny = a[24]
+        self.specgriddx = a[25]
+        self.specgriddy = a[26]
+        self.specgridcenterx = a[27]
+        self.specgridcentery = a[28]
+
+        self.count3 = self.vertpoints * 3
+
+        self.specvz = b[256: 256 + self.count3]
+        self.specvz3 = self.specvz.reshape(self.vertpoints, 3)
+        self.data = b[256 + self.count3:]
+
+        try:
+            self.a, self.b = int(self.nx / self.specgriddx), int(self.ny / self.specgriddy)
+            self.specdata = self.data.reshape(self.a, self.b, len(self.specvz3),
+                                              int(len(self.data) / self.a / self.b / len(self.specvz3)))
+        except ValueError:
+            self.a, self.b = self.xend, self.yend
+            self.specdata = self.data.reshape(self.a, self.b, len(self.specvz3),
+                                              int(len(self.data) / self.a / self.b / len(self.specvz3)))
+
+        self.cube_array = self.specdata[:, :, :, 1].T
+
+        _, self.xpix, self.ypix = self.cube_array.shape
