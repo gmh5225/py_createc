@@ -3,6 +3,8 @@ Py-Createc
 
 Modules and example scripts to interface with the `Createc STM <https://www.createc.de/LT-STMAFM>`_.
 
+The onine documentation can be found at `here <https://py-createc.readthedocs.io>`_.
+
 Installation
 ------------
 
@@ -41,6 +43,19 @@ More elaborate examples
 The `examples folder <https://github.com/chenxu2394/py_createc/tree/main/examples>`_ contains useful scripts to communicate with the STM.
 These scripts show off the more advanced features of the Py-Createc package.
 
+Here is an STM helper applet from ``./examples/utility/stm_tool.py``
+
+.. figure:: ./doc/stmutil.png
+
+
+Below is an oscilloscope from ``./examples/osc/oscilloscope.py``, the channel can be configured inside the example code
+
+.. figure:: ./doc/osc.png
+
+
+And below is another helper applet from ``./examples/map/map.py``
+
+.. figure:: ./doc/map.png
 
 API Documentation
 -----------------
