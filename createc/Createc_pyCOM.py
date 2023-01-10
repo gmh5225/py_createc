@@ -40,7 +40,6 @@ class CreatecWin32:
         except com_error as error:
             return
 
-        self.savedatfilename = self.savedatfilename
         # self.xPiezoConst = float(self.getparam('XPiezoconst')) # different from py_File where it's 'Xpiezoconst'
         # self.yPiezoConst = float(self.getparam('YPiezoconst'))
         # self.zPiezoConst = float(self.getparam('ZPiezoconst'))
@@ -206,24 +205,6 @@ class CreatecWin32:
         Not in use.
         """
         pass
-
-    def setxyoffpixel(self, dx: int = 0, dy: int = 0):
-        """
-        Set xy offset by pixel
-
-        Parameters
-        ----------
-        dx : int
-            dx , dy in pixel
-        dy : int
-            dx , dy in pixel
-
-        Returns
-        -------
-        None : None
-
-        """
-        self.setxyoffpixel(dx, dy)
 
     def pre_scan_config(self, chmode: int = None, rotation: float = None, ddeltaX: int = None,
                         deltaX_dac: int = None, deltaY_dac: int = None, channels_code: int = None,
