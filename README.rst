@@ -36,6 +36,31 @@ For example, an image instance can be created by:
    import createc
    image_file = createc.DAT_IMG('path/to/filename.dat')
 
+File Structure
+--------------
+
+.. code-block::
+
+   .
+   +-- createc  # The main modules
+   |   +-- Createc_pyCOM  
+   |   |  +-- CreatecWin32  # The wrapper class that expands the scope of default Createc functions. The .ramp_bias_mV and .ramp_current_pA methods are in here
+   |   |
+   |   +-- Createc_pyFile  # The unified Createc file classes
+   |      +-- GENERIC_FILE  # The parent file class
+   |      |  +-- DAT_IMG(GENERIC_FILE)  # The child class for reading .dat files
+   |      |  +-- VERT_SPEC(GENERIC_FILE)  # The child class for reading .vert files
+   |      +-- GRID_SPEC  # A standalone class for .gridspec files
+   |
+   +-- examples
+   |   +-- map  # An applet to map out a bunch of images according to their locations/angles, useful for offline images-viewing
+   |   +-- osc  # An applet to show real time STM signals, the channels can be easily configured inside the script
+   |   +-- utility  # A helper applet for the STM operation, The .ramp_bias_mV and .ramp_current_pA methods are in here. (see screenshots below)
+   |
+   +-- tests
+   +-- doc
+   +-- LICENSE
+   +-- README
 
 More elaborate examples
 -----------------------
@@ -60,14 +85,12 @@ And below is another helper applet from ``./examples/map/map.py``
 API Documentation
 -----------------
 
-Finally, there is the comprehensive :ref:`API documentation`.
+Finally, there is the comprehensive `API documentation <https://py-createc.readthedocs.io/en/latest/api.html#api-documentation>`_
 
 
 Citation
 --------
 
-If you use Py-Createc in a research project, pleace cite the following paper:
-arXiv:2108.04333
 
 Author
 ------
