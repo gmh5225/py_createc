@@ -3,7 +3,7 @@ Py-Createc
 
 Modules and example scripts to interface with the `Createc STM <https://www.createc.de/LT-STMAFM>`_.
 
-The online documentation can be found at `here <https://py-createc.readthedocs.io>`_.
+The online documentation can be found `here <https://py-createc.readthedocs.io>`_.
 
 Installation
 ------------
