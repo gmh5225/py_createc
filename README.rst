@@ -62,34 +62,34 @@ File Structure
    +-- LICENSE
    +-- README
 
-More elaborate examples
+More Elaborate Examples
 -----------------------
 
 The `examples folder <https://github.com/chenxu2394/py_createc/tree/main/examples>`_ contains useful scripts to communicate with the STM.
-These scripts show off the more advanced features of the Py-Createc package.
+These scripts show off the more advanced applications of the Py-Createc package.
 
-Here is an STM helper applet from ``./examples/utility/stm_tool.py``
-
-.. figure:: ./doc/stmutil.png
-
-
-Below is an oscilloscope from ``./examples/osc/oscilloscope.py``, the channel can be configured inside the example code
+1. Here is an oscilloscope from ``./examples/osc/oscilloscope.py``, which shows the temperatures of the STM. The value and its timestamp can be shown upon hovering the cursor over the curves. Other signals can also be displayed with some configuration.
 
 .. figure:: ./doc/osc.png
+   :align: center
+   :width: 80%
 
-
-And below is another helper applet from ``./examples/map/map.py``
+2. And below is a helper applet from ``./examples/map/map.py``, which can help to piece together images scanned at different locations. It can also communicate with the STM upon clicking 'Connect to STM', where the applet can synchronize its tip position with the STM.
 
 .. figure:: ./doc/map.png
+   :align: center
+   :width: 80%
+
+3. And this is a helper applet from ``./examples/utility/stm_tool.py``. Here the user only needs a single click to change STM parameters.
+
+.. figure:: ./doc/stmutil.png
+   :align: center
+   :width: 20%
 
 API Documentation
 -----------------
 
-Finally, there is the comprehensive `API documentation <https://py-createc.readthedocs.io/en/latest/api.html#api-documentation>`_
-
-
-Citation
---------
+Finally, there is the comprehensive `API documentation <https://py-createc.readthedocs.io/en/latest/api.html#api-documentation>`_.
 
 
 Author
