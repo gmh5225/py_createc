@@ -1,5 +1,8 @@
 Py-Createc
 ==========
+.. image:: https://readthedocs.org/projects/py-createc/badge/?version=latest
+    :target: https://py-createc.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 Modules and example scripts to interface with the `Createc STM <https://www.createc.de/LT-STMAFM>`_.
 
@@ -16,9 +19,10 @@ Installation of the package can be done through `PIP <https://pip.pypa.io>`_:
 Quickstart
 ----------
 
-:py:class:`createc.CreatecWin32` is a wrapper class to interface with the Createc software.
+``createc.CreatecWin32`` is a wrapper class to interface with the Createc software.
 It provides access to all remote operations that can be found at the `stm-wiki <http://archive.today/I7Aw0>`_.
-In addition, there are several custom methods available, such as :py:meth:`createc.CreatecWin32.ramp_bias_mV` and :py:meth:`createc.CreatecWin32.ramp_current_pA`, etc.
+In addition, there are several custom methods available, such as ``createc.CreatecWin32.ramp_bias_mV`` and ``createc.CreatecWin32.ramp_current_pA``, etc.
+
 
 Here is an example that plays the testing beep sound on the STM:
 
