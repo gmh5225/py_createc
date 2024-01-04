@@ -4,7 +4,9 @@ Py-Createc
     :target: https://py-createc.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-Modules and example scripts to interface with the `Createc STM <https://www.createc.de/LT-STMAFM>`_.
+This is a Python framework for the `CreaTec scanning probe microscope <https://www.createc.de/LT-STMAFM>`_.
+
+It contains modules and example scripts to interface with the microscope.
 
 The online documentation can be found `here <https://py-createc.readthedocs.io>`_.
 
