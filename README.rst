@@ -4,7 +4,7 @@ Py-Createc
     :target: https://py-createc.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-This is a Python framework for the `CreaTec scanning probe microscope <https://www.createc.de/LT-STMAFM>`_.
+This is a Python interface package for the `CreaTec scanning probe microscope <https://www.createc.de/LT-STMAFM>`_.
 
 It contains modules and example scripts to interface with the microscope.
 
