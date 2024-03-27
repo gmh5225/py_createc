@@ -19,13 +19,16 @@ Installation of the package can be done through `PIP <https://pip.pypa.io>`_:
 
 ``pip install createc``
 
+Or in the root directory, run
+``pip install -e .``
+
 
 Quickstart
 ----------
 
 **Interfacing with Createc STM**
 
-.. code-block:: python
+.. code-block::
 
    import createc
    stm = createc.CreatecWin32()
@@ -37,7 +40,7 @@ Quickstart
 Furthermore, several classes are available to to read ``.dat``, ``.vert`` files etc.
 For example, an image instance can be created by:
 
-.. code-block:: python
+.. code-block::
 
    import createc
    image_file = createc.DAT_IMG('path/to/filename.dat')
