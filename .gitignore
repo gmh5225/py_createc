@@ -152,3 +152,4 @@ tests/test_pyFile.ipynb
 /doc/createc.rst
 /doc/createc.utils.rst
 #/cmd_logger.py
+.DS_Store
