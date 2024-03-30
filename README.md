@@ -14,9 +14,7 @@ The online documentation can be found [here](https://py-createc.readthedocs.io).
 
 ## Installation
 
-Installation of the package can be done by ```pip install createc```
-
-Or in the root directory, run
+In the root directory, run
 ```pip install -e .```
 
 
@@ -67,17 +65,22 @@ image_file = createc.DAT_IMG('path/to/filename.dat')
 
 ## More Elaborate Examples
 
-The [examples folder](https://github.com/chenxu2394/py_createc/tree/main/examples) contains useful scripts to communicate with the STM.
-These scripts show off the more advanced applications of the Py-Createc package.
+The [examples folder](https://github.com/chenxu2394/py_createc/tree/main/examples) contains useful scripts to communicate with the STM. These scripts demonstrate the advanced applications of the Py-Createc package.
 
-#### 1. Here is an oscilloscope from `./examples/osc/oscilloscope.py`, which shows the temperatures of the STM. The value and its timestamp can be shown upon hovering the cursor over the curves. Other signals can also be displayed with some configuration.
+#### 1. Oscilloscope Example (`./examples/osc/oscilloscope.py`)
 
-![oscilloscope](./doc/osc.png)
+This script displays the temperatures of the STM in an oscilloscope format. Users can view the value and its timestamp by hovering the cursor over the curves. It's also configurable to display other signals.
 
-#### 2. And below is a helper applet from `./examples/map/map.py`, which can help to piece together images scanned at different locations. It can also communicate with the STM upon clicking 'Connect to STM', where the applet can synchronize its tip position with the STM.
+![oscilloscope](./doc/osc.gif)
+
+#### 2. Image Mapping Applet (`./examples/map/map.py`)
+
+This helper applet facilitates piecing together images scanned at different locations. Additionally, it enables communication with the STM through a 'Connect to STM' feature, synchronizing the applet's tip position with that of the STM.
 
 ![map](./doc/map.gif)
 
-#### 3. And finally below is a helper applet from `./examples/utility/stm_tool.py`. Here the user only needs a single click to change STM parameters.
+#### 3. STM Utility Tool (`./examples/utility/stm_tool.py`)
+
+With this utility, changing STM parameters is simplified to a single click, enhancing user convenience and efficiency.
 
 ![utility](./doc/stmutil.png)
