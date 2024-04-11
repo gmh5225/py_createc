@@ -25,7 +25,7 @@ In the root directory, run
 ```
 import createc
 stm = createc.CreatecWin32()
-stm.stmbeep()  # Playing the testing beep sound on the STM
+stm.stmbeep()  # Playing the testing beep sound on the STM constroller
 stm.ramp_bias_mV(1000)  # Ramping bias to 1V
 ```
 **Handling STM Data Files**
