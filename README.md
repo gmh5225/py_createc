@@ -2,7 +2,7 @@
 
 ![Documentation Status](https://readthedocs.org/projects/py-createc/badge/?version=latest)
 
-This is a Python interface package for the [CreaTec scanning probe microscope](https://www.createc.de/LT-STMAFM). This package serves two main purposes:
+This is a Python interface package for the [CreaTec scanning probe microscope (STM)](https://www.createc.de/LT-STMAFM). This package serves two main purposes:
 
 #### 1. **Python Interface for Createc STM**: 
 It includes a wrapper class (`createc.CreatecWin32`) that interfaces with the Createc STM software. This component offers enhanced access to all standard remote operations, with additional custom methods such as `ramp_bias_mV` and `ramp_current_pA`, extending the capabilities beyond the default functions.
